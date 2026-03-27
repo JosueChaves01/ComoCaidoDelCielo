@@ -7,6 +7,7 @@ from src.shared.llm import get_llm
 from src.shared.database import SessionLocal
 from src.terrazas import repository as terraza_repo
 from src.reservaciones import service as reservacion_service
+from src.reservaciones import repository as reservacion_repo
 from src.reservaciones.schemas import ReservacionCreate
 
 
@@ -56,8 +57,25 @@ def collect_info_node(state: ChatState) -> ChatState:
             {"id": t.id, "nombre": t.nombre, "capacidad": t.capacidad, "precio_hora": float(t.precio_hora)}
             for t in terrazas
         ]
+        proximas = reservacion_repo.get_proximas(db, days=14)
     finally:
         db.close()
+
+    # Build occupied slots map: {terraza_nombre: ["YYYY-MM-DD HH:MM–HH:MM", ...]}
+    nombre_by_id = {t["id"]: t["nombre"] for t in state["available_terrazas"]}
+    occupied: dict[str, list[str]] = {}
+    for r in proximas:
+        nombre = nombre_by_id.get(r.terraza_id, f"Terraza {r.terraza_id}")
+        occupied.setdefault(nombre, []).append(
+            f"{r.fecha} {str(r.hora_inicio)[:5]}–{str(r.hora_fin)[:5]}"
+        )
+
+    if occupied:
+        occupied_str = "\n".join(
+            f"  {name}: {', '.join(slots)}" for name, slots in occupied.items()
+        )
+    else:
+        occupied_str = "  (sin reservaciones en los próximos 14 días — todo disponible)"
 
     llm = get_llm()
     terrazas_desc = "\n".join(
@@ -69,14 +87,20 @@ def collect_info_node(state: ChatState) -> ChatState:
 
     system = SystemMessage(content=(
         f"Eres el asistente de reservaciones de 'Como Caído del Cielo'.\n"
+        f"Hoy es {date.today().isoformat()}.\n\n"
         f"Terrazas disponibles:\n{terrazas_desc}\n\n"
+        f"Horarios ya reservados (próximos 14 días):\n{occupied_str}\n\n"
         f"Datos recolectados hasta ahora: {current_info}\n\n"
-        "Extrae los datos de reservación del usuario y responde con JSON:\n"
+        "INSTRUCCIONES:\n"
+        "- Si el usuario pregunta por disponibilidad sin fecha/hora concreta, sugiere 2-3 opciones "
+        "reales basándote en los horarios ya reservados. Usa fechas específicas (no 'la semana que viene').\n"
+        "- Si el usuario menciona cuántas personas son, filtra terrazas con capacidad suficiente.\n"
+        "- Extrae todos los datos que puedas de la conversación y responde con JSON:\n"
         '{"nombre_cliente": "", "email_cliente": "", "terraza_id": 0, '
         '"fecha": "YYYY-MM-DD", "hora_inicio": "HH:MM", "hora_fin": "HH:MM", '
         '"num_personas": 0, "notas": "", "completo": true|false, "respuesta": ""}\n'
-        "Si faltan datos, pon completo=false y pregunta por ellos en 'respuesta'.\n"
-        "Si ya tienes todo, pon completo=true."
+        "- completo=true solo cuando tienes: nombre, terraza_id, fecha, hora_inicio, hora_fin y num_personas.\n"
+        "- Responde siempre en español, de forma amigable y concisa."
     ))
     response = llm.invoke([system, HumanMessage(content=conversation)])
 

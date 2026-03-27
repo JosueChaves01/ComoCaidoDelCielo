@@ -123,6 +123,21 @@ def ingresos_estimados(db: Session) -> Decimal:
     return total
 
 
+def get_proximas(db: Session, days: int = 14) -> list[Reservacion]:
+    hoy = datetime.now(timezone.utc).date()
+    limite = hoy + timedelta(days=days)
+    return (
+        db.query(Reservacion)
+        .filter(
+            Reservacion.fecha >= hoy,
+            Reservacion.fecha <= limite,
+            Reservacion.estado.notin_(["cancelada"]),
+        )
+        .order_by(Reservacion.fecha, Reservacion.hora_inicio)
+        .all()
+    )
+
+
 def get_pendientes_recordatorio(db: Session) -> list[Reservacion]:
     manana = (datetime.now(timezone.utc) + timedelta(days=1)).date()
     return (
