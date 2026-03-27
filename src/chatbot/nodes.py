@@ -85,22 +85,31 @@ def collect_info_node(state: ChatState) -> ChatState:
     current_info = json.dumps(state.get("reservation_info", {}), default=str, ensure_ascii=False)
     conversation = "\n".join(f"{m['role']}: {m['content']}" for m in state["messages"][-6:])
 
+    today_str = date.today().isoformat()
+    today_weekday = date.today().strftime("%A")
     system = SystemMessage(content=(
         f"Eres el asistente de reservaciones de 'Como Caído del Cielo'.\n"
-        f"Hoy es {date.today().isoformat()}.\n\n"
-        f"Terrazas disponibles:\n{terrazas_desc}\n\n"
-        f"Horarios ya reservados (próximos 14 días):\n{occupied_str}\n\n"
-        f"Datos recolectados hasta ahora: {current_info}\n\n"
-        "INSTRUCCIONES:\n"
-        "- Si el usuario pregunta por disponibilidad sin fecha/hora concreta, sugiere 2-3 opciones "
-        "reales basándote en los horarios ya reservados. Usa fechas específicas (no 'la semana que viene').\n"
-        "- Si el usuario menciona cuántas personas son, filtra terrazas con capacidad suficiente.\n"
-        "- Extrae todos los datos que puedas de la conversación y responde con JSON:\n"
-        '{"nombre_cliente": "", "email_cliente": "", "terraza_id": 0, '
-        '"fecha": "YYYY-MM-DD", "hora_inicio": "HH:MM", "hora_fin": "HH:MM", '
-        '"num_personas": 0, "notas": "", "completo": true|false, "respuesta": ""}\n'
-        "- completo=true solo cuando tienes: nombre, terraza_id, fecha, hora_inicio, hora_fin y num_personas.\n"
-        "- Responde siempre en español, de forma amigable y concisa."
+        f"Hoy es {today_str} ({today_weekday}).\n\n"
+        f"TERRAZAS:\n{terrazas_desc}\n\n"
+        f"SLOTS OCUPADOS (próximos 14 días):\n{occupied_str}\n\n"
+        f"DATOS YA CONFIRMADOS: {current_info}\n\n"
+        "=== COMPORTAMIENTO (sigue el caso que aplique) ===\n\n"
+        "CASO A — El cliente NO tiene fecha ni hora definida todavía:\n"
+        "  - Sugiere exactamente 2 opciones con fecha ISO y horario concreto.\n"
+        "  - Ejemplo de respuesta: 'Tenemos disponibilidad el 2026-04-01 (martes) "
+        "de 18:00 a 22:00 en Terraza Jardín, o el 2026-04-03 (jueves) a partir de las 19:00. "
+        "¿Cuál te funciona?'\n"
+        "  - Filtra por capacidad si el cliente mencionó número de personas.\n"
+        "  - NO pidas nombre, email ni todos los campos de una sola vez.\n\n"
+        "CASO B — El cliente ya eligió fecha y terraza pero faltan nombre o email:\n"
+        "  - Pide únicamente los datos que faltan.\n\n"
+        "CASO C — Tienes nombre_cliente, terraza_id, fecha, hora_inicio, hora_fin y num_personas:\n"
+        "  - Pon completo=true y confirma el resumen al cliente.\n\n"
+        "Responde ÚNICAMENTE con este JSON (sin texto adicional antes ni después):\n"
+        '{"nombre_cliente":"","email_cliente":"","terraza_id":0,"fecha":"YYYY-MM-DD",'
+        '"hora_inicio":"HH:MM","hora_fin":"HH:MM","num_personas":0,"notas":"",'
+        '"completo":false,"respuesta":""}\n'
+        "El campo 'respuesta' es el mensaje en español que verá el cliente."
     ))
     response = llm.invoke([system, HumanMessage(content=conversation)])
 

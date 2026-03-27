@@ -6,7 +6,7 @@ import TerrazasGrid from '@/components/landing/TerrazasGrid'
 import FeaturesSection from '@/components/landing/FeaturesSection'
 import CTASection from '@/components/landing/CTASection'
 
-export const revalidate = 60
+export const revalidate = 0
 
 export default async function HomePage() {
   let terrazas: Awaited<ReturnType<typeof getTerrazas>> = []
