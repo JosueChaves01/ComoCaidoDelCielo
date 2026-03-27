@@ -52,3 +52,16 @@ class AvailabilityResponse(BaseModel):
     disponible: bool
     mensaje: str
     conflictos: list[str] = []
+
+
+class OcupacionTerraza(BaseModel):
+    terraza_id: int
+    nombre: str
+    total_reservaciones: int
+
+
+class DashboardStats(BaseModel):
+    reservaciones_hoy: int
+    reservaciones_semana: int
+    ingresos_estimados_semana: float
+    ocupacion_por_terraza: list[OcupacionTerraza]

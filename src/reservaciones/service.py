@@ -5,6 +5,8 @@ from src.reservaciones.schemas import (
     ReservacionCreate,
     ReservacionResponse,
     AvailabilityResponse,
+    DashboardStats,
+    OcupacionTerraza,
 )
 from src.terrazas import repository as terraza_repo
 
@@ -71,3 +73,13 @@ def cancel(db: Session, codigo: str) -> ReservacionResponse:
 def list_all(db: Session) -> list[ReservacionResponse]:
     reservaciones = repository.list_all(db)
     return [ReservacionResponse.model_validate(r) for r in reservaciones]
+
+
+def get_dashboard_stats(db: Session) -> DashboardStats:
+    ocupacion = [OcupacionTerraza(**row) for row in repository.ocupacion_por_terraza(db)]
+    return DashboardStats(
+        reservaciones_hoy=repository.stats_hoy(db),
+        reservaciones_semana=repository.stats_semana(db),
+        ingresos_estimados_semana=float(repository.ingresos_estimados(db)),
+        ocupacion_por_terraza=ocupacion,
+    )

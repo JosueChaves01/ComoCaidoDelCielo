@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     secret_key: str = "dev-secret-key"
     environment: str = "development"
     allowed_origins: str = "http://localhost:3000"
+    admin_username: str = "admin"
+    admin_password: str = ""
+    jwt_algorithm: str = "HS256"
+    jwt_expire_minutes: int = 480
 
     @property
     def allowed_origins_list(self) -> list[str]:

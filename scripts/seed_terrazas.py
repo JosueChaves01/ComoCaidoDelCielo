@@ -46,7 +46,7 @@ def seed():
             terraza = Terraza(**data)
             db.add(terraza)
         db.commit()
-        print(f"✓ {len(TERRAZAS)} terrazas insertadas exitosamente.")
+        print(f"OK: {len(TERRAZAS)} terrazas insertadas exitosamente.")
     except Exception as e:
         db.rollback()
         print(f"Error al insertar terrazas: {e}")

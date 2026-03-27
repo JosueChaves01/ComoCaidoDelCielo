@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.shared.config import get_settings
 from src.shared.database import Base, engine
-from src.api.routes import chat, reservaciones, disponibilidad
+from src.api.routes import chat, reservaciones, disponibilidad, auth, terrazas, admin_stats
 
 # Import models so SQLAlchemy registers them before create_all
 import src.terrazas.models  # noqa: F401
@@ -34,9 +34,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(chat.router, tags=["chat"])
 app.include_router(reservaciones.router)
 app.include_router(disponibilidad.router)
+app.include_router(terrazas.router)
+app.include_router(admin_stats.router)
 
 
 @app.get("/health")
