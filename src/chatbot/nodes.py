@@ -136,17 +136,26 @@ def collect_info_node(state: ChatState) -> ChatState:
             '{"terraza_id":0,"fecha":"","hora_inicio":"","hora_fin":"","num_personas":0}'
         ))
         extract_resp = llm.invoke([extract_system, HumanMessage(content=conversation)])
+        import re as _re
+        _DATE_RE = _re.compile(r"^\d{4}-\d{2}-\d{2}$")
+        _TIME_RE = _re.compile(r"^\d{2}:\d{2}$")
         try:
             extracted = json.loads(extract_resp.content)
-            for field in ["terraza_id", "fecha", "hora_inicio", "hora_fin", "num_personas"]:
-                val = extracted.get(field)
-                if val:
-                    info[field] = val  # type: ignore[literal-required]
+            if _DATE_RE.match(str(extracted.get("fecha", ""))):
+                info["fecha"] = extracted["fecha"]  # type: ignore[literal-required]
+            if _TIME_RE.match(str(extracted.get("hora_inicio", ""))):
+                info["hora_inicio"] = extracted["hora_inicio"]  # type: ignore[literal-required]
+            if _TIME_RE.match(str(extracted.get("hora_fin", ""))):
+                info["hora_fin"] = extracted["hora_fin"]  # type: ignore[literal-required]
+            if extracted.get("terraza_id"):
+                info["terraza_id"] = extracted["terraza_id"]  # type: ignore[literal-required]
+            if extracted.get("num_personas"):
+                info["num_personas"] = extracted["num_personas"]  # type: ignore[literal-required]
         except (json.JSONDecodeError, AttributeError):
             pass
 
-        # If the user's message provided a date, the next iteration handles CASO B
-        if info.get("fecha") and info.get("hora_inicio"):
+        # If the user's message provided a real date+time, skip slot suggestion
+        if _DATE_RE.match(str(info.get("fecha", ""))) and _TIME_RE.match(str(info.get("hora_inicio", ""))):
             has_date, has_time = True, True
         else:
             # Build friendly slot suggestion from Python data
