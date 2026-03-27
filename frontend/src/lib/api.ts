@@ -1,4 +1,4 @@
-import type { ChatResponse, Terraza, Reservacion, DashboardStats, TokenResponse } from './types'
+import type { ChatResponse, Terraza, Reservacion, DashboardStats, TokenResponse, AvailabilityResponse } from './types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 
@@ -71,4 +71,19 @@ export async function updateTerraza(id: number, data: object, token: string): Pr
     body: JSON.stringify(data),
     headers: { Authorization: `Bearer ${token}` },
   })
+}
+
+export async function checkDisponibilidad(
+  terrazaId: number,
+  fecha: string,
+  horaInicio: string,
+  horaFin: string,
+): Promise<AvailabilityResponse> {
+  const params = new URLSearchParams({
+    terraza_id: String(terrazaId),
+    fecha,
+    hora_inicio: horaInicio,
+    hora_fin: horaFin,
+  })
+  return request<AvailabilityResponse>(`/disponibilidad?${params}`)
 }

@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, String, Date, Time, Text, TIMESTAMP, ForeignKey, CheckConstraint
+    Column, Integer, String, Date, Time, Text, TIMESTAMP, Boolean, ForeignKey, CheckConstraint
 )
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -26,6 +26,7 @@ class Reservacion(Base):
     num_personas = Column(Integer, nullable=False)
     estado = Column(String(20), nullable=False, default="confirmada")
     notas = Column(Text, nullable=True)
+    recordatorio_enviado = Column(Boolean, nullable=False, server_default="false", default=False)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
 
     terraza = relationship("Terraza", backref="reservaciones")

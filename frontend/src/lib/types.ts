@@ -52,3 +52,9 @@ export interface TokenResponse {
   access_token: string
   token_type: string
 }
+
+export interface AvailabilityResponse {
+  disponible: boolean
+  mensaje: string
+  conflictos: string[]
+}

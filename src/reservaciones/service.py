@@ -60,7 +60,22 @@ def create(db: Session, data: ReservacionCreate) -> ReservacionResponse:
 
     codigo = _generate_codigo(db)
     reservacion = repository.create(db, data, codigo)
-    return ReservacionResponse.model_validate(reservacion)
+    response = ReservacionResponse.model_validate(reservacion)
+
+    if reservacion.email_cliente:
+        from src.notifications.email import send_confirmacion
+        send_confirmacion(
+            codigo=reservacion.codigo,
+            nombre=reservacion.nombre_cliente,
+            email=reservacion.email_cliente,
+            terraza=reservacion.terraza.nombre,
+            fecha=str(reservacion.fecha),
+            hora_inicio=str(reservacion.hora_inicio)[:5],
+            hora_fin=str(reservacion.hora_fin)[:5],
+            personas=reservacion.num_personas,
+        )
+
+    return response
 
 
 def cancel(db: Session, codigo: str) -> ReservacionResponse:

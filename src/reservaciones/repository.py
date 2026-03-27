@@ -123,6 +123,27 @@ def ingresos_estimados(db: Session) -> Decimal:
     return total
 
 
+def get_pendientes_recordatorio(db: Session) -> list[Reservacion]:
+    manana = (datetime.now(timezone.utc) + timedelta(days=1)).date()
+    return (
+        db.query(Reservacion)
+        .filter(
+            Reservacion.fecha == manana,
+            Reservacion.estado == "confirmada",
+            Reservacion.email_cliente.isnot(None),
+            Reservacion.recordatorio_enviado.is_(False),
+        )
+        .all()
+    )
+
+
+def marcar_recordatorio_enviado(db: Session, reservacion_id: int) -> None:
+    db.query(Reservacion).filter(Reservacion.id == reservacion_id).update(
+        {"recordatorio_enviado": True}
+    )
+    db.commit()
+
+
 def ocupacion_por_terraza(db: Session) -> list[dict]:
     from src.terrazas.models import Terraza
 

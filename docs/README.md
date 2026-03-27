@@ -172,11 +172,10 @@ El archivo `railway.toml` ejecuta automáticamente `alembic upgrade head` antes 
 - [x] **Tabla de reservaciones** — `/admin/reservaciones` con filtro por estado, búsqueda y botón cancelar
 - [x] **CRUD de terrazas UI** — `/admin/terrazas` con modal crear/editar y toggle activa/inactiva
 
-### Fase 4 — Pulido y notificaciones
-- [ ] **Confirmación por email** — enviar código de reservación al confirmar (Resend o SendGrid)
-- [ ] **Recordatorio 24h antes** — Railway Cron que envía email al cliente
-- [ ] **Burbuja flotante** — widget de chat embebible (botón esquina inferior derecha)
-- [ ] **Vista de disponibilidad** — calendario visual por terraza antes de iniciar el chat
+### Fase 4 — Pulido y notificaciones ✅
+- [x] **Confirmación por email** — Resend SDK; se envía en `service.create()` si hay email; no bloquea la reservación si falla
+- [x] **Recordatorio 24h antes** — `POST /cron/recordatorios` protegido con `X-Cron-Secret`; llama Railway Cron diariamente
+- [x] **Vista de disponibilidad** — `/disponibilidad` con selector de terraza, fecha y horario; resultado visual con CTA al chat
 
 ### Fase 5 — Robustez y escala
 - [ ] **Memoria persistente de sesión** — reemplazar dict en memoria por Redis

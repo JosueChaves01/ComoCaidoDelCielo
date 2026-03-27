@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     admin_password: str = ""
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 480
+    resend_api_key: str = ""
+    resend_from_email: str = "reservaciones@comocaidodelcielo.com"
+    cron_secret: str = ""
 
     @property
     def allowed_origins_list(self) -> list[str]:
