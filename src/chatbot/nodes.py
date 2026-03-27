@@ -120,70 +120,46 @@ def collect_info_node(state: ChatState) -> ChatState:
     today_str = today.isoformat()
     today_weekday = today.strftime("%A")
 
-    # ── CASO A: no date/time confirmed yet ──────────────────────────────────
-    # Compute available slots in Python and present them directly — do not
-    # rely on the LLM to format a slot suggestion (free models ignore it).
-    # We still call the LLM to extract any date/time the user may have typed.
-    if not has_date or not has_time:
+    import re as _re
+    _DATE_RE = _re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
+    _TIME_RE_MSG = _re.compile(r"\b(\d{1,2}:\d{2})\b")
+
+    # Check last user message for an explicit ISO date — if found, skip CASO A
+    last_user_msg = next(
+        (m["content"] for m in reversed(state["messages"]) if m["role"] == "user"), ""
+    )
+    msg_has_date = bool(_DATE_RE.search(last_user_msg))
+
+    # ── CASO A: no date/time confirmed yet AND user didn't provide one ────────
+    if (not has_date or not has_time) and not msg_has_date:
         slots = _build_available_slots(
             state["available_terrazas"], occupied, num_personas, today
         )
-        # Try to extract fields from the user message via LLM (light JSON prompt)
-        extract_system = SystemMessage(content=(
-            f"Extrae del mensaje del cliente los datos de reservación. "
-            f"Hoy es {today_str}. Terrazas disponibles:\n{terrazas_desc}\n\n"
-            "Responde SOLO con JSON (sin texto extra):\n"
-            '{"terraza_id":0,"fecha":"","hora_inicio":"","hora_fin":"","num_personas":0}'
-        ))
-        extract_resp = llm.invoke([extract_system, HumanMessage(content=conversation)])
-        import re as _re
-        _DATE_RE = _re.compile(r"^\d{4}-\d{2}-\d{2}$")
-        _TIME_RE = _re.compile(r"^\d{2}:\d{2}$")
-        try:
-            extracted = json.loads(extract_resp.content)
-            if _DATE_RE.match(str(extracted.get("fecha", ""))):
-                info["fecha"] = extracted["fecha"]  # type: ignore[literal-required]
-            if _TIME_RE.match(str(extracted.get("hora_inicio", ""))):
-                info["hora_inicio"] = extracted["hora_inicio"]  # type: ignore[literal-required]
-            if _TIME_RE.match(str(extracted.get("hora_fin", ""))):
-                info["hora_fin"] = extracted["hora_fin"]  # type: ignore[literal-required]
-            if extracted.get("terraza_id"):
-                info["terraza_id"] = extracted["terraza_id"]  # type: ignore[literal-required]
-            if extracted.get("num_personas"):
-                info["num_personas"] = extracted["num_personas"]  # type: ignore[literal-required]
-        except (json.JSONDecodeError, AttributeError):
-            pass
-
-        # If the user's message provided a real date+time, skip slot suggestion
-        if _DATE_RE.match(str(info.get("fecha", ""))) and _TIME_RE.match(str(info.get("hora_inicio", ""))):
-            has_date, has_time = True, True
-        else:
-            # Build friendly slot suggestion from Python data
-            if slots:
-                weekdays_es = {
-                    "Monday": "lunes", "Tuesday": "martes", "Wednesday": "miércoles",
-                    "Thursday": "jueves", "Friday": "viernes",
-                    "Saturday": "sábado", "Sunday": "domingo",
-                }
-                from datetime import datetime as dt
-                lines = []
-                for i, s in enumerate(slots[:2]):
-                    d = dt.fromisoformat(s["fecha"])
-                    dia = weekdays_es.get(d.strftime("%A"), d.strftime("%A"))
-                    lines.append(
-                        f"• {s['terraza_nombre']} — {dia} {s['fecha']} de {s['hora_inicio']} a {s['hora_fin']}"
-                    )
-                reply = (
-                    "¡Con gusto! Tenemos estas opciones disponibles:\n"
-                    + "\n".join(lines)
-                    + "\n¿Cuál de las dos te funciona mejor?"
+        if slots:
+            weekdays_es = {
+                "Monday": "lunes", "Tuesday": "martes", "Wednesday": "miércoles",
+                "Thursday": "jueves", "Friday": "viernes",
+                "Saturday": "sábado", "Sunday": "domingo",
+            }
+            from datetime import datetime as dt
+            lines = []
+            for i, s in enumerate(slots[:2]):
+                d = dt.fromisoformat(s["fecha"])
+                dia = weekdays_es.get(d.strftime("%A"), d.strftime("%A"))
+                lines.append(
+                    f"• {s['terraza_nombre']} — {dia} {s['fecha']} de {s['hora_inicio']} a {s['hora_fin']}"
                 )
-            else:
-                reply = "Tenemos disponibilidad esta semana. ¿Qué fecha y horario te vienen mejor?"
-            state = _append_assistant(state, reply)
-            state["reservation_info"] = info
-            state["current_state"] = "COLLECTING_INFO"
-            return state
+            reply = (
+                "¡Con gusto! Tenemos estas opciones disponibles:\n"
+                + "\n".join(lines)
+                + "\n¿Cuál de las dos te funciona mejor?"
+            )
+        else:
+            reply = "Tenemos disponibilidad esta semana. ¿Qué fecha y horario te vienen mejor?"
+        state = _append_assistant(state, reply)
+        state["reservation_info"] = info
+        state["current_state"] = "COLLECTING_INFO"
+        return state
 
     # ── CASO B / C: date confirmed → collect remaining fields via JSON ────────
     system = SystemMessage(content=(
