@@ -177,12 +177,12 @@ El archivo `railway.toml` ejecuta automáticamente `alembic upgrade head` antes 
 - [x] **Recordatorio 24h antes** — `POST /cron/recordatorios` protegido con `X-Cron-Secret`; llama Railway Cron diariamente
 - [x] **Vista de disponibilidad** — `/disponibilidad` con selector de terraza, fecha y horario; resultado visual con CTA al chat
 
-### Fase 5 — Robustez y escala
-- [ ] **Memoria persistente de sesión** — reemplazar dict en memoria por Redis
-- [ ] **Rate limiting** — limitar peticiones por IP en `/chat`
-- [ ] **Webhook de pago** — depósito al confirmar via Stripe o MercadoPago
-- [ ] **Monitoreo** — Sentry para errores + métricas de LLM (latencia, tasa de conversión)
-- [ ] **Tests E2E** — flujo completo con LLM mockeado
+### Fase 5 — Robustez y escala ✅
+- [x] **Memoria persistente de sesión** — Redis con fallback in-memory; serialización JSON; TTL 24h
+- [x] **Rate limiting** — slowapi 20/min por IP en `POST /chat`
+- [x] **Webhook de pago** — `POST /pagos/checkout` + `POST /pagos/webhook` (Stripe); activa reservación al recibir `checkout.session.completed`
+- [x] **Monitoreo** — Sentry inicializado en `main.py` con `FastApiIntegration`; activo solo si `SENTRY_DSN` está configurado
+- [x] **Tests E2E** — 3 tests con LLM mockeado: booking completo, conflicto de horario y cancelación (41 tests totales)
 
 ---
 

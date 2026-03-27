@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     resend_from_email: str = "reservaciones@comocaidodelcielo.com"
     cron_secret: str = ""
+    redis_url: str = ""
+    sentry_dsn: str = ""
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    frontend_url: str = "http://localhost:3000"
 
     @property
     def allowed_origins_list(self) -> list[str]:
