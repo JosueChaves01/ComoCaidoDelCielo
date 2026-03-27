@@ -1,7 +1,12 @@
 import os
+import sys
+from pathlib import Path
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
+
+# Add project root to sys.path so `src` package is importable
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 # Import models to register them with Base
 from src.shared.database import Base
