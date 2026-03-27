@@ -4,6 +4,7 @@ Chatbot de reservaciones para una empresa de alquiler de terrazas. El agente con
 
 **API en producción:** `https://superb-bravery-production.up.railway.app`
 **Documentación interactiva:** `https://superb-bravery-production.up.railway.app/docs`
+**Frontend en producción:** _(pendiente — conectar repo en vercel.com/new)_
 
 ---
 
@@ -16,7 +17,10 @@ Chatbot de reservaciones para una empresa de alquiler de terrazas. El agente con
 | LLM | OpenRouter (`stepfun/step-3.5-flash:free`) |
 | Base de datos | PostgreSQL (Railway) |
 | ORM + migraciones | SQLAlchemy 2 + Alembic |
-| Deploy | Railway (web + DB en un solo proveedor) |
+| Auth | JWT (python-jose) |
+| Frontend | Next.js 14 + Tailwind CSS |
+| Deploy backend | Railway (web + DB) |
+| Deploy frontend | Vercel |
 
 ---
 
@@ -64,14 +68,20 @@ GREETING → COLLECTING_INFO → CHECKING_AVAILABILITY → CONFIRMING → BOOKIN
 
 ## Endpoints
 
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| `POST` | `/chat` | Enviar mensaje al chatbot |
-| `GET` | `/reservaciones` | Listar todas las reservaciones |
-| `DELETE` | `/reservaciones/{codigo}` | Cancelar una reservación |
-| `GET` | `/disponibilidad` | Verificar disponibilidad de horario |
-| `GET` | `/health` | Estado del servicio |
-| `GET` | `/docs` | Swagger UI |
+| Método | Ruta | Auth | Descripción |
+|--------|------|------|-------------|
+| `POST` | `/chat` | — | Enviar mensaje al chatbot |
+| `GET` | `/reservaciones` | — | Listar todas las reservaciones |
+| `DELETE` | `/reservaciones/{codigo}` | — | Cancelar una reservación |
+| `GET` | `/disponibilidad` | — | Verificar disponibilidad de horario |
+| `GET` | `/terrazas` | — | Listar terrazas activas (vista pública) |
+| `POST` | `/auth/login` | — | Obtener JWT de administrador |
+| `GET` | `/terrazas/admin` | JWT | Listar todas las terrazas (admin) |
+| `POST` | `/terrazas` | JWT | Crear nueva terraza |
+| `PUT` | `/terrazas/{id}` | JWT | Editar terraza |
+| `GET` | `/admin/stats` | JWT | Stats del día/semana + ingresos |
+| `GET` | `/health` | — | Estado del servicio |
+| `GET` | `/docs` | — | Swagger UI |
 
 ---
 
@@ -97,7 +107,7 @@ open http://localhost:8000/docs
 ## Tests
 
 ```bash
-pytest tests/          # 23 tests, SQLite en memoria, sin servicios externos
+pytest tests/          # 38 tests, SQLite en memoria, sin servicios externos
 ```
 
 ---
@@ -142,31 +152,38 @@ El archivo `railway.toml` ejecuta automáticamente `alembic upgrade head` antes 
 
 ## Roadmap
 
-### Frontend web (prioridad alta)
-- [ ] **Widget de chat embebible** — componente React/Vue que se integra en cualquier sitio web con una sola línea de código (`<script src="...">`)
-- [ ] **Página de reservaciones standalone** — interfaz completa con el chatbot, calendario visual de disponibilidad y confirmación animada
-- [ ] **Burbuja flotante** — botón de chat en esquina inferior derecha, estilo Intercom/Zendesk, con contador de mensajes no leídos
-- [ ] **Vista de disponibilidad tipo calendario** — grid mensual que muestra horarios libres/ocupados por terraza antes de iniciar conversación
+### Fase 1 — Backend completo ✅
+- [x] **FastAPI + LangGraph** — API REST con flujo FSM (GREETING → BOOKING → COMPLETED)
+- [x] **PostgreSQL en Railway** — reservaciones persistentes con detección de conflictos de horario
+- [x] **JWT auth + admin endpoints** — `POST /auth/login`, rutas protegidas con Bearer token
+- [x] **CRUD de terrazas** — `GET/POST/PUT /terrazas`, incluyendo vista pública y admin
+- [x] **Dashboard stats** — `GET /admin/stats` con reservaciones del día, semana e ingresos estimados
+- [x] **38 tests** — SQLite en memoria, sin servicios externos
 
-### Experiencia conversacional
-- [ ] **Memoria persistente de sesión** — reemplazar el dict en memoria por Redis para que las conversaciones sobrevivan reinicios del servidor
-- [ ] **Reconocimiento de fechas en lenguaje natural** — interpretar "este sábado", "el próximo viernes a las 3" sin requerir formato ISO
-- [ ] **Flujo de modificación de reservación** — permitir cambiar fecha/hora de una reservación existente (actualmente solo se puede cancelar)
-- [ ] **Confirmación por email** — enviar correo con código de reservación y detalles al confirmar (usando Resend o SendGrid)
-- [ ] **Recordatorio 24h antes** — tarea programada (Railway Cron) que envía recordatorio al email del cliente
+### Fase 2 — Frontend público ✅
+- [x] **Landing page** — hero, grid de terrazas desde API real, sección de features, CTA
+- [x] **Chatbot web** — `/chat` con burbujas, typing indicator, auto-scroll, sesión UUID
+- [x] **Design system** — Tailwind con paleta personalizada (verde primario, dorado, crema)
+- [x] **Deploy en Vercel** — `frontend/` como root, variable `NEXT_PUBLIC_API_URL` configurada
 
-### Administración
-- [ ] **Panel de administración** — dashboard web para el dueño del negocio: ver todas las reservaciones, bloquear horarios, gestionar terrazas
-- [ ] **Autenticación de admin** — JWT para proteger endpoints de gestión (`POST /terrazas`, `PUT /reservaciones/{id}`, etc.)
-- [ ] **API para gestionar terrazas** — endpoints para crear, editar y desactivar terrazas sin tocar la base de datos directamente
-- [ ] **Reportes de ocupación** — gráficas de reservaciones por terraza, hora pico, ingresos estimados por período
+### Fase 3 — Panel de administración (siguiente)
+- [ ] **Login page** — `/admin/login` con form → `POST /auth/login` → guarda JWT en cookie
+- [ ] **Dashboard** — `/admin` con las stats del día (reservaciones, ingresos, ocupación)
+- [ ] **Tabla de reservaciones** — `/admin/reservaciones` con filtros por fecha/terraza y botón cancelar
+- [ ] **CRUD de terrazas UI** — `/admin/terrazas` para crear, editar y desactivar terrazas
 
-### Robustez y escala
-- [ ] **Rate limiting** — limitar peticiones por IP en `/chat` para evitar abuso del LLM
-- [ ] **Webhook de pago** — integrar Stripe o MercadoPago para cobrar un depósito al confirmar la reservación
-- [ ] **Multi-idioma** — detectar idioma del usuario y responder en español o inglés automáticamente
-- [ ] **Monitoreo** — integrar Sentry para errores y un dashboard de métricas (tiempo de respuesta del LLM, tasa de reservaciones completadas)
-- [ ] **Tests E2E** — flujo completo con LLM mockeado: desde saludo hasta reservación en base de datos
+### Fase 4 — Pulido y notificaciones
+- [ ] **Confirmación por email** — enviar código de reservación al confirmar (Resend o SendGrid)
+- [ ] **Recordatorio 24h antes** — Railway Cron que envía email al cliente
+- [ ] **Burbuja flotante** — widget de chat embebible (botón esquina inferior derecha)
+- [ ] **Vista de disponibilidad** — calendario visual por terraza antes de iniciar el chat
+
+### Fase 5 — Robustez y escala
+- [ ] **Memoria persistente de sesión** — reemplazar dict en memoria por Redis
+- [ ] **Rate limiting** — limitar peticiones por IP en `/chat`
+- [ ] **Webhook de pago** — depósito al confirmar via Stripe o MercadoPago
+- [ ] **Monitoreo** — Sentry para errores + métricas de LLM (latencia, tasa de conversión)
+- [ ] **Tests E2E** — flujo completo con LLM mockeado
 
 ---
 
