@@ -49,6 +49,40 @@ def greeting_node(state: ChatState) -> ChatState:
     return state
 
 
+def _build_available_slots(
+    terrazas: list[dict],
+    occupied: dict[str, list[str]],
+    num_personas: int,
+    today: date,
+) -> list[dict]:
+    """Return up to 4 available slot suggestions for the next 7 days."""
+    from datetime import timedelta
+
+    DEFAULT_SLOTS = [("18:00", "22:00"), ("13:00", "16:00"), ("19:00", "23:00"), ("12:00", "15:00")]
+    suggestions = []
+    for delta in range(1, 8):
+        candidate = (today + timedelta(days=delta)).isoformat()
+        for t in terrazas:
+            if num_personas and t["capacidad"] < num_personas:
+                continue
+            nombre = t["nombre"]
+            for hora_inicio, hora_fin in DEFAULT_SLOTS:
+                slot_str = f"{candidate} {hora_inicio}–{hora_fin}"
+                occupied_slots = occupied.get(nombre, [])
+                conflict = any(candidate in s for s in occupied_slots)
+                if not conflict:
+                    suggestions.append({
+                        "terraza_id": t["id"],
+                        "terraza_nombre": nombre,
+                        "fecha": candidate,
+                        "hora_inicio": hora_inicio,
+                        "hora_fin": hora_fin,
+                    })
+                if len(suggestions) >= 4:
+                    return suggestions
+    return suggestions
+
+
 def collect_info_node(state: ChatState) -> ChatState:
     db = _get_db()
     try:
@@ -70,42 +104,53 @@ def collect_info_node(state: ChatState) -> ChatState:
             f"{r.fecha} {str(r.hora_inicio)[:5]}–{str(r.hora_fin)[:5]}"
         )
 
-    if occupied:
-        occupied_str = "\n".join(
-            f"  {name}: {', '.join(slots)}" for name, slots in occupied.items()
-        )
-    else:
-        occupied_str = "  (sin reservaciones en los próximos 14 días — todo disponible)"
+    info: ReservationInfo = state.get("reservation_info", ReservationInfo())
+    has_date = bool(info.get("fecha"))
+    has_time = bool(info.get("hora_inicio"))
+    num_personas = int(info.get("num_personas") or 0)
 
     llm = get_llm()
     terrazas_desc = "\n".join(
         f"  - ID {t['id']}: {t['nombre']} (cap. {t['capacidad']} personas, ${t['precio_hora']}/hora)"
         for t in state["available_terrazas"]
     )
-    current_info = json.dumps(state.get("reservation_info", {}), default=str, ensure_ascii=False)
+    current_info = json.dumps(info, default=str, ensure_ascii=False)
     conversation = "\n".join(f"{m['role']}: {m['content']}" for m in state["messages"][-6:])
+    today = date.today()
+    today_str = today.isoformat()
+    today_weekday = today.strftime("%A")
 
-    today_str = date.today().isoformat()
-    today_weekday = date.today().strftime("%A")
+    # Build slot suggestions to inject into the prompt when no date is set
+    slots_desc = ""
+    if not has_date or not has_time:
+        slots = _build_available_slots(
+            state["available_terrazas"], occupied, num_personas, today
+        )
+        slots_desc = "\n".join(
+            f"  Opción {i+1}: {s['terraza_nombre']} el {s['fecha']} de {s['hora_inicio']} a {s['hora_fin']}"
+            for i, s in enumerate(slots[:2])
+        )
+
     system = SystemMessage(content=(
         f"Eres el asistente de reservaciones de 'Como Caído del Cielo'.\n"
         f"Hoy es {today_str} ({today_weekday}).\n\n"
         f"TERRAZAS:\n{terrazas_desc}\n\n"
-        f"SLOTS OCUPADOS (próximos 14 días):\n{occupied_str}\n\n"
         f"DATOS YA CONFIRMADOS: {current_info}\n\n"
-        "=== COMPORTAMIENTO (sigue el caso que aplique) ===\n\n"
-        "CASO A — El cliente NO tiene fecha ni hora definida todavía:\n"
-        "  - Sugiere exactamente 2 opciones con fecha ISO y horario concreto.\n"
-        "  - Ejemplo de respuesta: 'Tenemos disponibilidad el 2026-04-01 (martes) "
-        "de 18:00 a 22:00 en Terraza Jardín, o el 2026-04-03 (jueves) a partir de las 19:00. "
-        "¿Cuál te funciona?'\n"
-        "  - Filtra por capacidad si el cliente mencionó número de personas.\n"
-        "  - NO pidas nombre, email ni todos los campos de una sola vez.\n\n"
-        "CASO B — El cliente ya eligió fecha y terraza pero faltan nombre o email:\n"
-        "  - Pide únicamente los datos que faltan.\n\n"
-        "CASO C — Tienes nombre_cliente, terraza_id, fecha, hora_inicio, hora_fin y num_personas:\n"
-        "  - Pon completo=true y confirma el resumen al cliente.\n\n"
-        "Responde ÚNICAMENTE con este JSON (sin texto adicional antes ni después):\n"
+        + (
+            f"SLOTS DISPONIBLES SUGERIDOS:\n{slots_desc}\n\n"
+            "INSTRUCCIÓN PARA EL CAMPO 'respuesta':\n"
+            "  El cliente aún no eligió fecha ni hora. Presenta las 2 opciones de la lista "
+            "SLOTS DISPONIBLES SUGERIDOS y pregunta cuál prefiere.\n"
+            "  NO pidas nombre, email ni ningún otro dato todavía.\n"
+            "  Si el mensaje del cliente menciona una fecha u hora específica, extráela al JSON.\n\n"
+            if not has_date or not has_time else
+            "INSTRUCCIÓN PARA EL CAMPO 'respuesta':\n"
+            "  El cliente ya eligió fecha/hora. Pide SOLO el dato que falta "
+            "(nombre, terraza, o número de personas). Un campo a la vez.\n"
+            "  Si tienes nombre_cliente, terraza_id, fecha, hora_inicio, hora_fin y num_personas "
+            "pon completo=true y confirma el resumen.\n\n"
+        )
+        + "Responde ÚNICAMENTE con este JSON (sin texto adicional antes ni después):\n"
         '{"nombre_cliente":"","email_cliente":"","terraza_id":0,"fecha":"YYYY-MM-DD",'
         '"hora_inicio":"HH:MM","hora_fin":"HH:MM","num_personas":0,"notas":"",'
         '"completo":false,"respuesta":""}\n'
@@ -115,7 +160,6 @@ def collect_info_node(state: ChatState) -> ChatState:
 
     try:
         data = json.loads(response.content)
-        info: ReservationInfo = state.get("reservation_info", ReservationInfo())
         for field in ["nombre_cliente", "email_cliente", "terraza_id", "fecha",
                       "hora_inicio", "hora_fin", "num_personas", "notas"]:
             val = data.get(field)
@@ -129,7 +173,7 @@ def collect_info_node(state: ChatState) -> ChatState:
         else:
             state["current_state"] = "COLLECTING_INFO"
     except (json.JSONDecodeError, AttributeError):
-        state = _append_assistant(state, "Necesito algunos datos para continuar. ¿Cuál es tu nombre, la fecha y el horario deseado?")
+        state = _append_assistant(state, "¿Cuál es tu nombre para la reservación?")
         state["current_state"] = "COLLECTING_INFO"
 
     return state
