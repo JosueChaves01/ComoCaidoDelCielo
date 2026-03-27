@@ -166,11 +166,11 @@ El archivo `railway.toml` ejecuta automáticamente `alembic upgrade head` antes 
 - [x] **Design system** — Tailwind con paleta personalizada (verde primario, dorado, crema)
 - [x] **Deploy en Vercel** — `frontend/` como root, variable `NEXT_PUBLIC_API_URL` configurada
 
-### Fase 3 — Panel de administración (siguiente)
-- [ ] **Login page** — `/admin/login` con form → `POST /auth/login` → guarda JWT en cookie
-- [ ] **Dashboard** — `/admin` con las stats del día (reservaciones, ingresos, ocupación)
-- [ ] **Tabla de reservaciones** — `/admin/reservaciones` con filtros por fecha/terraza y botón cancelar
-- [ ] **CRUD de terrazas UI** — `/admin/terrazas` para crear, editar y desactivar terrazas
+### Fase 3 — Panel de administración ✅
+- [x] **Login page** — `/admin/login` con form → `POST /auth/login` → guarda JWT en localStorage
+- [x] **Dashboard** — `/admin` con 4 stats (hoy, semana, ingresos, terrazas activas) + tabla de ocupación
+- [x] **Tabla de reservaciones** — `/admin/reservaciones` con filtro por estado, búsqueda y botón cancelar
+- [x] **CRUD de terrazas UI** — `/admin/terrazas` con modal crear/editar y toggle activa/inactiva
 
 ### Fase 4 — Pulido y notificaciones
 - [ ] **Confirmación por email** — enviar código de reservación al confirmar (Resend o SendGrid)
