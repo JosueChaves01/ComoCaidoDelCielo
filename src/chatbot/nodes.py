@@ -120,37 +120,72 @@ def collect_info_node(state: ChatState) -> ChatState:
     today_str = today.isoformat()
     today_weekday = today.strftime("%A")
 
-    # Build slot suggestions to inject into the prompt when no date is set
-    slots_desc = ""
+    # ── CASO A: no date/time confirmed yet ──────────────────────────────────
+    # Compute available slots in Python and present them directly — do not
+    # rely on the LLM to format a slot suggestion (free models ignore it).
+    # We still call the LLM to extract any date/time the user may have typed.
     if not has_date or not has_time:
         slots = _build_available_slots(
             state["available_terrazas"], occupied, num_personas, today
         )
-        slots_desc = "\n".join(
-            f"  Opción {i+1}: {s['terraza_nombre']} el {s['fecha']} de {s['hora_inicio']} a {s['hora_fin']}"
-            for i, s in enumerate(slots[:2])
-        )
+        # Try to extract fields from the user message via LLM (light JSON prompt)
+        extract_system = SystemMessage(content=(
+            f"Extrae del mensaje del cliente los datos de reservación. "
+            f"Hoy es {today_str}. Terrazas disponibles:\n{terrazas_desc}\n\n"
+            "Responde SOLO con JSON (sin texto extra):\n"
+            '{"terraza_id":0,"fecha":"","hora_inicio":"","hora_fin":"","num_personas":0}'
+        ))
+        extract_resp = llm.invoke([extract_system, HumanMessage(content=conversation)])
+        try:
+            extracted = json.loads(extract_resp.content)
+            for field in ["terraza_id", "fecha", "hora_inicio", "hora_fin", "num_personas"]:
+                val = extracted.get(field)
+                if val:
+                    info[field] = val  # type: ignore[literal-required]
+        except (json.JSONDecodeError, AttributeError):
+            pass
 
+        # If the user's message provided a date, the next iteration handles CASO B
+        if info.get("fecha") and info.get("hora_inicio"):
+            has_date, has_time = True, True
+        else:
+            # Build friendly slot suggestion from Python data
+            if slots:
+                weekdays_es = {
+                    "Monday": "lunes", "Tuesday": "martes", "Wednesday": "miércoles",
+                    "Thursday": "jueves", "Friday": "viernes",
+                    "Saturday": "sábado", "Sunday": "domingo",
+                }
+                from datetime import datetime as dt
+                lines = []
+                for i, s in enumerate(slots[:2]):
+                    d = dt.fromisoformat(s["fecha"])
+                    dia = weekdays_es.get(d.strftime("%A"), d.strftime("%A"))
+                    lines.append(
+                        f"• {s['terraza_nombre']} — {dia} {s['fecha']} de {s['hora_inicio']} a {s['hora_fin']}"
+                    )
+                reply = (
+                    "¡Con gusto! Tenemos estas opciones disponibles:\n"
+                    + "\n".join(lines)
+                    + "\n¿Cuál de las dos te funciona mejor?"
+                )
+            else:
+                reply = "Tenemos disponibilidad esta semana. ¿Qué fecha y horario te vienen mejor?"
+            state = _append_assistant(state, reply)
+            state["reservation_info"] = info
+            state["current_state"] = "COLLECTING_INFO"
+            return state
+
+    # ── CASO B / C: date confirmed → collect remaining fields via JSON ────────
     system = SystemMessage(content=(
         f"Eres el asistente de reservaciones de 'Como Caído del Cielo'.\n"
         f"Hoy es {today_str} ({today_weekday}).\n\n"
         f"TERRAZAS:\n{terrazas_desc}\n\n"
         f"DATOS YA CONFIRMADOS: {current_info}\n\n"
-        + (
-            f"SLOTS DISPONIBLES SUGERIDOS:\n{slots_desc}\n\n"
-            "INSTRUCCIÓN PARA EL CAMPO 'respuesta':\n"
-            "  El cliente aún no eligió fecha ni hora. Presenta las 2 opciones de la lista "
-            "SLOTS DISPONIBLES SUGERIDOS y pregunta cuál prefiere.\n"
-            "  NO pidas nombre, email ni ningún otro dato todavía.\n"
-            "  Si el mensaje del cliente menciona una fecha u hora específica, extráela al JSON.\n\n"
-            if not has_date or not has_time else
-            "INSTRUCCIÓN PARA EL CAMPO 'respuesta':\n"
-            "  El cliente ya eligió fecha/hora. Pide SOLO el dato que falta "
-            "(nombre, terraza, o número de personas). Un campo a la vez.\n"
-            "  Si tienes nombre_cliente, terraza_id, fecha, hora_inicio, hora_fin y num_personas "
-            "pon completo=true y confirma el resumen.\n\n"
-        )
-        + "Responde ÚNICAMENTE con este JSON (sin texto adicional antes ni después):\n"
+        "Pide SOLO el dato que falta (nombre, terraza, hora o personas). Un campo a la vez.\n"
+        "Si tienes nombre_cliente, terraza_id, fecha, hora_inicio, hora_fin y num_personas: "
+        "pon completo=true y confirma el resumen.\n\n"
+        "Responde ÚNICAMENTE con este JSON (sin texto adicional antes ni después):\n"
         '{"nombre_cliente":"","email_cliente":"","terraza_id":0,"fecha":"YYYY-MM-DD",'
         '"hora_inicio":"HH:MM","hora_fin":"HH:MM","num_personas":0,"notas":"",'
         '"completo":false,"respuesta":""}\n'

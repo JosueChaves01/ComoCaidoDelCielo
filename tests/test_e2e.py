@@ -35,25 +35,35 @@ def test_full_booking_flow(client, sample_terraza):
     """
     tid = sample_terraza.id
 
-    # 6 LLM calls total: 2 per turn (greeting_node + collect_info_node)
+    # LLM calls per turn (graph always: greeting → collect_info → ...):
+    #   turn 1: greeting(1) + collect_info CASO-A extract(1) = 2
+    #           (no date extracted → Python slot suggestion, early return)
+    #   turn 2: greeting(1) + collect_info CASO-A extract(1) + CASO-B(1) = 3
+    #           (extract returns full data → CASO B → check_avail → confirm → END)
+    #   turn 3: greeting(1) + collect_info CASO-B(1) = 2
+    #           (all data in session → CASO B → check_avail → confirm → booking → END)
     llm_responses = [
-        # turn 1
+        # turn 1 — greeting
         _llm_resp(json.dumps({"intent": "nueva_reserva", "respuesta": "¡Hola! ¿Cómo te llamas?"})),
-        _llm_resp(json.dumps({
-            "nombre_cliente": "", "email_cliente": "", "terraza_id": 0,
-            "fecha": "", "hora_inicio": "", "hora_fin": "", "num_personas": 0,
-            "notas": "", "completo": False, "respuesta": "¿Cuáles son tus datos?",
-        })),
-        # turn 2
+        # turn 1 — collect_info CASO-A extract (empty → Python slot suggestion)
+        _llm_resp(json.dumps({"terraza_id": 0, "fecha": "", "hora_inicio": "", "hora_fin": "", "num_personas": 0})),
+        # turn 2 — greeting
         _llm_resp(json.dumps({"intent": "nueva_reserva", "respuesta": "Entendido."})),
+        # turn 2 — collect_info CASO-A extract (full data from user message)
+        _llm_resp(json.dumps({
+            "terraza_id": tid, "fecha": "2026-09-01",
+            "hora_inicio": "18:00", "hora_fin": "21:00", "num_personas": 8,
+        })),
+        # turn 2 — collect_info CASO-B (all data → completo=True, advances to check_avail)
         _llm_resp(json.dumps({
             "nombre_cliente": "Ana E2E", "email_cliente": "ana@e2e.com",
             "terraza_id": tid, "fecha": "2026-09-01",
             "hora_inicio": "18:00", "hora_fin": "21:00", "num_personas": 8,
             "notas": "", "completo": True, "respuesta": "¿Confirmamos tu reservación?",
         })),
-        # turn 3
+        # turn 3 — greeting
         _llm_resp(json.dumps({"intent": "nueva_reserva", "respuesta": "Ok."})),
+        # turn 3 — collect_info CASO-B (all data still in session → completo=True)
         _llm_resp(json.dumps({
             "nombre_cliente": "Ana E2E", "email_cliente": "ana@e2e.com",
             "terraza_id": tid, "fecha": "2026-09-01",
@@ -108,15 +118,18 @@ def test_booking_conflict(client, sample_terraza):
 
     tid = sample_terraza.id
     llm_responses = [
-        # turn 1
+        # turn 1 — greeting
         _llm_resp(json.dumps({"intent": "nueva_reserva", "respuesta": "¡Hola!"})),
-        _llm_resp(json.dumps({
-            "nombre_cliente": "", "email_cliente": "", "terraza_id": 0,
-            "fecha": "", "hora_inicio": "", "hora_fin": "", "num_personas": 0,
-            "notas": "", "completo": False, "respuesta": "¿Cuáles son tus datos?",
-        })),
-        # turn 2: same slot as existing reservation
+        # turn 1 — collect_info CASO-A extract (empty → Python slots, early return)
+        _llm_resp(json.dumps({"terraza_id": 0, "fecha": "", "hora_inicio": "", "hora_fin": "", "num_personas": 0})),
+        # turn 2 — greeting
         _llm_resp(json.dumps({"intent": "nueva_reserva", "respuesta": "Ok."})),
+        # turn 2 — collect_info CASO-A extract (full conflicting slot)
+        _llm_resp(json.dumps({
+            "terraza_id": tid, "fecha": "2026-09-10",
+            "hora_inicio": "14:00", "hora_fin": "16:00", "num_personas": 3,
+        })),
+        # turn 2 — collect_info CASO-B (all data → completo=True)
         _llm_resp(json.dumps({
             "nombre_cliente": "Otro", "email_cliente": None,
             "terraza_id": tid, "fecha": "2026-09-10",
