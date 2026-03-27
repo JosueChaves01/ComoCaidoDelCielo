@@ -1,10 +1,11 @@
-# Como Caído del Cielo 🌿
+# Como Caído del Cielo
 
-Chatbot de reservaciones para una empresa de alquiler de terrazas. El agente conversacional guía al cliente desde el saludo hasta la confirmación de su cita, con verificación de disponibilidad en tiempo real y persistencia en PostgreSQL.
+Plataforma completa de reservaciones para terrazas. Un agente conversacional guía al cliente desde el saludo hasta la confirmación, con verificación de disponibilidad en tiempo real, pagos con Stripe, notificaciones por email y panel de administración.
 
-**API en producción:** `https://superb-bravery-production.up.railway.app`
-**Documentación interactiva:** `https://superb-bravery-production.up.railway.app/docs`
-**Frontend en producción:** _(pendiente — conectar repo en vercel.com/new)_
+**API:** `https://superb-bravery-production.up.railway.app`
+**Docs:** `https://superb-bravery-production.up.railway.app/docs`
+**Frontend:** `https://como-caido-del-cielo.vercel.app`
+**Admin:** `https://como-caido-del-cielo.vercel.app/admin`
 
 ---
 
@@ -13,13 +14,17 @@ Chatbot de reservaciones para una empresa de alquiler de terrazas. El agente con
 | Capa | Tecnología |
 |------|------------|
 | API | FastAPI + Uvicorn |
-| Flujo conversacional | LangGraph (FSM con estados definidos) |
+| Flujo conversacional | LangGraph (FSM) |
 | LLM | OpenRouter (`stepfun/step-3.5-flash:free`) |
 | Base de datos | PostgreSQL (Railway) |
+| Caché de sesiones | Redis (Railway) |
 | ORM + migraciones | SQLAlchemy 2 + Alembic |
 | Auth | JWT (python-jose) |
+| Email | Resend |
+| Pagos | Stripe Checkout |
+| Monitoreo | Sentry |
 | Frontend | Next.js 14 + Tailwind CSS |
-| Deploy backend | Railway (web + DB) |
+| Deploy backend | Railway |
 | Deploy frontend | Vercel |
 
 ---
@@ -29,29 +34,40 @@ Chatbot de reservaciones para una empresa de alquiler de terrazas. El agente con
 ```
 src/
 ├── api/
-│   ├── main.py                  # FastAPI app, CORS, lifespan
+│   ├── main.py                  # FastAPI app, CORS, Sentry, rate limiting
+│   ├── limiter.py               # slowapi Limiter (20 req/min en /chat)
 │   ├── schemas.py               # Pydantic request/response
 │   └── routes/
-│       ├── chat.py              # POST /chat
+│       ├── chat.py              # POST /chat (rate limited)
 │       ├── reservaciones.py     # GET/DELETE /reservaciones
-│       └── disponibilidad.py    # GET /disponibilidad
+│       ├── disponibilidad.py    # GET /disponibilidad
+│       ├── terrazas.py          # GET/POST/PUT /terrazas
+│       ├── auth.py              # POST /auth/login
+│       ├── admin_stats.py       # GET /admin/stats
+│       ├── cron.py              # POST /cron/recordatorios
+│       └── pagos.py             # POST /pagos/checkout + /pagos/webhook
 ├── chatbot/
 │   ├── states.py                # TypedDict: ChatState, ReservationInfo
-│   ├── nodes.py                 # Nodos LangGraph (greeting, collect, booking…)
-│   ├── edges.py                 # Rutas condicionales entre estados
+│   ├── nodes.py                 # Nodos LangGraph
+│   ├── edges.py                 # Rutas condicionales
 │   ├── graph.py                 # StateGraph compilado
-│   └── session_store.py         # Sesiones en memoria (dict)
+│   └── session_store.py         # Redis + fallback in-memory, TTL 24h
+├── notifications/
+│   └── email.py                 # Resend: confirmación + recordatorio
 ├── reservaciones/
 │   ├── models.py                # ORM: Reservacion
-│   ├── repository.py            # Queries + detección de conflictos
-│   ├── service.py               # Lógica de negocio
+│   ├── repository.py            # Queries, conflictos, recordatorios pendientes
+│   ├── service.py               # Lógica de negocio + dispara email
 │   └── schemas.py               # Pydantic schemas
 ├── terrazas/
 │   ├── models.py                # ORM: Terraza
 │   ├── repository.py            # Queries
 │   └── schemas.py               # Pydantic schemas
+├── auth/
+│   ├── service.py               # Validación de credenciales + JWT
+│   └── dependencies.py          # Dependency: get_current_admin
 └── shared/
-    ├── config.py                # pydantic-settings
+    ├── config.py                # pydantic-settings (todas las variables)
     ├── database.py              # Engine + SessionLocal + get_db()
     └── llm.py                   # ChatOpenAI factory (OpenRouter)
 ```
@@ -70,60 +86,21 @@ GREETING → COLLECTING_INFO → CHECKING_AVAILABILITY → CONFIRMING → BOOKIN
 
 | Método | Ruta | Auth | Descripción |
 |--------|------|------|-------------|
-| `POST` | `/chat` | — | Enviar mensaje al chatbot |
-| `GET` | `/reservaciones` | — | Listar todas las reservaciones |
-| `DELETE` | `/reservaciones/{codigo}` | — | Cancelar una reservación |
+| `POST` | `/chat` | — | Enviar mensaje al chatbot (20 req/min) |
+| `GET` | `/reservaciones` | JWT | Listar reservaciones |
+| `DELETE` | `/reservaciones/{codigo}` | JWT | Cancelar reservación |
 | `GET` | `/disponibilidad` | — | Verificar disponibilidad de horario |
-| `GET` | `/terrazas` | — | Listar terrazas activas (vista pública) |
-| `POST` | `/auth/login` | — | Obtener JWT de administrador |
-| `GET` | `/terrazas/admin` | JWT | Listar todas las terrazas (admin) |
-| `POST` | `/terrazas` | JWT | Crear nueva terraza |
+| `GET` | `/terrazas` | — | Terrazas activas (pública) |
+| `POST` | `/auth/login` | — | Obtener JWT |
+| `GET` | `/terrazas/admin` | JWT | Todas las terrazas (admin) |
+| `POST` | `/terrazas` | JWT | Crear terraza |
 | `PUT` | `/terrazas/{id}` | JWT | Editar terraza |
 | `GET` | `/admin/stats` | JWT | Stats del día/semana + ingresos |
+| `POST` | `/pagos/checkout` | — | Crear Stripe Checkout Session |
+| `POST` | `/pagos/webhook` | Stripe | Confirmar reservación al pago |
+| `POST` | `/cron/recordatorios` | Secret | Enviar recordatorios 24h antes |
 | `GET` | `/health` | — | Estado del servicio |
 | `GET` | `/docs` | — | Swagger UI |
-
----
-
-## Quickstart local
-
-```bash
-# 1. Clonar e instalar dependencias
-git clone <repo>
-cd ComoCaidoDelCielo
-pip install -r requirements.txt
-
-# 2. Configurar variables
-cp config/.env.example .env
-# Editar .env con tus valores
-
-# 3. Correr en desarrollo (usa SQLite automáticamente)
-uvicorn src.api.main:app --reload
-
-# 4. Abrir docs
-open http://localhost:8000/docs
-```
-
-## Tests
-
-```bash
-pytest tests/          # 38 tests, SQLite en memoria, sin servicios externos
-```
-
----
-
-## Deploy (Railway)
-
-```bash
-railway login
-railway init
-railway add --database postgres
-railway variables set OPENROUTER_API_KEY=sk-or-...
-railway up
-railway run python scripts/seed_terrazas.py
-```
-
-El archivo `railway.toml` ejecuta automáticamente `alembic upgrade head` antes de iniciar el servidor.
 
 ---
 
@@ -131,58 +108,126 @@ El archivo `railway.toml` ejecuta automáticamente `alembic upgrade head` antes 
 
 | Variable | Requerida | Descripción |
 |----------|-----------|-------------|
-| `DATABASE_URL` | Sí | Railway la inyecta automáticamente desde PostgreSQL |
-| `OPENROUTER_API_KEY` | Sí | API key de [openrouter.ai](https://openrouter.ai) |
+| `DATABASE_URL` | Sí | Railway la inyecta desde PostgreSQL |
+| `OPENROUTER_API_KEY` | Sí | API key de openrouter.ai |
 | `OPENROUTER_MODEL` | No | Modelo LLM (default: `stepfun/step-3.5-flash:free`) |
-| `SECRET_KEY` | Sí | Clave secreta para la app |
-| `ENVIRONMENT` | No | `development` / `production` |
-| `ALLOWED_ORIGINS` | No | Orígenes CORS permitidos (separados por coma) |
+| `SECRET_KEY` | Sí | Clave secreta JWT |
+| `ADMIN_USERNAME` | Sí | Usuario del panel admin |
+| `ADMIN_PASSWORD` | Sí | Contraseña del panel admin |
+| `ALLOWED_ORIGINS` | Sí | Orígenes CORS separados por coma |
+| `REDIS_URL` | No | Redis para sesiones persistentes |
+| `RESEND_API_KEY` | No | API key de resend.com para emails |
+| `RESEND_FROM_EMAIL` | No | Dirección remitente |
+| `CRON_SECRET` | No | Secret para el endpoint `/cron/recordatorios` |
+| `STRIPE_SECRET_KEY` | No | API key de Stripe |
+| `STRIPE_WEBHOOK_SECRET` | No | Signing secret del webhook de Stripe |
+| `FRONTEND_URL` | No | URL del frontend (para redirects de Stripe) |
+| `SENTRY_DSN` | No | DSN de Sentry para monitoreo de errores |
 
 ---
 
-## Terrazas disponibles
+## Quickstart local
 
-| ID | Nombre | Capacidad | Precio/hora |
-|----|--------|-----------|-------------|
-| 1 | Terraza Jardín | 30 personas | $800 |
-| 2 | Terraza Vista al Mar | 50 personas | $1,500 |
-| 3 | Terraza Privada VIP | 12 personas | $600 |
+```bash
+# 1. Clonar e instalar
+git clone <repo>
+cd ComoCaidoDelCielo
+pip install -r requirements.txt
+
+# 2. Variables mínimas para dev
+echo "OPENROUTER_API_KEY=sk-or-..." > .env
+echo "SECRET_KEY=dev-secret" >> .env
+echo "ADMIN_USERNAME=admin" >> .env
+echo "ADMIN_PASSWORD=admin" >> .env
+
+# 3. Correr (SQLite automático en dev)
+uvicorn src.api.main:app --reload
+
+# 4. Frontend
+cd frontend && npm install && npm run dev
+```
+
+## Tests
+
+```bash
+pytest tests/          # 41 tests, SQLite en memoria, sin servicios externos
+```
+
+---
+
+## Deploy
+
+El archivo `railway.toml` ejecuta `alembic upgrade head` automáticamente antes de iniciar el servidor. El frontend se despliega en Vercel con `frontend/` como root directory y `NEXT_PUBLIC_API_URL` apuntando a Railway.
+
+---
+
+## Terrazas
+
+| Nombre | Capacidad | Precio/hora |
+|--------|-----------|-------------|
+| Terraza Jardín | 30 personas | $800 |
+| Terraza Vista al Mar | 50 personas | $1,500 |
+| Terraza Privada VIP | 12 personas | $600 |
 
 ---
 
 ## Roadmap
 
 ### Fase 1 — Backend completo ✅
-- [x] **FastAPI + LangGraph** — API REST con flujo FSM (GREETING → BOOKING → COMPLETED)
-- [x] **PostgreSQL en Railway** — reservaciones persistentes con detección de conflictos de horario
-- [x] **JWT auth + admin endpoints** — `POST /auth/login`, rutas protegidas con Bearer token
-- [x] **CRUD de terrazas** — `GET/POST/PUT /terrazas`, incluyendo vista pública y admin
-- [x] **Dashboard stats** — `GET /admin/stats` con reservaciones del día, semana e ingresos estimados
-- [x] **38 tests** — SQLite en memoria, sin servicios externos
+- [x] FastAPI + LangGraph — flujo FSM con 7 estados
+- [x] PostgreSQL en Railway — reservaciones persistentes con detección de conflictos
+- [x] JWT auth + endpoints admin
+- [x] CRUD de terrazas
+- [x] Dashboard stats (día, semana, ingresos estimados)
+- [x] 38 tests unitarios
 
 ### Fase 2 — Frontend público ✅
-- [x] **Landing page** — hero, grid de terrazas desde API real, sección de features, CTA
-- [x] **Chatbot web** — `/chat` con burbujas, typing indicator, auto-scroll, sesión UUID
-- [x] **Design system** — Tailwind con paleta personalizada (verde primario, dorado, crema)
-- [x] **Deploy en Vercel** — `frontend/` como root, variable `NEXT_PUBLIC_API_URL` configurada
+- [x] Landing page — hero, grid de terrazas desde API real, features, CTA
+- [x] Chatbot web — burbujas, typing indicator, auto-scroll, sesión UUID
+- [x] Design system — Tailwind con paleta personalizada
+- [x] Deploy en Vercel
 
 ### Fase 3 — Panel de administración ✅
-- [x] **Login page** — `/admin/login` con form → `POST /auth/login` → guarda JWT en localStorage
-- [x] **Dashboard** — `/admin` con 4 stats (hoy, semana, ingresos, terrazas activas) + tabla de ocupación
-- [x] **Tabla de reservaciones** — `/admin/reservaciones` con filtro por estado, búsqueda y botón cancelar
-- [x] **CRUD de terrazas UI** — `/admin/terrazas` con modal crear/editar y toggle activa/inactiva
+- [x] Login — JWT en localStorage, guard de rutas
+- [x] Dashboard — 4 stats + tabla de ocupación con barras de progreso
+- [x] Tabla de reservaciones — filtro por estado, búsqueda, cancelación inline
+- [x] CRUD de terrazas — modal crear/editar, toggle activa/inactiva
 
-### Fase 4 — Pulido y notificaciones ✅
-- [x] **Confirmación por email** — Resend SDK; se envía en `service.create()` si hay email; no bloquea la reservación si falla
-- [x] **Recordatorio 24h antes** — `POST /cron/recordatorios` protegido con `X-Cron-Secret`; llama Railway Cron diariamente
-- [x] **Vista de disponibilidad** — `/disponibilidad` con selector de terraza, fecha y horario; resultado visual con CTA al chat
+### Fase 4 — Notificaciones y disponibilidad ✅
+- [x] Email de confirmación — Resend, HTML, fire-and-forget
+- [x] Recordatorio 24h antes — cron endpoint + columna `recordatorio_enviado`
+- [x] Vista de disponibilidad — `/disponibilidad` con selector visual y CTA al chat
 
 ### Fase 5 — Robustez y escala ✅
-- [x] **Memoria persistente de sesión** — Redis con fallback in-memory; serialización JSON; TTL 24h
-- [x] **Rate limiting** — slowapi 20/min por IP en `POST /chat`
-- [x] **Webhook de pago** — `POST /pagos/checkout` + `POST /pagos/webhook` (Stripe); activa reservación al recibir `checkout.session.completed`
-- [x] **Monitoreo** — Sentry inicializado en `main.py` con `FastApiIntegration`; activo solo si `SENTRY_DSN` está configurado
-- [x] **Tests E2E** — 3 tests con LLM mockeado: booking completo, conflicto de horario y cancelación (41 tests totales)
+- [x] Redis — sesiones persistentes con fallback in-memory, TTL 24h
+- [x] Rate limiting — slowapi 20 req/min por IP en `/chat`
+- [x] Stripe — checkout + webhook para confirmar reservaciones al pago
+- [x] Sentry — monitoreo de errores en producción
+- [x] Tests E2E — booking completo, conflicto y cancelación con LLM mockeado (41 tests)
+
+---
+
+## Próximas mejoras — Fase 6
+
+### Inteligencia del asistente
+- [ ] **Memoria de preferencias** — el agente recuerda terraza y horario favorito del cliente por email
+- [ ] **Consulta de reservación activa** — el cliente puede preguntar "¿cuál es mi reservación?" y el agente la busca por email o código
+- [ ] **Sugerencia inteligente de horarios** — si el slot está ocupado, el agente propone el siguiente disponible automáticamente
+- [ ] **Manejo de ambigüedad** — si el cliente dice "el sábado a las 7" sin especificar terraza, el agente propone opciones según disponibilidad real
+- [ ] **Flujo de modificación** — el cliente puede cambiar fecha u horario de una reservación existente sin cancelar y volver a reservar
+- [ ] **Contexto multiturno mejorado** — el agente no olvida datos entre sesiones para el mismo email
+
+### Experiencia de usuario
+- [ ] **Widget embebible** — botón flotante de chat para incrustar en cualquier sitio web con un `<script>`
+- [ ] **Página de confirmación** — `/reservacion/{codigo}` pública con QR y detalles, útil para mostrar en entrada
+- [ ] **Selector de horarios visual** — timeline por terraza en `/disponibilidad` que muestre slots ocupados/libres del día
+- [ ] **WhatsApp Business** — mismo agente LangGraph conectado a la API de WhatsApp Cloud
+
+### Operaciones
+- [ ] **Panel de métricas del LLM** — latencia promedio, tasa de conversión (GREETING → COMPLETED), abandono por estado
+- [ ] **Exportar reservaciones** — botón en admin para descargar CSV del rango de fechas seleccionado
+- [ ] **Multi-negocio** — soporte para múltiples restaurantes con su propia BD, admin y subdomain
+- [ ] **Notificación al admin** — email o Slack cuando llega una reservación nueva
 
 ---
 
