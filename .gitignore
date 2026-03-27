@@ -11,3 +11,4 @@ dist/
 build/
 *.egg-info/
 .mypy_cache/
+frontend/.next/\nfrontend/node_modules/\nfrontend/.env.local
