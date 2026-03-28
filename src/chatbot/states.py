@@ -10,6 +10,7 @@ ConversationState = Literal[
     "BOOKING",
     "COMPLETED",
     "CANCELLATION",
+    "CONSULTING",
     "ERROR",
 ]
 

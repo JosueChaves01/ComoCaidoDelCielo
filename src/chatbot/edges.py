@@ -3,8 +3,11 @@ from src.chatbot.states import ChatState
 
 def route_after_greeting(state: ChatState) -> str:
     intent = state.get("intent", "nueva_reserva")
+    current_state = state.get("current_state", "GREETING")
     if intent == "cancelar":
         return "cancellation"
+    if intent == "consultar" or current_state == "CONSULTING":
+        return "availability_consult"
     return "collect_info"
 
 

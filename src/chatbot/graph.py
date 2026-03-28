@@ -7,6 +7,7 @@ from src.chatbot.nodes import (
     confirm_node,
     booking_node,
     cancellation_node,
+    availability_consult_node,
     error_node,
 )
 from src.chatbot.edges import (
@@ -27,6 +28,7 @@ def build_graph() -> StateGraph:
     graph.add_node("confirm", confirm_node)
     graph.add_node("booking", booking_node)
     graph.add_node("cancellation", cancellation_node)
+    graph.add_node("availability_consult", availability_consult_node)
     graph.add_node("error", error_node)
 
     graph.set_entry_point("greeting")
@@ -34,7 +36,11 @@ def build_graph() -> StateGraph:
     graph.add_conditional_edges(
         "greeting",
         route_after_greeting,
-        {"cancellation": "cancellation", "collect_info": "collect_info"},
+        {
+            "cancellation": "cancellation",
+            "collect_info": "collect_info",
+            "availability_consult": "availability_consult",
+        },
     )
     graph.add_conditional_edges(
         "collect_info",
@@ -57,6 +63,7 @@ def build_graph() -> StateGraph:
         {"error": "error", "end": END},
     )
     graph.add_edge("cancellation", END)
+    graph.add_edge("availability_consult", END)
     graph.add_edge("error", END)
 
     return graph

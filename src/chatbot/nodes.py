@@ -31,7 +31,9 @@ def greeting_node(state: ChatState) -> ChatState:
     system = SystemMessage(content=(
         "Eres el asistente de reservaciones de 'Como Caído del Cielo', un restaurante con terrazas. "
         "Detecta la intención del usuario en su mensaje y responde SOLO con un JSON: "
-        '{"intent": "nueva_reserva"|"cancelar"|"consultar", "respuesta": "<saludo breve>"}'
+        '{"intent": "nueva_reserva"|"cancelar"|"consultar", "respuesta": "<saludo breve>"} '
+        "Usa 'consultar' cuando el usuario pregunta por disponibilidad, horarios o qué terrazas hay libres, "
+        "sin haber pedido aún hacer una reservación."
     ))
     response = llm.invoke([system, HumanMessage(content=user_msg)])
     try:
@@ -44,6 +46,8 @@ def greeting_node(state: ChatState) -> ChatState:
 
     if state["intent"] == "cancelar":
         state["current_state"] = "CANCELLATION"
+    elif state["intent"] == "consultar":
+        state["current_state"] = "CONSULTING"
     else:
         state["current_state"] = "COLLECTING_INFO"
     return state
@@ -309,6 +313,142 @@ def cancellation_node(state: ChatState) -> ChatState:
         state["current_state"] = "ERROR"
     finally:
         db.close()
+    return state
+
+
+def availability_consult_node(state: ChatState) -> ChatState:
+    """Handle availability consultation without committing to a reservation."""
+    import re
+    from datetime import timedelta, datetime as dt
+
+    db = _get_db()
+    try:
+        terrazas = terraza_repo.get_all(db)
+        terrazas_list = [
+            {"id": t.id, "nombre": t.nombre, "capacidad": t.capacidad}
+            for t in terrazas
+        ]
+        proximas = reservacion_repo.get_proximas(db, days=30)
+    finally:
+        db.close()
+
+    # Build occupied map: {fecha_iso: {terraza_nombre: ["HH:MM–HH:MM", ...]}}
+    nombre_by_id = {t["id"]: t["nombre"] for t in terrazas_list}
+    occupied: dict[str, dict[str, list[str]]] = {}
+    for r in proximas:
+        fecha_str = str(r.fecha)
+        nombre = nombre_by_id.get(r.terraza_id, f"Terraza {r.terraza_id}")
+        occupied.setdefault(fecha_str, {}).setdefault(nombre, []).append(
+            f"{str(r.hora_inicio)[:5]}–{str(r.hora_fin)[:5]}"
+        )
+
+    last_user_msg = next(
+        (m["content"] for m in reversed(state["messages"]) if m["role"] == "user"), ""
+    )
+    msg_lower = last_user_msg.lower()
+    today = date.today()
+
+    WEEKDAY_MAP = {
+        "lunes": 0, "martes": 1, "miércoles": 2, "miercoles": 2,
+        "jueves": 3, "viernes": 4, "sábado": 5, "sabado": 5, "domingo": 6,
+    }
+    WEEKDAY_ES = {0: "lunes", 1: "martes", 2: "miércoles", 3: "jueves",
+                  4: "viernes", 5: "sábado", 6: "domingo"}
+    DEFAULT_SLOTS = [("12:00", "15:00"), ("16:00", "19:00"), ("18:00", "22:00"), ("20:00", "23:00")]
+
+    # Resolve target dates from user message
+    dates_to_show: list[date] = []
+
+    iso_dates = re.findall(r'\b(\d{4}-\d{2}-\d{2})\b', last_user_msg)
+    if iso_dates:
+        for d in iso_dates[:3]:
+            try:
+                dates_to_show.append(date.fromisoformat(d))
+            except ValueError:
+                pass
+
+    if not dates_to_show:
+        for day_name, day_num in WEEKDAY_MAP.items():
+            if day_name in msg_lower:
+                days_ahead = (day_num - today.weekday()) % 7 or 7
+                # "la semana que viene" or "próxima" shifts by +7
+                if any(w in msg_lower for w in ["próxima", "proxima", "que viene", "siguiente"]):
+                    days_ahead += 7
+                dates_to_show.append(today + timedelta(days=days_ahead))
+
+    if not dates_to_show:
+        if "fin de semana" in msg_lower:
+            sat_ahead = (5 - today.weekday()) % 7 or 7
+            if any(w in msg_lower for w in ["próximo", "proximo", "que viene", "siguiente"]):
+                sat_ahead += 7
+            dates_to_show = [today + timedelta(days=sat_ahead),
+                             today + timedelta(days=sat_ahead + 1)]
+        elif any(w in msg_lower for w in ["mañana", "manana"]):
+            dates_to_show = [today + timedelta(days=1)]
+        elif "hoy" in msg_lower:
+            dates_to_show = [today]
+        elif "pasado" in msg_lower:
+            dates_to_show = [today + timedelta(days=2)]
+
+    # No specific dates found → ask for clarification
+    if not dates_to_show:
+        reply = (
+            "¡Claro! Tenemos bastante disponibilidad. "
+            "¿Qué días específicos te gustaría consultar? "
+            "Puedes decirme por ejemplo 'el sábado', 'martes y jueves', o una fecha exacta como '2026-04-05', "
+            "y te muestro los horarios libres de cada terraza."
+        )
+        state = _append_assistant(state, reply)
+        state["current_state"] = "CONSULTING"
+        return state
+
+    # Build availability response for the resolved dates
+    lines = []
+    for d in sorted(set(dates_to_show)):
+        fecha_str = d.isoformat()
+        dia = WEEKDAY_ES[d.weekday()]
+        lines.append(f"\n📅 {dia.capitalize()} {fecha_str}:")
+
+        any_free = False
+        for t in terrazas_list:
+            occ_slots = occupied.get(fecha_str, {}).get(t["nombre"], [])
+
+            # Parse occupied intervals for conflict check
+            def _to_minutes(hhmm: str) -> int:
+                h, m = hhmm.split(":")
+                return int(h) * 60 + int(m)
+
+            occ_intervals = []
+            for s in occ_slots:
+                start_str, end_str = s.split("–")
+                occ_intervals.append((_to_minutes(start_str), _to_minutes(end_str)))
+
+            free_slots = []
+            for slot_start, slot_end in DEFAULT_SLOTS:
+                s_min, e_min = _to_minutes(slot_start), _to_minutes(slot_end)
+                conflict = any(s_min < oe and e_min > os for os, oe in occ_intervals)
+                if not conflict:
+                    free_slots.append(f"{slot_start}–{slot_end}")
+
+            if free_slots:
+                any_free = True
+                lines.append(f"  ✅ {t['nombre']} (cap. {t['capacidad']}): {', '.join(free_slots)}")
+            else:
+                lines.append(f"  ❌ {t['nombre']}: sin disponibilidad")
+
+        if not any_free:
+            lines.append("  (sin terrazas libres ese día)")
+
+    cta = "\n\n¿Te gustaría reservar alguno de estos horarios? Solo dime y te ayudo."
+    reply = "¡Aquí tienes la disponibilidad!" + "".join(lines) + cta
+
+    # If user now wants to book, transition to reservation flow
+    if any(w in msg_lower for w in ["reservar", "reserva", "apartar", "quiero ese"]):
+        state["current_state"] = "COLLECTING_INFO"
+    else:
+        state["current_state"] = "CONSULTING"
+
+    state = _append_assistant(state, reply)
     return state
 
 
