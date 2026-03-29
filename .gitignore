@@ -1,8 +1,3 @@
-<<<<<<< Updated upstream
-node_modules/
-.github/
-guidelines/
-=======
 # Dependencies
 node_modules
 .pnpm-debug.log*
@@ -30,4 +25,7 @@ build
 # OS Files
 .DS_Store
 Thumbs.db
->>>>>>> Stashed changes
+
+node_modules/
+.github/
+guidelines/
