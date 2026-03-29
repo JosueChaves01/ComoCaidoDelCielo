@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { Flame, Users, Sunset } from "lucide-react";
 
 interface TerraceSectionProps {
-  images: string[];
+  images: { description: string; url: string }[];
 }
 
 export function TerraceSection({ images }: TerraceSectionProps) {
@@ -38,8 +38,8 @@ export function TerraceSection({ images }: TerraceSectionProps) {
             className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden group"
           >
             <img
-              src={images[0]}
-              alt="Terraza principal"
+              src={images[0].url}
+              alt={images[0].description}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -52,8 +52,8 @@ export function TerraceSection({ images }: TerraceSectionProps) {
             className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden group"
           >
             <img
-              src={images[1]}
-              alt="Vista panorámica"
+              src={images[1].url}
+              alt={images[1].description}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
