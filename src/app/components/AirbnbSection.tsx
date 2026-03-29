@@ -14,7 +14,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <section id="hospedaje" ref={ref} className="py-24 px-6 md:px-12 bg-[#E8DED0]">
+    <section id="hospedaje" ref={ref} className="py-24 px-6 md:px-12 bg-[#F5F2E8]">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
