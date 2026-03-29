@@ -110,8 +110,9 @@ export default function App() {
       <Navbar />
       <Hero imageUrl={heroImage} />
       <TerraceSection images={terraceImages} />
-      <FoodTruckSection images={foodTruckImages.map(img => img.url)} />
       <EventsSection images={eventsImages.map(img => img.url)} />
+      <FoodTruckSection images={foodTruckImages.map(img => img.url)} />
+
       <EventHallSection images={eventHallImages} />
       <AirbnbSection images={airbnbImages.map(img => img.url)} />
       <MomentsGallery images={momentsImages} />
