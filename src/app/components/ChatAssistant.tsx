@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { MessageCircle, X, Send } from "lucide-react";
 
@@ -8,6 +8,24 @@ export function ChatAssistant() {
     { text: "¡Hola! Soy tu asistente de Como Caído del Cielo. ¿En qué puedo ayudarte hoy?", isUser: false }
   ]);
   const [input, setInput] = useState("");
+
+  useEffect(() => {
+    const handleOpenChat = (event: CustomEvent<{ message: string }>) => {
+      setIsOpen(true);
+      if (event.detail?.message) {
+        setMessages(prev => [...prev, { text: event.detail.message, isUser: true }]);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            text: "Perfecto. Nuestro equipo te enviará toda la información en breve. ¿Para qué fecha y qué tipo de evento estás buscando?",
+            isUser: false
+          }]);
+        }, 1000);
+      }
+    };
+
+    window.addEventListener("open-chat", handleOpenChat as EventListener);
+    return () => window.removeEventListener("open-chat", handleOpenChat as EventListener);
+  }, []);
 
   const handleSend = () => {
     if (!input.trim()) return;

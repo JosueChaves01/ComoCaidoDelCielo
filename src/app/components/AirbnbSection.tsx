@@ -1,7 +1,8 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Moon, Trees, Home } from "lucide-react";
+import { AirbnbModal } from "./AirbnbModal";
 
 interface AirbnbSectionProps {
   images: string[];
@@ -10,6 +11,8 @@ interface AirbnbSectionProps {
 export function AirbnbSection({ images }: AirbnbSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   return (
     <section id="hospedaje" ref={ref} className="py-24 px-6 md:px-12 bg-[#E8DED0]">
@@ -94,11 +97,20 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-center"
         >
-          <button className="px-8 py-4 bg-[#8B6F47] text-white rounded-full hover:bg-[#6B5337] transition-all hover:shadow-xl">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="px-8 py-4 bg-[#8B6F47] text-white rounded-full hover:bg-[#6B5337] transition-all hover:shadow-xl"
+          >
             Ver hospedaje en Airbnb
           </button>
         </motion.div>
       </div>
+
+      <AirbnbModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        images={images} 
+      />
     </section>
   );
 }
