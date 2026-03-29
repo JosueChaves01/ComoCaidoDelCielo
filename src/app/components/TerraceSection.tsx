@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef } from "react";
+import BackgroundEffectLocal from "./BackgroundEffectLocal";
 
 interface TerraceSectionProps {
   images: { description: string; url: string }[];
@@ -132,8 +133,9 @@ export function TerraceSection({
     <section
       id="terrazas"
       ref={ref}
-      className="py-24 px-6 md:px-12 bg-[#FBF8F3]"
+      className="py-24 px-6 md:px-12 relative overflow-hidden bg-transparent"
     >
+      <BackgroundEffectLocal sectionRef={ref as any} />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div

@@ -1,0 +1,62 @@
+/* Background effect styles using theme variables */
+.site-background-local {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+
+
+.bg-gradient {
+  position: absolute;
+  inset: 0;
+  /* Sunset: celeste -> naranja -> coral -> azul profundo */
+  background: linear-gradient(
+    to bottom,
+    #7EC8FF 0%,    /* cielo celeste */
+    #FFD08A 30%,   /* naranja suave */
+    #FF7A6B 60%,   /* coral/atardecer */
+    #0B2A66 100%   /* azul profundo de la noche */
+  );
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  transform-origin: center;
+}
+
+.bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: black;
+  opacity: 0;
+  transition: opacity 0.12s linear;
+}
+
+.bg-stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s linear;
+}
+
+.bg-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #f6f5fb;
+  border-radius: 50%;
+  filter: drop-shadow(0 0 4px rgba(255,255,255,0.1));
+  animation: bg-twinkle 2.2s infinite ease-in-out;
+}
+
+@keyframes bg-twinkle {
+  0%, 100% { opacity: 0.28; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* make sure background doesn't cover fixed UI (z-index) */
+@media (prefers-reduced-motion: reduce) {
+  .bg-star { animation: none; }
+  .bg-gradient { transition: none; }
+  .bg-overlay { transition: none; }
+}
