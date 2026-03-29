@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo/logo.jpg" alt="Como Caído del Cielo" width="180" style="border-radius: 50%;" />
+  <img src="public/assets/logo/logo.jpg" alt="Como Caído del Cielo" width="180" style="border-radius: 50%;" />
 </p>
 
 <h1 align="center">🌅 Como Caído del Cielo</h1>
