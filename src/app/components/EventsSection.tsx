@@ -2,54 +2,26 @@ import { motion, useInView, useScroll, useTransform, AnimatePresence } from "mot
 import { useRef, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 
-// Ignoramos images[] para usar nuestras rutas fijas de assets
-interface EventsSectionProps {
-  images: string[];
+export interface MainEvent {
+  id: string;
+  title: string;
+  description: string;
+  poster_url: string;
+  gallery_urls: string[];
 }
 
-const mainEvents = [
-  {
-    id: "sabinazo",
-    title: "El Sabinazo",
-    description: "Una noche inolvidable rindiendo tributo a la poesía y música de Joaquín Sabina. Canto, recuerdos y un ambiente acústico espectacular.",
-    poster: "/assets/Eventos/ElSabinazoPoster.jpg",
-    photos: [
-      "/assets/Eventos/ElSabinazo1.jpg",
-      "/assets/Eventos/ElSabinazo2.jpg",
-      "/assets/Eventos/ElSabinazo3.jpg",
-      "/assets/Eventos/ElSabinazo4.jpg",
-      "/assets/Eventos/ElSabinazo5.jpg",
-      "/assets/Eventos/ElSabinazo6.jpg",
-    ]
-  },
-  {
-    id: "tardeo",
-    title: "Tardeo",
-    description: "La transición perfecta del día a la noche con buena música, excelente gastronomía y un ambiente inmejorable al atardecer.",
-    poster: "/assets/Eventos/TardeoPoster.jpg",
-    photos: [
-      "/assets/Eventos/Tardeo.jpg",
-      "/assets/Eventos/Tardeo1.jpg",
-      "/assets/Eventos/Tardeo2.jpg",
-      "/assets/Eventos/Tardeo3.jpg",
-      "/assets/Eventos/Tardeo4.jpg",
-      "/assets/Eventos/Tardeo5.jpg",
-      "/assets/Eventos/Tardeo6.jpg",
-      "/assets/Eventos/Tardeo7.jpg",
-      "/assets/Eventos/Tardeo8.jpg",
-      "/assets/Eventos/Tardeo9.jpg",
-    ]
-  }
-];
+export interface UpcomingEvent {
+  id: string;
+  title: string;
+  poster_url: string;
+}
 
-const upcomingPosters = [
-  { img: "/assets/Eventos/PiscisSunsetPoster.jpg", title: "Piscis Sunset" },
-  { img: "/assets/Eventos/BateeriaPoster.jpg", title: "Show de Batería" },
-  { img: "/assets/Eventos/SaxofonPoster.jpg", title: "Noches de Saxofón" },
-  { img: "/assets/Eventos/ConciertosInstrumentosPoster.jpg", title: "Música en Vivo" },
-];
+interface EventsSectionProps {
+  mainEvents: MainEvent[];
+  upcomingPosters: UpcomingEvent[];
+}
 
-export function EventsSection({ }: EventsSectionProps) {
+export function EventsSection({ mainEvents, upcomingPosters }: EventsSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [activeIndex, setActiveIndex] = useState(0);
@@ -170,12 +142,12 @@ export function EventsSection({ }: EventsSectionProps) {
               transition={{ duration: 0.5, ease: "easeOut" }}
               className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start"
             >
-              {/* Left: Poster & Info */}
+              {/* Left: Poster, Info & Controls */}
               <div className="w-full lg:w-1/3 flex flex-col gap-6">
                 <div className="relative rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(200,159,106,0.2)]">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#090b10] via-transparent to-transparent z-10"></div>
                   <img 
-                    src={mainEvents[activeIndex].poster} 
+                    src={mainEvents[activeIndex].poster_url} 
                     alt={mainEvents[activeIndex].title} 
                     className="w-full h-auto max-h-[500px] object-cover" 
                   />
@@ -187,18 +159,43 @@ export function EventsSection({ }: EventsSectionProps) {
                 <p className="text-zinc-300 text-lg leading-relaxed">
                   {mainEvents[activeIndex].description}
                 </p>
+
+                {/* Carousel Controls (Integrated into the event column) */}
+                <div className="flex justify-center lg:justify-start mt-2 mb-6 lg:mb-0 gap-6 items-center">
+                  <button 
+                    onClick={prevSlide} 
+                    className="p-4 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors backdrop-blur-md border border-white/10 hover:border-white/20 shadow-xl"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                  <div className="flex gap-2">
+                    {mainEvents.map((_, i) => (
+                      <button 
+                        key={i} 
+                        onClick={() => setActiveIndex(i)}
+                        className={`h-2 rounded-full transition-all duration-300 ${activeIndex === i ? 'w-8 bg-[#C89F6A]' : 'w-2 bg-white/20 hover:bg-white/40'}`}
+                      />
+                    ))}
+                  </div>
+                  <button 
+                    onClick={nextSlide} 
+                    className="p-4 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors backdrop-blur-md border border-white/10 hover:border-white/20 shadow-xl"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                </div>
               </div>
 
               {/* Right: Collage Masonry */}
-              <div className="w-full lg:w-2/3 max-h-[600px] overflow-y-auto pr-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20 transition-all">
-                <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
-                  {mainEvents[activeIndex].photos.map((photo, j) => (
+              <div className="w-full lg:w-2/3 max-h-[450px] lg:max-h-[650px] overflow-y-auto pr-2 lg:pr-4 [&::-webkit-scrollbar]:w-1 lg:[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20 transition-all">
+                <div className="columns-2 lg:columns-3 gap-2 lg:gap-4">
+                  {mainEvents[activeIndex].gallery_urls.map((photo: string, j: number) => (
                     <motion.div 
                       key={j}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, delay: 0.1 + j * 0.05 }}
-                      className="rounded-xl overflow-hidden shadow-lg border border-white/5 bg-white/5 break-inside-avoid mb-4"
+                      className="rounded-xl overflow-hidden shadow-lg border border-white/5 bg-white/5 break-inside-avoid mb-2 lg:mb-4"
                     >
                       <img 
                         src={photo} 
@@ -211,31 +208,6 @@ export function EventsSection({ }: EventsSectionProps) {
               </div>
             </motion.div>
           </AnimatePresence>
-
-          {/* Carousel Controls */}
-          <div className="flex justify-center mt-12 gap-6 items-center">
-            <button 
-              onClick={prevSlide} 
-              className="p-4 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors backdrop-blur-md border border-white/10 hover:border-white/20 shadow-xl"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <div className="flex gap-2">
-              {mainEvents.map((_, i) => (
-                <button 
-                  key={i} 
-                  onClick={() => setActiveIndex(i)}
-                  className={`h-2 rounded-full transition-all duration-300 ${activeIndex === i ? 'w-8 bg-[#C89F6A]' : 'w-2 bg-white/20 hover:bg-white/40'}`}
-                />
-              ))}
-            </div>
-            <button 
-              onClick={nextSlide} 
-              className="p-4 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors backdrop-blur-md border border-white/10 hover:border-white/20 shadow-xl"
-            >
-              <ChevronRight size={24} />
-            </button>
-          </div>
         </div>
 
         {/* Separator */}
@@ -268,7 +240,7 @@ export function EventsSection({ }: EventsSectionProps) {
                 className="relative rounded-2xl overflow-hidden shadow-2xl group border border-white/5"
               >
                 <img 
-                  src={item.img} 
+                  src={item.poster_url} 
                   alt={item.title} 
                   className="w-full aspect-[3/4] object-cover group-hover:scale-110 group-hover:blur-[2px] transition-all duration-700" 
                 />

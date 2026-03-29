@@ -1,21 +1,90 @@
-import { Hero } from "./components/Hero";
-import { TerraceSection } from "./components/TerraceSection";
-import { FoodTruckSection } from "./components/FoodTruckSection";
-import { EventsSection } from "./components/EventsSection";
-import { EventHallSection } from "./components/EventHallSection";
-import { AirbnbSection } from "./components/AirbnbSection";
-import { MomentsGallery } from "./components/MomentsGallery";
-import { InfoSection } from "./components/InfoSection";
-import { Footer } from "./components/Footer";
-import { ChatAssistant } from "./components/ChatAssistant";
-import { Navbar } from "./components/Navbar";
+import { Hero } from "../components/Hero";
+import { TerraceSection } from "../components/TerraceSection";
+import { FoodTruckSection } from "../components/FoodTruckSection";
+import { EventsSection, MainEvent, UpcomingEvent } from "../components/EventsSection";
+import { EventHallSection } from "../components/EventHallSection";
+import { AirbnbSection } from "../components/AirbnbSection";
+import { MomentsGallery } from "../components/MomentsGallery";
+import { InfoSection } from "../components/InfoSection";
+import { Footer } from "../components/Footer";
+import { ChatAssistant } from "../components/ChatAssistant";
+import { Navbar } from "../components/Navbar";
+import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
 
-import { Routes, Route } from "react-router";
-import { Landing } from "./pages/Landing";
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
+const fallbackMainEvents: MainEvent[] = [
+  {
+    id: "sabinazo",
+    title: "El Sabinazo",
+    description: "Una noche inolvidable rindiendo tributo a la poesía y música de Joaquín Sabina. Canto, recuerdos y un ambiente acústico espectacular.",
+    poster_url: "/assets/Eventos/ElSabinazoPoster.jpg",
+    gallery_urls: [
+      "/assets/Eventos/ElSabinazo1.jpg",
+      "/assets/Eventos/ElSabinazo2.jpg",
+      "/assets/Eventos/ElSabinazo3.jpg",
+      "/assets/Eventos/ElSabinazo4.jpg",
+      "/assets/Eventos/ElSabinazo5.jpg",
+      "/assets/Eventos/ElSabinazo6.jpg",
+    ]
+  },
+  {
+    id: "tardeo",
+    title: "Tardeo",
+    description: "La transición perfecta del día a la noche con buena música, excelente gastronomía y un ambiente inmejorable al atardecer.",
+    poster_url: "/assets/Eventos/TardeoPoster.jpg",
+    gallery_urls: [
+      "/assets/Eventos/Tardeo.jpg",
+      "/assets/Eventos/Tardeo1.jpg",
+      "/assets/Eventos/Tardeo2.jpg",
+      "/assets/Eventos/Tardeo3.jpg",
+      "/assets/Eventos/Tardeo4.jpg",
+      "/assets/Eventos/Tardeo5.jpg",
+      "/assets/Eventos/Tardeo6.jpg",
+      "/assets/Eventos/Tardeo7.jpg",
+      "/assets/Eventos/Tardeo8.jpg",
+      "/assets/Eventos/Tardeo9.jpg",
+    ]
+  }
+];
 
-export default function App() {
+const fallbackUpcomingPosters: UpcomingEvent[] = [
+  { id: "p1", poster_url: "/assets/Eventos/PiscisSunsetPoster.jpg", title: "Piscis Sunset" },
+  { id: "p2", poster_url: "/assets/Eventos/BateeriaPoster.jpg", title: "Show de Batería" },
+  { id: "p3", poster_url: "/assets/Eventos/SaxofonPoster.jpg", title: "Noches de Saxofón" },
+  { id: "p4", poster_url: "/assets/Eventos/ConciertosInstrumentosPoster.jpg", title: "Música en Vivo" },
+];
+
+export function Landing() {
+  const [mainEvents, setMainEvents] = useState<MainEvent[]>(fallbackMainEvents);
+  const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>(fallbackUpcomingPosters);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const { data: carouselData } = await supabase
+          .from('carousel_events')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (carouselData && carouselData.length > 0) {
+          setMainEvents([...carouselData, ...fallbackMainEvents]);
+        }
+
+        const { data: upcomingData } = await supabase
+          .from('upcoming_events')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (upcomingData && upcomingData.length > 0) {
+          setUpcomingEvents([...upcomingData, ...fallbackUpcomingPosters]);
+        }
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      }
+    };
+
+    fetchEvents();
+  }, []);
   // Hero image
   const heroImage = "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/474073411_988019740087191_996796627425577335_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=7b2446&_nc_ohc=jC4ynTK0_RQQ7kNvwH78VgQ&_nc_oc=Adp_5TUxoLvAJI3UUVBmMbkOlx5OvcONZG1j4_t4TnuMh6CouZpG_y3yUyaodeY7t-j_UUxlCPNGpZNGgMU1-S-z&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=A8STgCoqxKqKS5emqKySXA&_nc_ss=7a30f&oh=00_AfzyBRQPZ3lP8oaVjsevRRD5Yq0k-AAaJy8CqSNd0LDZ8g&oe=69CE23CC";
 
@@ -29,7 +98,7 @@ export default function App() {
     },
     {
       description: "Vista con fogata/noche",
-      url: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/528234181_772783235234061_4145822863533234919_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=7b2446&_nc_ohc=g_g4yL9_MgUQ7kNvwHtzCFY&_nc_oc=Adp8_EF-tFeadzYMMyIuskO2aTuDArWNlXuVnMwwGXAM6lx2wXhPBELHgKLqPbHV_-OZdPdeyV0ewTeYXIP_AitTS&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=lkxfqWMuAyX46jlYI4sOGQ&_nc_ss=7a32e&oh=00_AfwAv_Fug1bkuwOd5ckCGY6hprRdR-7bN6aj3MGb6mRrFQ&oe=69CE95BB"
+      url: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/528234181_772783235234061_4145822863533234919_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=7b2446&_nc_ohc=g_g4yL9_MgUQ7kNvwHtzCFY&_nc_oc=Adp8_EF-tFeadzYMMyIuskO2aTuDArWNlXuVnMwwGXAM6lx2wXhd9HZWtOEB-doUtt5SuMB15FJEpIssy29sMHyb&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=lkxfqWMuAyX46jlYI4sOGQ&_nc_ss=7a32e&oh=00_AfwAv_Fug1bkuwOd5ckCGY6hprRdR-7bN6aj3MGb6mRrFQ&oe=69CE95BB"
     },
     {
       description: "Vista panorámica atardecer",
@@ -51,7 +120,7 @@ export default function App() {
   const foodTruckImages = [
     {
       description: "Food truck principal",
-      url: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.75761-15/476615545_18013476683690161_666161389142179383_n.jpg?stp=dst-jpegr_tt6&_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=3vnUWd5avrIQ7kNvwHsJH5g&_nc_oc=AdqoIQ_IRqfYc0Ydjhrmq3k5b_vr6F2oiXXzR-vKZnvph1mV7h5GETlOJQHQ8gCG35vO0W-hfILOPUhN89uJE4u-&_nc_zt=23&se=-1&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=pAfbXBayo7w_0t7ywe8myQ&_nc_ss=7a389&oh=00_AfwHMjgE9cx3gdszcj46mAzfbnVB7K2xE3KAiAZ5lCPMtQ&oe=69CF5E03"
+      url: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.75761-15/476445130_18013476695690161_6028235328747529693_n.jpg?stp=dst-jpegr_tt6&_nc_cat=104&ccb=1-7&_nc_sid=13d280&_nc_ohc=YVl0de5pBZUQ7kNvwEwcfYy&_nc_oc=Adq_xPCgQWIdtMksXzxzlo-JAVcISVEAU4uRK6Up037nIVZs1zvYYrysi-NOtBw2QM_U9bqFbYGfXBnTlyOHqP4R&_nc_zt=23&se=-1&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=VMGs40Xm-xX2mtasCgDIJA&_nc_ss=7a30f&oh=00_AfyTZ4cvLn--n83eHDpwJ2dUJJmgZaDODEcadvjKG9_8Sg&oe=69CE8B9F"
     },
     {
       description: "Ambiente natural",
@@ -76,37 +145,6 @@ export default function App() {
       url: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/469238785_18005545208690161_8684546020131478997_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=13d280&_nc_ohc=dhqpvh46hdoQ7kNvwG4keY3&_nc_oc=Adp-NNmhlGMyJyp7UyoZICi9gteGbSrawn47BjNeOylw88_FDLv3zQ1cCtnGh-m7BOYvBKwyUFji9wnDZnPPgak6&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=Ie2a7feThB5vhmGud9jXaA&_nc_ss=7a30f&oh=00_AfwxKeFHzrVCraMjQcfsO0Eg5Tbn5ElGxlZFdOHim9Vvgg&oe=69CEB2F4"
     }
   ];
-
-  // Events data for EventsSection
-  const mainEvents = [
-    {
-      id: "1",
-      title: "Noches de Jazz",
-      description: "Disfruta de las mejores noches con música jazz en vivo y un ambiente único.",
-      poster_url: eventsImages[0]?.url || "",
-      gallery_urls: eventsImages.map(img => img.url)
-    },
-    {
-      id: "2", 
-      title: "Fiesta Latina",
-      description: "Noche de salsa, bachata y reggaetón con los mejores DJ locales.",
-      poster_url: eventsImages[1]?.url || "",
-      gallery_urls: eventsImages.map(img => img.url)
-    },
-    {
-      id: "3",
-      title: "Sunset Sessions", 
-      description: "Atardeceres mágicos con música electrónica y cocktails especiales.",
-      poster_url: eventsImages[2]?.url || "",
-      gallery_urls: eventsImages.map(img => img.url)
-    }
-  ];
-
-  const upcomingPosters = eventsImages.slice(0, 4).map((img, i) => ({
-    id: String(i),
-    title: `Evento ${i + 1}`,
-    poster_url: img.url
-  }));
 
   // Event hall images (real photos — curated order)
   const eventHallImages = [
@@ -144,7 +182,7 @@ export default function App() {
       <Navbar />
       <Hero imageUrl={heroImage} />
       <TerraceSection images={terraceImages} />
-      <EventsSection mainEvents={mainEvents} upcomingPosters={upcomingPosters} />
+      <EventsSection mainEvents={mainEvents} upcomingPosters={upcomingEvents} />
       <FoodTruckSection images={foodTruckImages.map(img => img.url)} />
       <EventHallSection images={eventHallImages} />
       <AirbnbSection images={airbnbImages.map(img => img.url)} />
