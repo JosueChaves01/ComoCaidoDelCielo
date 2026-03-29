@@ -2,54 +2,26 @@ import { motion, useInView, useScroll, useTransform, AnimatePresence } from "mot
 import { useRef, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 
-// Ignoramos images[] para usar nuestras rutas fijas de assets
-interface EventsSectionProps {
-  images: string[];
+export interface MainEvent {
+  id: string;
+  title: string;
+  description: string;
+  poster_url: string;
+  gallery_urls: string[];
 }
 
-const mainEvents = [
-  {
-    id: "sabinazo",
-    title: "El Sabinazo",
-    description: "Una noche inolvidable rindiendo tributo a la poesía y música de Joaquín Sabina. Canto, recuerdos y un ambiente acústico espectacular.",
-    poster: "/assets/Eventos/ElSabinazoPoster.jpg",
-    photos: [
-      "/assets/Eventos/ElSabinazo1.jpg",
-      "/assets/Eventos/ElSabinazo2.jpg",
-      "/assets/Eventos/ElSabinazo3.jpg",
-      "/assets/Eventos/ElSabinazo4.jpg",
-      "/assets/Eventos/ElSabinazo5.jpg",
-      "/assets/Eventos/ElSabinazo6.jpg",
-    ]
-  },
-  {
-    id: "tardeo",
-    title: "Tardeo",
-    description: "La transición perfecta del día a la noche con buena música, excelente gastronomía y un ambiente inmejorable al atardecer.",
-    poster: "/assets/Eventos/TardeoPoster.jpg",
-    photos: [
-      "/assets/Eventos/Tardeo.jpg",
-      "/assets/Eventos/Tardeo1.jpg",
-      "/assets/Eventos/Tardeo2.jpg",
-      "/assets/Eventos/Tardeo3.jpg",
-      "/assets/Eventos/Tardeo4.jpg",
-      "/assets/Eventos/Tardeo5.jpg",
-      "/assets/Eventos/Tardeo6.jpg",
-      "/assets/Eventos/Tardeo7.jpg",
-      "/assets/Eventos/Tardeo8.jpg",
-      "/assets/Eventos/Tardeo9.jpg",
-    ]
-  }
-];
+export interface UpcomingEvent {
+  id: string;
+  title: string;
+  poster_url: string;
+}
 
-const upcomingPosters = [
-  { img: "/assets/Eventos/PiscisSunsetPoster.jpg", title: "Piscis Sunset" },
-  { img: "/assets/Eventos/BateeriaPoster.jpg", title: "Show de Batería" },
-  { img: "/assets/Eventos/SaxofonPoster.jpg", title: "Noches de Saxofón" },
-  { img: "/assets/Eventos/ConciertosInstrumentosPoster.jpg", title: "Música en Vivo" },
-];
+interface EventsSectionProps {
+  mainEvents: MainEvent[];
+  upcomingPosters: UpcomingEvent[];
+}
 
-export function EventsSection({ }: EventsSectionProps) {
+export function EventsSection({ mainEvents, upcomingPosters }: EventsSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [activeIndex, setActiveIndex] = useState(0);
@@ -175,7 +147,7 @@ export function EventsSection({ }: EventsSectionProps) {
                 <div className="relative rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(200,159,106,0.2)]">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#090b10] via-transparent to-transparent z-10"></div>
                   <img 
-                    src={mainEvents[activeIndex].poster} 
+                    src={mainEvents[activeIndex].poster_url} 
                     alt={mainEvents[activeIndex].title} 
                     className="w-full h-auto max-h-[500px] object-cover" 
                   />
@@ -217,7 +189,7 @@ export function EventsSection({ }: EventsSectionProps) {
               {/* Right: Collage Masonry */}
               <div className="w-full lg:w-2/3 max-h-[450px] lg:max-h-[650px] overflow-y-auto pr-2 lg:pr-4 [&::-webkit-scrollbar]:w-1 lg:[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20 transition-all">
                 <div className="columns-2 lg:columns-3 gap-2 lg:gap-4">
-                  {mainEvents[activeIndex].photos.map((photo, j) => (
+                  {mainEvents[activeIndex].gallery_urls.map((photo: string, j: number) => (
                     <motion.div 
                       key={j}
                       initial={{ opacity: 0, scale: 0.95 }}
@@ -268,7 +240,7 @@ export function EventsSection({ }: EventsSectionProps) {
                 className="relative rounded-2xl overflow-hidden shadow-2xl group border border-white/5"
               >
                 <img 
-                  src={item.img} 
+                  src={item.poster_url} 
                   alt={item.title} 
                   className="w-full aspect-[3/4] object-cover group-hover:scale-110 group-hover:blur-[2px] transition-all duration-700" 
                 />
