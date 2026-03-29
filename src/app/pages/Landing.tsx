@@ -120,7 +120,7 @@ export function Landing() {
   const foodTruckImages = [
     {
       description: "Food truck principal",
-      url: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.75761-15/476445130_18013476695690161_6028235328747529693_n.jpg?stp=dst-jpegr_tt6&_nc_cat=104&ccb=1-7&_nc_sid=13d280&_nc_ohc=YVl0de5pBZUQ7kNvwEwcfYy&_nc_oc=Adq_xPCgQWIdtMksXzxzlo-JAVcISVEAU4uRK6Up037nIVZs1zvYYrysi-NOtBw2QM_U9bqFbYGfXBnTlyOHqP4R&_nc_zt=23&se=-1&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=VMGs40Xm-xX2mtasCgDIJA&_nc_ss=7a30f&oh=00_AfyTZ4cvLn--n83eHDpwJ2dUJJmgZaDODEcadvjKG9_8Sg&oe=69CE8B9F"
+      url: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.75761-15/476615545_18013476683690161_666161389142179383_n.jpg?stp=dst-jpegr_tt6&_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=3vnUWd5avrIQ7kNvwHsJH5g&_nc_oc=AdqoIQ_IRqfYc0Ydjhrmq3k5b_vr6F2oiXXzR-vKZnvph1mV7h5GETlOJQHQ8gCG35vO0W-hfILOPUhN89uJE4u-&_nc_zt=23&se=-1&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=pAfbXBayo7w_0t7ywe8myQ&_nc_ss=7a389&oh=00_AfwHMjgE9cx3gdszcj46mAzfbnVB7K2xE3KAiAZ5lCPMtQ&oe=69CF5E03"
     },
     {
       description: "Ambiente natural",
