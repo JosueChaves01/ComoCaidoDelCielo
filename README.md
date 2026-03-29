@@ -581,14 +581,6 @@ src/
 
 ---
 
-## 🤝 Contribución
-
-1. Fork el repositorio
-2. Crea una rama para tu feature: `git checkout -b feature/mi-feature`
-3. Commit tus cambios: `git commit -m 'feat: descripción del cambio'`
-4. Push a la rama: `git push origin feature/mi-feature`
-5. Abre un Pull Request
-
 ### Convenciones
 
 - **Componentes**: PascalCase (`TerraceSection.tsx`)
@@ -602,7 +594,7 @@ src/
 
 © 2026 **Como Caído del Cielo**. Todos los derechos reservados.
 
-Proyecto desarrollado como sitio web comercial para el establecimiento *Como Caído del Cielo* en Nicoya, Guanacaste — Costa Rica.
+Proyecto desarrollado como sitio web comercial para el establecimiento *Como Caído del Cielo* — Costa Rica.
 
 ---
 
