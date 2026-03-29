@@ -72,17 +72,16 @@ export default function App() {
     }
   ];
 
-  // ===========================================
-  // SALÓN DE EVENTOS
-  // ===========================================
-  const eventHallImage = {
-    description: "Salón de eventos privado",
-    url: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/607493861_889442386901478_8792716040068011097_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=7b2446&_nc_ohc=L3Sr4ofTNoYQ7kNvwF9bRyS&_nc_oc=AdoMQesVlaV17bP4sF8hfV5P_KkM_3OuJ1TJbLX-P7alYivMgEXlrtB8e5083Xcyp3cvdphnjI6Pm7cdzImewxAc&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=88coy1Lq9vO6dR-D1OY0Zg&_nc_ss=7a32e&oh=00_Afz88TteY6EYO4-9EiF49sdHzenxmtBRM0DU41pUEuz0KA&oe=69CE9C83"
-  };
+  // Event hall images (real photos — curated order)
+  const eventHallImages = [
+    "/assets/SalonEventos/mesass2.jpg",   // Elegante con cortinas doradas — hero
+    "/assets/SalonEventos/salon.jpg",      // Vista panorámica del salón
+    "/assets/SalonEventos/Mesa.jpg",       // Detalle de mesa con vista
+    "/assets/SalonEventos/Mesas2.jpeg",    // Decoración temática de mar
+    "/assets/SalonEventos/postres.jpg",    // Celebración cumpleaños
+  ];
 
-  // ===========================================
-  // AIRBNB
-  // ===========================================
+  // Airbnb images
   const airbnbImages = [
     {
       description: "Habitación acogedora",
@@ -111,7 +110,6 @@ export default function App() {
       <TerraceSection images={terraceImages} />
       <FoodTruckSection images={foodTruckImages.map(img => img.url)} />
       <EventsSection images={eventsImages.map(img => img.url)} />
-      <EventHallSection image={eventHallImage.url} />
       <AirbnbSection images={airbnbImages.map(img => img.url)} />
       <MomentsGallery images={momentsImages} />
       <InfoSection />

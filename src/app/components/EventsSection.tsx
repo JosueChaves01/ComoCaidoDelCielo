@@ -12,7 +12,7 @@ export function EventsSection({ images }: EventsSectionProps) {
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <section id="eventos" ref={ref} className="py-24 px-6 md:px-12 bg-[#2A2419] text-white">
+    <section id="eventos" ref={ref} className="py-24 px-6 md:px-12 bg-[#FBF8F3]">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -20,10 +20,10 @@ export function EventsSection({ images }: EventsSectionProps) {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-6xl mb-6">
+          <h2 className="text-4xl md:text-6xl text-[#2A2419] mb-6">
             Cuando la noche cobra vida
           </h2>
-          <p className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-[#6B5D4F] max-w-3xl mx-auto">
             No solo somos paisaje y calma. También somos energía, música y celebración. 
             Descubre nuestros eventos que transforman el espacio.
           </p>
@@ -85,7 +85,7 @@ export function EventsSection({ images }: EventsSectionProps) {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-center"
         >
-          <p className="text-lg mb-6 text-white/80">
+          <p className="text-lg mb-6 text-[#6B5D4F]">
             Cada evento es una experiencia diferente. No te pierdas nuestras próximas noches.
           </p>
           <button className="px-8 py-4 bg-[#C89F6A] text-[#2A2419] rounded-full hover:bg-[#D4A574] transition-all hover:shadow-2xl">
