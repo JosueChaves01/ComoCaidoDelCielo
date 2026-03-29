@@ -167,7 +167,15 @@ export function EventHallSection({ images }: EventHallSectionProps) {
             Cupos limitados para garantizar una experiencia exclusiva.
             Reserva con anticipación y define todos los detalles a tu gusto.
           </p>
-          <button className="group flex items-center gap-3 px-8 py-4 bg-[#C89F6A] text-[#2A2419] rounded-full font-semibold hover:bg-[#D4A574] transition-all hover:shadow-2xl hover:shadow-[#C89F6A]/30 transform hover:scale-105 whitespace-nowrap">
+          <button 
+            onClick={() => {
+              const event = new CustomEvent("open-chat", {
+                detail: { message: "Hola buen día, quiero consultar la disponibilidad" }
+              });
+              window.dispatchEvent(event);
+            }}
+            className="group flex items-center gap-3 px-8 py-4 bg-[#C89F6A] text-[#2A2419] rounded-full font-semibold hover:bg-[#D4A574] transition-all hover:shadow-2xl hover:shadow-[#C89F6A]/30 transform hover:scale-105 whitespace-nowrap"
+          >
             Solicitar disponibilidad
             <ChevronRight
               size={18}
