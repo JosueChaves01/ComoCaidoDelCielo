@@ -34,7 +34,7 @@ export default function BackgroundEffectLocal({ sectionRef }: Props) {
 
     // Apply the gradient directly to the section element so it's always visible behind content
     const parentEl = (sectionRef && sectionRef.current) ? sectionRef.current : starsContainer.closest("section");
-    const gradientCss = "linear-gradient(to bottom, #7EC8FF 0%, #FFD08A 30%, #FF7A6B 60%, #0B2A66 100%)";
+    const gradientCss = "linear-gradient(to bottom, #7EC8FF 0%, #FFD08A 30%, #f8a03bff 60%, #08082cff 80%, #000000ff 100%)";
     if (parentEl) {
       (parentEl as HTMLElement).style.backgroundImage = gradientCss;
       (parentEl as HTMLElement).style.backgroundRepeat = "no-repeat";

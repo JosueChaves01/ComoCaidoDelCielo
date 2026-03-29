@@ -491,7 +491,7 @@ export function TerraceSection({
                 <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
                   Naturaleza Inmersiva
                 </span>
-                <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
+                <h3 className="text-4xl md:text-5xl text-[#df9138ff] mb-4">
                   Vistas Que Quitan el Aliento
                 </h3>
                 <p className="text-lg text-[#6B5D4F] leading-relaxed">
