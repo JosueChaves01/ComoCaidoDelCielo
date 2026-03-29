@@ -12,7 +12,7 @@ import { Navbar } from "./components/Navbar";
 
 export default function App() {
   // Hero image
-  const heroImage = "https://images.unsplash.com/photo-1758571993819-029a11a09ed0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdW5zZXQlMjB0ZXJyYWNlJTIwbW91bnRhaW4lMjB2aWV3fGVufDF8fHx8MTc3NDcyOTM2Nnww&ixlib=rb-4.1.0&q=80&w=1080";
+  const heroImage = "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.82787-15/631679101_18055833230690161_347261501323098901_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=13d280&_nc_ohc=a6Ppz-US06kQ7kNvwEtEOky&_nc_oc=AdplYA2oBQAyR-djYApyWA_a3Ph8GAPNqrNwJXPV8vNuWQvizmcEuSt3GPh6udUz9QZ0Nxtf6riasxo9CweFBL76&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=XJ0N8nRIco8qErY1hlMQYQ&_nc_ss=7a30f&oh=00_AfwbTt79UnvcWBcUQzUQDFQjRDmdVBcBgmyaDE9mREr7rQ&oe=69CE8EF0";
 
   // Terrace images
   const terraceImages = [
@@ -35,7 +35,7 @@ export default function App() {
   ];
 
   // Event hall image
-  const eventHallImage = "https://images.unsplash.com/photo-1763231575952-98244918f99b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwZXZlbnQlMjBoYWxsJTIwaW50ZXJpb3J8ZW58MXx8fHwxNzc0NzI5MzY3fDA&ixlib=rb-4.1.0&q=80&w=1080";
+  const eventHallImage = "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/607703143_889442146901502_6650776926722163890_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=102&ccb=1-7&_nc_sid=7b2446&_nc_ohc=xNz8R_H4roYQ7kNvwEWJVSs&_nc_oc=Ado92ls6gtReQYurKAtrNckx7oig70sc9YwnfM2n73CO9eTEvCgaxa7yuQ6GDVgCpG9L6xsXEiZPk_7U9eDee_3c&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=d5t6Nrk43jSYy49K_YiqgA&_nc_ss=7a30f&oh=00_AfzSpag0IhVehobQ-5MonqJitnPyCV0erLxsgByexpcerg&oe=69CEB181";
 
   // Airbnb images
   const airbnbImages = [
