@@ -17,15 +17,20 @@ export function MenuItem({ name, price, description, image, category }: MenuItem
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group"
+      className="bg-[#F5F2E8] rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group"
     >
       <div className="relative aspect-square overflow-hidden max-h-52">
         {!imageError ? (
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
             onError={() => setImageError(true)}
+            style={{
+              transform: 'scale(1.05)',
+              transition: 'transform 0.3s ease-in-out',
+              filter: 'brightness(1.1) contrast(1.2)',
+            }}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#F0E8E0] to-[#E8DCC4] flex items-center justify-center">

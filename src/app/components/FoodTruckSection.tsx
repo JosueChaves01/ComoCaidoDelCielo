@@ -22,26 +22,18 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
   const menuNarrative: NarrativeStep[] = [
     {
       title: "Menú cuidado",
-      description:
-        "Platos preparados con dedicación, bebidas refrescantes y opciones para todos los gustos. Cada elemento es seleccionado con esmero para garantizar una experiencia memorable.",
+      description: "Platos deliciosos para compartir en un lugar que brinda buenos momentos con personas que amamos",
       highlight: "Sabores que inspiran",
     },
     {
       title: "Experiencias especiales",
-      description:
-        "Noches temáticas, cenas bajo las estrellas y eventos gastronómicos únicos. Creamos momentos especiales que transforman una simple comida en un recuerdo inolvidable.",
+      description: "Noches temáticas, cenas bajo las estrellas y eventos gastronómicos únicos. Creamos momentos especiales que transforman una simple comida en un recuerdo inolvidable.",
       highlight: "Momentos inolvidables",
-    },
-    {
-      title: "Ingredientes frescos",
-      description:
-        "Productos locales de la más alta calidad, seleccionados diariamente. Trabajamos con proveedores de confianza para asegurar frescura y sabor en cada bocado.",
-      highlight: "Sabor garantizado",
     },
   ];
 
   return (
-    <section id="foodtruck" ref={ref} className="py-24 px-6 md:px-12 bg-[#F0E8E0]">
+    <section id="foodtruck" ref={ref} className="py-24 px-6 md:px-12 bg-gradient-to-b from-[#0F0F0A] via-[#2A3A25] to-[#3A4F35] text-white">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -50,14 +42,14 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <span className="text-sm uppercase tracking-wider text-[#8B6F47] mb-2 block">
+          <span className="text-sm uppercase tracking-wider text-white mb-2 block">
             Sabores Auténticos
           </span>
-          <h2 className="text-4xl md:text-6xl text-[#2A2419] mb-4">
+          <h2 className="text-4xl md:text-6xl text-white mb-4">
             Gastronomía con
-            <span className="block text-[#8B6F47]">alma</span>
+            <span className="block text-white">alma</span>
           </h2>
-          <p className="text-lg text-[#6B5D4F] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
             Nuestro food truck no es solo comida, es parte de la experiencia.
             Sabores auténticos que complementan cada momento del día.
           </p>
@@ -79,14 +71,14 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#8B6F47] mb-2 block">
+                <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
                   Experiencia Gastronómica
                 </span>
-                <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
+                <h3 className="text-4xl md:text-5xl text-white mb-4">
                   Sabores Que
-                  <span className="block text-[#8B6F47]">Conectan</span>
+                  <span className="block text-[#C19A6B]">Conectan</span>
                 </h3>
-                <p className="text-lg text-[#6B5D4F] leading-relaxed">
+                <p className="text-lg text-gray-300 leading-relaxed">
                   Cada plato cuenta una historia, cada sabor despierta un recuerdo.
                   Descubre la magia de nuestra cocina artesanal.
                 </p>
