@@ -9,7 +9,7 @@ interface AirbnbSectionProps {
 
 export function AirbnbSection({ images }: AirbnbSectionProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
     <section id="hospedaje" ref={ref} className="py-24 px-6 md:px-12 bg-[#E8DED0]">

@@ -16,7 +16,7 @@ export function TerraceSection({
   images,
 }: TerraceSectionProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   // Imágenes específicas para cada narrativa
   const sunsetImage =
@@ -138,7 +138,8 @@ export function TerraceSection({
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-20"
         >
@@ -155,16 +156,18 @@ export function TerraceSection({
         {/* EXPERIENCIA 1: Atardeceres Únicos */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.8 }}
           className="mb-32"
         >
           <div className="grid md:grid-cols-2 gap-12 items-start mb-12">
             <div className="order-2 md:order-1">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.3 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
                 className="mb-6"
               >
                 <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
@@ -187,9 +190,8 @@ export function TerraceSection({
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: -20 }}
-                    animate={
-                      isInView ? { opacity: 1, x: 0 } : {}
-                    }
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
                       delay: 0.4 + index * 0.15,
@@ -219,8 +221,9 @@ export function TerraceSection({
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.8, delay: 0.4 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
               className="order-1 md:order-2 relative h-[500px] md:h-[700px] rounded-3xl overflow-hidden group shadow-2xl sticky top-8"
             >
               <img
@@ -242,15 +245,17 @@ export function TerraceSection({
         {/* EXPERIENCIA 2: Distintos Tipos de Terrazas */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.8 }}
           className="mb-32"
         >
           <div className="grid md:grid-cols-2 gap-12 items-start mb-12">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.8, delay: 0.6 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
               className="relative sticky top-8"
             >
               <div className="grid grid-cols-2 gap-4">
@@ -258,9 +263,8 @@ export function TerraceSection({
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
-                    animate={
-                      isInView ? { opacity: 1, y: 0 } : {}
-                    }
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
                       delay: 0.6 + index * 0.1,
@@ -304,9 +308,8 @@ export function TerraceSection({
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: 20 }}
-                    animate={
-                      isInView ? { opacity: 1, x: 0 } : {}
-                    }
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
                       delay: 0.6 + index * 0.15,
@@ -339,8 +342,9 @@ export function TerraceSection({
         {/* EXPERIENCIA 3: Fogatas y Magia Nocturna */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.8 }}
           className="mb-32"
         >
           <div className="grid md:grid-cols-2 gap-12 items-start mb-12">
@@ -371,9 +375,8 @@ export function TerraceSection({
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: -20 }}
-                    animate={
-                      isInView ? { opacity: 1, x: 0 } : {}
-                    }
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
                       delay: 0.8 + index * 0.15,
@@ -403,8 +406,9 @@ export function TerraceSection({
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.8, delay: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
               className="order-1 md:order-2 relative h-[500px] md:h-[700px] rounded-3xl overflow-hidden group shadow-2xl sticky top-8"
             >
               <img
@@ -450,8 +454,9 @@ export function TerraceSection({
         {/* EXPERIENCIA 4: Vistas Panorámicas */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.8 }}
         >
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <motion.div
@@ -501,9 +506,8 @@ export function TerraceSection({
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: 20 }}
-                    animate={
-                      isInView ? { opacity: 1, x: 0 } : {}
-                    }
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
                     transition={{
                       duration: 0.6,
                       delay: 1.0 + index * 0.15,

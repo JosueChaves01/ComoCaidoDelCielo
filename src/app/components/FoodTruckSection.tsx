@@ -9,7 +9,7 @@ interface FoodTruckSectionProps {
 
 export function FoodTruckSection({ images }: FoodTruckSectionProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
     <section id="foodtruck" ref={ref} className="py-24 px-6 md:px-12 bg-[#E8DED0]">
@@ -25,7 +25,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
               Gastronomía con alma
             </h2>
             <p className="text-lg text-[#6B5D4F] mb-8">
-              Nuestro food truck no es solo comida, es parte de la experiencia. 
+              Nuestro food truck no es solo comida, es parte de la experiencia.
               Sabores auténticos que complementan cada momento del día.
             </p>
 

@@ -9,7 +9,7 @@ interface EventsSectionProps {
 
 export function EventsSection({ images }: EventsSectionProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
     <section id="eventos" ref={ref} className="py-24 px-6 md:px-12 bg-[#2A2419] text-white">
