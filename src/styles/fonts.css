@@ -1,0 +1,50 @@
+/* ============================================================
+   TYPOGRAPHY SYSTEM — Como Caído del Cielo
+   ============================================================
+   Display  → Cormorant Garamond  (hero titles, brand name)
+   Heading  → Fraunces            (section titles, h2/h3)
+   Body/UI  → Outfit              (body text, labels, nav, CTAs)
+   ============================================================ */
+
+:root {
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-heading: 'Fraunces', Georgia, serif;
+  --font-body:    'Outfit', system-ui, sans-serif;
+}
+
+/* ── Global base ── */
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Display: hero names, brand mark, big cinematic text ── */
+.font-display,
+h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* ── Heading: section titles, card headings ── */
+.font-heading,
+h2, h3 {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* ── Body/UI: everything else ── */
+.font-body,
+h4, h5, h6,
+p, span, a, label,
+button, input, textarea, select, nav {
+  font-family: var(--font-body);
+}
+
+/* ── Utility classes for manual overrides ── */
+.font-display { font-family: var(--font-display) !important; }
+.font-heading  { font-family: var(--font-heading)  !important; }
+.font-body     { font-family: var(--font-body)     !important; }

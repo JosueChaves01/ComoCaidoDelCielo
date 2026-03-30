@@ -172,8 +172,8 @@ export function TerraceSection({
                 transition={{ duration: 0.8 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#966F40] mb-2 block">
-                  Experiencia Sensorial
+                <span className="text-sm tracking-wider text-[#966F40] mb-2 block">
+                  Experiencia sensorial
                 </span>
                 <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
                   Atardeceres Únicos
@@ -235,7 +235,7 @@ export function TerraceSection({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               <div className="absolute bottom-8 left-8 right-8 text-white">
-                <p className="text-sm uppercase tracking-wider mb-2 opacity-90">
+                <p className="text-sm tracking-wider mb-2 opacity-90">
                   Golden Hour
                 </p>
                 <p className="text-2xl">5:00 PM - 6:30 PM</p>
@@ -291,8 +291,8 @@ export function TerraceSection({
                 transition={{ duration: 0.8, delay: 0.5 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#966F40] mb-2 block">
-                  Espacios Versátiles
+                <span className="text-sm tracking-wider text-[#966F40] mb-2 block">
+                  Espacios versátiles
                 </span>
                 <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
                   Distintos Tipos y Tamaños
@@ -357,8 +357,8 @@ export function TerraceSection({
                 transition={{ duration: 0.8, delay: 0.7 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#966F40] mb-2 block">
-                  Experiencia Nocturna
+                <span className="text-sm tracking-wider text-[#966F40] mb-2 block">
+                  Experiencia nocturna
                 </span>
                 <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
                   Fogatas y Magia Nocturna
@@ -420,8 +420,8 @@ export function TerraceSection({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-8 left-8 right-8 text-white">
-                <p className="text-sm uppercase tracking-wider mb-2 opacity-90">
-                  Experiencia Nocturna
+                <p className="text-sm tracking-wider mb-2 opacity-90">
+                  Experiencia nocturna
                 </p>
                 <p className="text-2xl">7:00 PM - 11:00 PM</p>
               </div>
@@ -433,7 +433,7 @@ export function TerraceSection({
             transition={{ duration: 0.8, delay: 1.2 }}
             className="mt-8 bg-gradient-to-br from-[#2A2419] to-[#3A3329] rounded-2xl p-6 text-white"
           >
-            <p className="text-sm uppercase tracking-wider mb-2 opacity-80">
+            <p className="text-sm tracking-wider mb-2 opacity-80">
               Incluye
             </p>
             <ul className="space-y-2 text-sm">
@@ -474,8 +474,8 @@ export function TerraceSection({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               <div className="absolute bottom-8 left-8 right-8 text-white">
-                <p className="text-sm uppercase tracking-wider mb-2 opacity-90">
-                  Vista Panorámica
+                <p className="text-sm tracking-wider mb-2 opacity-90">
+                  Vista panorámica
                 </p>
                 <p className="text-2xl">Golfo de Nicoya</p>
               </div>
@@ -488,8 +488,8 @@ export function TerraceSection({
                 transition={{ duration: 0.8, delay: 0.9 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#966F40] mb-2 block">
-                  Naturaleza Inmersiva
+                <span className="text-sm tracking-wider text-[#966F40] mb-2 block">
+                  Naturaleza inmersiva
                 </span>
                 <h3 className="text-4xl md:text-5xl text-[#B1630A] mb-4">
                   Vistas Que Quitan el Aliento
@@ -542,8 +542,8 @@ export function TerraceSection({
                 transition={{ duration: 0.8, delay: 1.5 }}
                 className="mt-8 bg-gradient-to-br from-[#966F40] to-[#8A7254] rounded-2xl p-6 text-white"
               >
-                <p className="text-sm uppercase tracking-wider mb-3 opacity-90">
-                  Lo Que Verás
+                <p className="text-sm tracking-wider mb-3 opacity-90">
+                  Lo que verás
                 </p>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>

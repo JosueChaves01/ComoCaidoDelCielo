@@ -23,11 +23,11 @@ export function EventHallSection({ images }: EventHallSectionProps) {
         >
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
-              <span className="inline-block text-sm tracking-[0.2em] uppercase text-[#C89F6A] mb-4">
+              <span className="inline-block text-sm tracking-[0.2em] text-[#C89F6A] mb-4">
                 Reserva privada
               </span>
               <h2 className="text-4xl md:text-6xl lg:text-7xl text-white leading-tight">
-                Tu espacio
+                Tu Espacio
                 <span className="block italic text-[#C89F6A]">privado</span>
               </h2>
             </div>
@@ -56,7 +56,7 @@ export function EventHallSection({ images }: EventHallSectionProps) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
               <div className="absolute bottom-6 left-6">
-                <span className="bg-[#C89F6A] text-[#2A2419] text-xs font-semibold tracking-wider uppercase px-4 py-2 rounded-full">
+                <span className="bg-[#C89F6A] text-[#2A2419] text-xs font-semibold tracking-wider px-4 py-2 rounded-full">
                   Espacio privado
                 </span>
               </div>
@@ -104,7 +104,7 @@ export function EventHallSection({ images }: EventHallSectionProps) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               <div className="absolute bottom-4 left-4">
-                <span className="text-white/80 text-xs tracking-widest uppercase">
+                <span className="text-white/80 text-xs tracking-widest">
                   Cada celebración es única
                 </span>
               </div>
@@ -121,21 +121,9 @@ export function EventHallSection({ images }: EventHallSectionProps) {
         >
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              {
-                icon: Heart,
-                title: "Celebraciones especiales",
-                desc: "Cumpleaños, aniversarios, despedidas de soltera. Tu momento más especial merece un escenario que lo esté también.",
-              },
-              {
-                icon: Briefcase,
-                title: "Retiros y corporativos",
-                desc: "Reuniones de equipo, talleres creativos, presentaciones. Un entorno que inspira desde que llegas.",
-              },
-              {
-                icon: Shuffle,
-                title: "Totalmente adaptable",
-                desc: "El espacio se transforma según tu visión. Íntimo o amplio, formal o festivo, siempre elegante.",
-              },
+              { icon: Heart,     title: "Celebraciones Especiales", desc: "Cumpleaños, aniversarios, despedidas de soltera. Tu momento más especial merece un escenario que lo esté también." },
+              { icon: Briefcase, title: "Retiros y Corporativos",    desc: "Reuniones de equipo, talleres creativos, presentaciones. Un entorno que inspira desde que llegas." },
+              { icon: Shuffle,   title: "Totalmente Adaptable",      desc: "El espacio se transforma según tu visión. Íntimo o amplio, formal o festivo, siempre elegante." },
             ].map((use) => {
               const Icon = use.icon;
               return (

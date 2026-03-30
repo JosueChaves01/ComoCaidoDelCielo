@@ -20,7 +20,7 @@ export function MomentsGallery({ images }: MomentsGalleryProps) {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-6xl text-white mb-6">
-            Momentos que inspiran
+            Momentos Que Inspiran
           </h2>
           <p className="text-lg md:text-xl text-[#D6BFA6] max-w-3xl mx-auto">
             Más que un lugar, somos recuerdos en construcción.

@@ -17,7 +17,7 @@ export function InfoSection() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-6xl mb-6">
-            Información práctica
+            Información Práctica
           </h2>
           <p className="text-lg md:text-xl text-white/80 max-w-3xl mx-auto">
             Todo lo que necesitas saber para planificar tu visita

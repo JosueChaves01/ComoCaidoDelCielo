@@ -24,7 +24,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-6xl text-[#3B2A22] mb-6">
-            Extiende tu experiencia
+            Extiende Tu Experiencia
           </h2>
           <p className="text-lg md:text-xl text-[#3B2A22]/70 max-w-3xl mx-auto">
             ¿Por qué solo unas horas? Quédate a descansar y vive el lugar en su totalidad.
@@ -48,7 +48,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
               <h3 className="text-2xl text-white font-medium translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
-                Descanso profundo
+                Descanso Profundo
               </h3>
               <p className="text-white/80 text-sm mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-150">
                 Desconecta del ruido y reconecta contigo
@@ -65,7 +65,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
               <h3 className="text-2xl text-white font-medium translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
-                Entorno natural
+                Entorno Natural
               </h3>
               <p className="text-white/80 text-sm mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-150">
                 Despierta rodeado de verde
@@ -83,7 +83,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
         >
           <div className="text-center">
             <Moon className="text-[#7A553A] mx-auto mb-4" size={40} />
-            <h3 className="text-2xl text-[#3B2A22] mb-3">Descanso profundo</h3>
+            <h3 className="text-2xl text-[#3B2A22] mb-3">Descanso Profundo</h3>
             <p className="text-[#3B2A22]/70">
               Desconecta del ruido y reconecta contigo. El silencio de la naturaleza como banda sonora.
             </p>
@@ -91,7 +91,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
 
           <div className="text-center">
             <Trees className="text-[#7A553A] mx-auto mb-4" size={40} />
-            <h3 className="text-2xl text-[#3B2A22] mb-3">Entorno natural</h3>
+            <h3 className="text-2xl text-[#3B2A22] mb-3">Entorno Natural</h3>
             <p className="text-[#3B2A22]/70">
               Despierta rodeado de verde. Vive el amanecer desde otra perspectiva.
             </p>
@@ -99,7 +99,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
 
           <div className="text-center">
             <Home className="text-[#7A553A] mx-auto mb-4" size={40} />
-            <h3 className="text-2xl text-[#3B2A22] mb-3">Como en casa</h3>
+            <h3 className="text-2xl text-[#3B2A22] mb-3">Como En Casa</h3>
             <p className="text-[#3B2A22]/70">
               Comodidad, privacidad y todas las amenidades para una estadía inolvidable.
             </p>
@@ -117,7 +117,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
             onClick={() => setIsModalOpen(true)}
             className="px-8 py-4 bg-[#3B2A22] text-white rounded-full hover:bg-[#7A553A] transition-all hover:shadow-xl"
           >
-            Detalles del Hospedaje
+            Detalles del hospedaje
           </button>
         </motion.div>
       </div>

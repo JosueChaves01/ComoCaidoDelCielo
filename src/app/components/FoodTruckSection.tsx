@@ -22,12 +22,12 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
 
   const menuNarrative: NarrativeStep[] = [
     {
-      title: "Antojitos para el momento",
+      title: "Antojitos Para El Momento",
       description: "Opciones sencillas y ricas para acompañar la experiencia. Chocolates calientes, café, dulces y algo para picar mientras disfrutás del ambiente.",
       highlight: "Hecho para compartir",
     },
     {
-      title: "Momentos que se viven",
+      title: "Momentos Que Se Viven",
       description: "Fogatas, atardeceres, noches especiales y espacios para relajarse. Más que venir a comer, es venir a pasarla bien.",
       highlight: "Cada visita es diferente",
     },
@@ -74,11 +74,11 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <span className="text-sm uppercase tracking-wider text-white mb-2 block">
+          <span className="text-sm tracking-wider text-white mb-2 block">
             Rincón del Atardecer
           </span>
           <h2 className="text-4xl md:text-6xl text-white mb-4">
-            Sabores para disfrutar el
+            Sabores Para Disfrutar El
             <span className="block text-white">atardecer</span>
           </h2>
           <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
@@ -103,7 +103,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
+                <span className="text-sm tracking-wider text-[#C19A6B] mb-2 block">
                   Momentos Compartidos
                 </span>
                 <h3 className="text-4xl md:text-5xl text-white mb-4">
@@ -161,8 +161,8 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                   className="w-full h-full object-cover group-hover:scale-110 group-hover:blur-[2px] transition-all duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                  <p className="text-sm uppercase tracking-wider mb-2 opacity-90">
-                    FOOD TRUCK
+                  <p className="text-sm tracking-wider mb-2 opacity-90">
+                    Food truck
                   </p>
                   <p className="text-2xl">Todo el día</p>
                   <button
