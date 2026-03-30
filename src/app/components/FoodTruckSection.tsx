@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef, useState } from "react";
-import { Coffee, Cake, Cookie } from "lucide-react";
+import { Coffee, Cake, Cookie, Utensils } from "lucide-react";
 import { FoodTruckModal } from "./FoodTruckModal";
 import { SpecialEventsSection, SpecialEvent } from "./SpecialEventsSection";
 
@@ -144,6 +144,16 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                     </div>
                   </motion.div>
                 ))}
+                {/* Mobile Menu Button CTA */}
+                <div className="md:hidden pt-8">
+                  <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="w-full py-5 bg-[#C89F6A] text-black font-bold tracking-widest uppercase rounded-2xl shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform"
+                  >
+                    <Utensils className="w-5 h-5" />
+                    Ver menú de comidas
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -152,22 +162,23 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="order-1 md:order-2 relative h-[500px] md:h-[700px] sticky top-8"
+              className="order-1 md:order-2 relative h-[500px] md:h-[700px] md:sticky md:top-8"
             >
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl group border border-white/5 cursor-pointer">
+              <div className="relative h-full rounded-3xl overflow-hidden shadow-2xl group border border-white/5 cursor-pointer" onClick={() => setIsModalOpen(true)}>
                 <img
                   src={images[0]}
                   alt="Food truck con gastronomía artesanal"
-                  className="w-full h-full object-cover group-hover:scale-110 group-hover:blur-[2px] transition-all duration-700"
+                  className="w-full h-full object-cover group-hover:scale-110 md:group-hover:blur-[2px] transition-all duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                  <p className="text-sm tracking-wider mb-2 opacity-90">
-                    Food truck
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
+                  <p className="text-sm tracking-wider mb-2 text-[#C89F6A] font-bold uppercase">
+                    Rincón del Atardecer
                   </p>
-                  <p className="text-2xl">Todo el día</p>
+                  <h4 className="text-3xl font-serif text-white mb-2">Nuestro Menú</h4>
+                  <p className="text-white/70 text-sm mb-6 max-w-xs md:hidden">Toca para explorar todas nuestras opciones gastronómicas.</p>
                   <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="mt-4 px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-colors border border-white/30"
+                    onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }}
+                    className="px-8 py-4 bg-[#C89F6A] text-black font-bold rounded-full hover:bg-[#D4A574] transition-all self-start shadow-lg"
                   >
                     Ver menú completo
                   </button>
