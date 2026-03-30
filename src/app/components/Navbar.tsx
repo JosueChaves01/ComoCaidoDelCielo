@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronRight, Home, Sunset, Calendar, Utensils, ChefHat, Bed } from "lucide-react";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -28,12 +28,12 @@ export function Navbar() {
   }, [isMobileMenuOpen]);
 
   const menuItems = [
-    { label: "Inicio", href: "#" },
-    { label: "Terrazas", href: "#terrazas" },
-    { label: "Eventos", href: "#eventos" },
-    { label: "Salon", href: "#salon" },
-    { label: "Food Truck", href: "#foodtruck" },
-    { label: "Hospedaje", href: "#hospedaje" },
+    { label: "Inicio", href: "#", icon: Home },
+    { label: "Terrazas", href: "#terrazas", icon: Sunset },
+    { label: "Eventos", href: "#eventos", icon: Calendar },
+    { label: "Salon", href: "#salon", icon: ChefHat },
+    { label: "Food Truck", href: "#foodtruck", icon: Utensils },
+    { label: "Hospedaje", href: "#hospedaje", icon: Bed },
   ];
 
   return (
@@ -52,9 +52,7 @@ export function Navbar() {
           {/* Logo/Brand */}
           <a
             href="#"
-            className={`text-xl md:text-2xl font-serif tracking-tight transition-all duration-500 ${
-              isMobileMenuOpen ? "text-white opacity-100" : (isScrolled ? "text-white" : "text-white")
-            }`}
+            className="text-xl md:text-2xl font-serif tracking-tight transition-all duration-500 text-white"
           >
             Como Caído <span className="text-[#C89F6A]">del Cielo</span>
           </a>
@@ -124,22 +122,27 @@ export function Navbar() {
             <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#7A553A]/20 rounded-full blur-[120px]" />
 
             <div className="relative w-full px-10 flex flex-col items-center text-center space-y-8">
-              {menuItems.map((item, index) => (
-                <motion.a
-                  key={item.label}
-                  href={item.href}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -30 }}
-                  transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="group flex items-center justify-center gap-4 text-3xl font-serif text-white hover:text-[#C89F6A] transition-colors"
-                >
-                  <span className="text-sm font-sans font-medium text-[#C89F6A]/50 group-hover:text-[#C89F6A] transition-colors tracking-tighter">0{index + 1}</span>
-                  {item.label}
-                  <ChevronRight className="w-6 h-6 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-[#C89F6A]" />
-                </motion.a>
-              ))}
+              {menuItems.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.a
+                    key={item.label}
+                    href={item.href}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="group flex items-center justify-center gap-4 text-3xl font-serif text-white hover:text-[#C89F6A] transition-colors"
+                  >
+                    <div className="bg-white/5 p-3 rounded-xl group-hover:bg-[#C89F6A]/20 transition-all border border-white/5 group-hover:border-[#C89F6A]/30">
+                      <Icon className="w-6 h-6 text-[#C89F6A]" strokeWidth={1.5} />
+                    </div>
+                    {item.label}
+                    <ChevronRight className="w-6 h-6 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-[#C89F6A]" />
+                  </motion.a>
+                );
+              })}
 
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
