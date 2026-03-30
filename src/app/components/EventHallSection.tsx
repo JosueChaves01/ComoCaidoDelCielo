@@ -12,7 +12,7 @@ export function EventHallSection({ images }: EventHallSectionProps) {
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
-    <section id="salon" ref={ref} className="py-24 px-6 md:px-12 bg-[#2A2419]">
+    <section id="salon" ref={ref} className="py-24 px-6 md:px-12 bg-[#3B2A22]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -167,7 +167,7 @@ export function EventHallSection({ images }: EventHallSectionProps) {
             Cupos limitados para garantizar una experiencia exclusiva.
             Reserva con anticipación y define todos los detalles a tu gusto.
           </p>
-          <button 
+          <button
             onClick={() => {
               const event = new CustomEvent("open-chat", {
                 detail: { message: "Hola buen día, quiero consultar la disponibilidad" }

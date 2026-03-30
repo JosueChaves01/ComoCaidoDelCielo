@@ -15,7 +15,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
 
 
   return (
-    <section id="hospedaje" ref={ref} className="py-24 px-6 md:px-12 bg-[#090b10] text-white">
+    <section id="hospedaje" ref={ref} className="py-24 px-6 md:px-12 bg-[#D6BFA6] text-[#3B2A22]">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -23,11 +23,11 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-6xl text-white mb-6">
+          <h2 className="text-4xl md:text-6xl text-[#3B2A22] mb-6">
             Extiende tu experiencia
           </h2>
-          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
-            ¿Por qué solo unas horas? Quédate a descansar y vive el lugar en su totalidad. 
+          <p className="text-lg md:text-xl text-[#3B2A22]/70 max-w-3xl mx-auto">
+            ¿Por qué solo unas horas? Quédate a descansar y vive el lugar en su totalidad.
             Hospedaje acogedor en conexión con la naturaleza.
           </p>
         </motion.div>
@@ -82,25 +82,25 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
           className="grid md:grid-cols-3 gap-8 mb-12"
         >
           <div className="text-center">
-            <Moon className="text-[#C19A6B] mx-auto mb-4" size={40} />
-            <h3 className="text-2xl text-white mb-3">Descanso profundo</h3>
-            <p className="text-gray-300">
+            <Moon className="text-[#7A553A] mx-auto mb-4" size={40} />
+            <h3 className="text-2xl text-[#3B2A22] mb-3">Descanso profundo</h3>
+            <p className="text-[#3B2A22]/70">
               Desconecta del ruido y reconecta contigo. El silencio de la naturaleza como banda sonora.
             </p>
           </div>
 
           <div className="text-center">
-            <Trees className="text-[#C19A6B] mx-auto mb-4" size={40} />
-            <h3 className="text-2xl text-white mb-3">Entorno natural</h3>
-            <p className="text-gray-300">
+            <Trees className="text-[#7A553A] mx-auto mb-4" size={40} />
+            <h3 className="text-2xl text-[#3B2A22] mb-3">Entorno natural</h3>
+            <p className="text-[#3B2A22]/70">
               Despierta rodeado de verde. Vive el amanecer desde otra perspectiva.
             </p>
           </div>
 
           <div className="text-center">
-            <Home className="text-[#C19A6B] mx-auto mb-4" size={40} />
-            <h3 className="text-2xl text-white mb-3">Como en casa</h3>
-            <p className="text-gray-300">
+            <Home className="text-[#7A553A] mx-auto mb-4" size={40} />
+            <h3 className="text-2xl text-[#3B2A22] mb-3">Como en casa</h3>
+            <p className="text-[#3B2A22]/70">
               Comodidad, privacidad y todas las amenidades para una estadía inolvidable.
             </p>
           </div>
@@ -113,19 +113,19 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="text-center"
         >
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
-            className="px-8 py-4 bg-[#8B6F47] text-white rounded-full hover:bg-[#6B5337] transition-all hover:shadow-xl"
+            className="px-8 py-4 bg-[#3B2A22] text-white rounded-full hover:bg-[#7A553A] transition-all hover:shadow-xl"
           >
             Detalles del Hospedaje
           </button>
         </motion.div>
       </div>
 
-      <AirbnbModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        images={images} 
+      <AirbnbModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        images={images}
       />
     </section>
   );

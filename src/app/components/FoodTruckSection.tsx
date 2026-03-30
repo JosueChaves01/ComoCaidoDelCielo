@@ -65,7 +65,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
   ];
 
   return (
-    <section id="foodtruck" ref={ref} className="py-24 px-6 md:px-12 bg-gradient-to-b from-[#0F0F0A] via-[#2A3A25] to-[#3A4F35] text-white">
+    <section id="foodtruck" ref={ref} className="py-24 px-6 md:px-12 bg-[#7A553A] text-white">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -81,7 +81,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
             Sabores para disfrutar el
             <span className="block text-white">atardecer</span>
           </h2>
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
             Nuestro food truck no es solo comida, es parte de la experiencia.
             Sabores auténticos que complementan cada momento del día.
           </p>
@@ -124,19 +124,19 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                     animate={isInView ? { opacity: 1, x: 0 } : {}}
                     transition={{ duration: 0.8, delay: 0.4 + index * 0.1 }}
                   >
-                    <div className="bg-white p-6 rounded-2xl shadow-sm">
+                    <div className="bg-[#D6BFA6] p-6 rounded-2xl shadow-md border border-white/10">
                       <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#C19A6B] to-[#8B7355] flex items-center justify-center text-white text-sm">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#3B2A22] flex items-center justify-center text-white text-sm font-bold">
                           {index + 1}
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-lg text-[#2A2419] mb-2">
+                          <h4 className="text-lg text-[#3B2A22] mb-2 font-medium">
                             {step.title}
                           </h4>
-                          <p className="text-[#6B5D4F] mb-3">
+                          <p className="text-[#3B2A22]/80 mb-3">
                             {step.description}
                           </p>
-                          <p className="text-sm text-[#C19A6B] italic">
+                          <p className="text-sm text-[#7A553A] font-semibold italic">
                             {step.highlight}
                           </p>
                         </div>

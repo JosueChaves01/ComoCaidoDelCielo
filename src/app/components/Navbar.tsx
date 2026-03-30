@@ -18,8 +18,9 @@ export function Navbar() {
   const menuItems = [
     { label: "Inicio", href: "#" },
     { label: "Terrazas", href: "#terrazas" },
-    { label: "Food Truck", href: "#foodtruck" },
     { label: "Eventos", href: "#eventos" },
+    { label: "Salon", href: "#salon" },
+    { label: "Food Truck", href: "#foodtruck" },
     { label: "Hospedaje", href: "#hospedaje" },
   ];
 
@@ -61,7 +62,7 @@ export function Navbar() {
           <button
             className={`px-6 py-2 rounded-full transition-all ${
               isScrolled
-                ? "bg-[#8B6F47] text-white hover:bg-[#6B5337]"
+                ? "bg-[#7A553A] text-white hover:bg-[#3B2A22]"
                 : "bg-white/20 backdrop-blur-sm text-white border border-white/40 hover:bg-white/30"
             }`}
           >
@@ -98,7 +99,7 @@ export function Navbar() {
                   {item.label}
                 </a>
               ))}
-              <button className="w-full px-6 py-3 bg-[#8B6F47] text-white rounded-full hover:bg-[#6B5337] transition-all">
+              <button className="w-full px-6 py-3 bg-[#7A553A] text-white rounded-full hover:bg-[#3B2A22] transition-all">
                 Reservar
               </button>
             </div>

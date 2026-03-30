@@ -35,7 +35,7 @@ export function SpecialEventsSection({ events }: SpecialEventsSectionProps) {
   };
 
   return (
-    <section ref={ref} className="py-24 px-6 md:px-12 bg-gradient-to-b from-[#3A4F35] to-[#0F0F0A]">
+    <section ref={ref} className="py-24 px-6 md:px-12 bg-[#7A553A]">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -46,7 +46,7 @@ export function SpecialEventsSection({ events }: SpecialEventsSectionProps) {
           <h2 className="text-4xl md:text-6xl text-white mb-6">
             Menús de Eventos Especiales
           </h2>
-          <p className="text-lg md:text-xl text-zinc-300 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-[#D6BFA6] max-w-3xl mx-auto">
             Descubre nuestros menús exclusivos para eventos especiales. 
             Cada actividad tiene su propio menú único diseñado para complementar la experiencia.
           </p>

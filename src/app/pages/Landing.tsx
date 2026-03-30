@@ -183,8 +183,8 @@ export function Landing() {
       <Hero imageUrl={heroImage} />
       <TerraceSection images={terraceImages} />
       <EventsSection mainEvents={mainEvents} upcomingPosters={upcomingEvents} />
-      <FoodTruckSection images={foodTruckImages.map(img => img.url)} />
       <EventHallSection images={eventHallImages} />
+      <FoodTruckSection images={foodTruckImages.map(img => img.url)} />
       <AirbnbSection images={airbnbImages.map(img => img.url)} />
       <MomentsGallery images={momentsImages} />
       <InfoSection />

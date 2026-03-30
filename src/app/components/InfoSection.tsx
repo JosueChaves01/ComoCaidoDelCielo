@@ -8,7 +8,7 @@ export function InfoSection() {
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <section ref={ref} className="py-24 px-6 md:px-12 bg-[#2A2419] text-white">
+    <section ref={ref} className="py-24 px-6 md:px-12 bg-[#7A553A] text-white">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -32,7 +32,7 @@ export function InfoSection() {
         >
           {/* Location */}
           <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-            <MapPin className="text-[#C89F6A] mb-4" size={40} />
+            <MapPin className="text-[#D6BFA6] mb-4" size={40} />
             <h3 className="text-2xl mb-3">Ubicación</h3>
             <p className="text-white/70">
               A solo 45 minutos de la ciudad. Camino panorámico, fácil acceso y estacionamiento disponible.
@@ -41,7 +41,7 @@ export function InfoSection() {
 
           {/* Hours */}
           <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-            <Clock className="text-[#C89F6A] mb-4" size={40} />
+            <Clock className="text-[#D6BFA6] mb-4" size={40} />
             <h3 className="text-2xl mb-3">Horarios</h3>
             <p className="text-white/70">
               Viernes a domingo de 2:00 PM a 10:00 PM. Eventos especiales con horarios extendidos.
@@ -50,7 +50,7 @@ export function InfoSection() {
 
           {/* Season */}
           <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-            <CalendarIcon className="text-[#C89F6A] mb-4" size={40} />
+            <CalendarIcon className="text-[#D6BFA6] mb-4" size={40} />
             <h3 className="text-2xl mb-3">Temporada</h3>
             <p className="text-white/70">
               Abierto todo el año. Cada estación ofrece una experiencia única y diferente.
@@ -59,7 +59,7 @@ export function InfoSection() {
 
           {/* Important Info */}
           <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-            <Info className="text-[#C89F6A] mb-4" size={40} />
+            <Info className="text-[#D6BFA6] mb-4" size={40} />
             <h3 className="text-2xl mb-3">Importante</h3>
             <p className="text-white/70">
               Reserva con anticipación. Cupo limitado para preservar la experiencia.
@@ -72,13 +72,13 @@ export function InfoSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-12 bg-[#C89F6A] text-[#2A2419] p-8 rounded-3xl text-center"
+          className="mt-12 bg-[#7A553A] text-white p-8 rounded-3xl text-center"
         >
           <h3 className="text-2xl mb-4">¿Necesitas más información?</h3>
-          <p className="mb-6 text-lg">
+          <p className="mb-6 text-lg text-[#D6BFA6]">
             Nuestro asistente está disponible para resolver todas tus dudas y ayudarte con tu reservación.
           </p>
-          <button className="px-8 py-4 bg-[#2A2419] text-white rounded-full hover:bg-[#3A3429] transition-all">
+          <button className="px-8 py-4 bg-[#3B2A22] text-white rounded-full hover:bg-[#D6BFA6] hover:text-[#3B2A22] transition-all">
             Hablar con el asistente
           </button>
         </motion.div>

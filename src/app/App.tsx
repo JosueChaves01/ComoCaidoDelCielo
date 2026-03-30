@@ -1,8 +1,8 @@
 import { Hero } from "./components/Hero";
 import { TerraceSection } from "./components/TerraceSection";
-import { FoodTruckSection } from "./components/FoodTruckSection";
 import { EventsSection } from "./components/EventsSection";
 import { EventHallSection } from "./components/EventHallSection";
+import { FoodTruckSection } from "./components/FoodTruckSection";
 import { AirbnbSection } from "./components/AirbnbSection";
 import { MomentsGallery } from "./components/MomentsGallery";
 import { InfoSection } from "./components/InfoSection";
