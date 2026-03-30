@@ -259,18 +259,7 @@ export function EventsSection({ mainEvents, upcomingPosters }: EventsSectionProp
           </div>
         </motion.div>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center mt-12"
-        >
-          <button className="px-10 py-5 bg-[#C89F6A] text-[#2A2419] rounded-full hover:bg-[#D4A574] transition-all hover:shadow-[0_0_30px_rgba(200,159,106,0.4)] font-semibold text-lg hover:-translate-y-1">
-            Ver calendario de eventos
-          </button>
-        </motion.div>
+
       </div>
     </section>
   );
