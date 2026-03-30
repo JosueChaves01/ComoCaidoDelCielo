@@ -21,14 +21,14 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
 
   const menuNarrative: NarrativeStep[] = [
     {
-      title: "Menú cuidado",
-      description: "Platos deliciosos para compartir en un lugar que brinda buenos momentos con personas que amamos",
-      highlight: "Sabores que inspiran",
+      title: "Antojitos para el momento",
+      description: "Opciones sencillas y ricas para acompañar la experiencia. Chocolates calientes, café, dulces y algo para picar mientras disfrutás del ambiente.",
+      highlight: "Hecho para compartir",
     },
     {
-      title: "Experiencias especiales",
-      description: "Noches temáticas, cenas bajo las estrellas y eventos gastronómicos únicos. Creamos momentos especiales que transforman una simple comida en un recuerdo inolvidable.",
-      highlight: "Momentos inolvidables",
+      title: "Momentos que se viven",
+      description: "Fogatas, atardeceres, noches especiales y espacios para relajarse. Más que venir a comer, es venir a pasarla bien.",
+      highlight: "Cada visita es diferente",
     },
   ];
 
@@ -43,11 +43,11 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
           className="text-center mb-16"
         >
           <span className="text-sm uppercase tracking-wider text-white mb-2 block">
-            Sabores Auténticos
+            Rincón del Atardecer
           </span>
           <h2 className="text-4xl md:text-6xl text-white mb-4">
-            Gastronomía con
-            <span className="block text-white">alma</span>
+            Sabores para disfrutar el
+            <span className="block text-white">atardecer</span>
           </h2>
           <p className="text-lg text-gray-300 max-w-3xl mx-auto leading-relaxed">
             Nuestro food truck no es solo comida, es parte de la experiencia.
@@ -72,15 +72,14 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                 className="mb-6"
               >
                 <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
-                  Experiencia Gastronómica
+                  Momentos Compartidos
                 </span>
                 <h3 className="text-4xl md:text-5xl text-white mb-4">
-                  Sabores Que
-                  <span className="block text-[#C19A6B]">Conectan</span>
+                  Atardeceres y Sabores
                 </h3>
                 <p className="text-lg text-gray-300 leading-relaxed">
-                  Cada plato cuenta una historia, cada sabor despierta un recuerdo.
-                  Descubre la magia de nuestra cocina artesanal.
+                  Más que comida, es un lugar para desconectar y disfrutar.
+                  Vení a compartir con amigos, ver el atardecer y acompañar el momento con algo rico del carrito.
                 </p>
               </motion.div>
 

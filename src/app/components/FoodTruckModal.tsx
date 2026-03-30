@@ -101,7 +101,7 @@ export function FoodTruckModal({ isOpen, onClose, images }: FoodTruckModalProps)
             <div className="sticky top-0 z-10 bg-[#8B6F47]/95 backdrop-blur-sm border-b border-[#C19A6B]/30 p-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-3xl font-bold text-white">Menú Food Truck</h2>
+                  <h2 className="text-3xl font-bold text-white">Menú Rincón del Atardecer</h2>
                   <div className="flex items-center gap-4 mt-2 text-white/80">
                     <div className="flex items-center gap-1">
                       <ChefHat className="w-4 h-4" />
