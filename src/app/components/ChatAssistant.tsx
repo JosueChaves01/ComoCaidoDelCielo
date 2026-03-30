@@ -53,41 +53,41 @@ export function ChatAssistant() {
             className="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-[#E8DED0]"
           >
             {/* Header */}
-            <div className="bg-[#8B6F47] text-white p-4 rounded-t-2xl flex justify-between items-center">
+            <div className="bg-[#3B2A22] text-white p-5 rounded-t-2xl flex justify-between items-center border-b border-white/10 shadow-lg">
               <div>
-                <h3 className="font-semibold">Como Caído del Cielo</h3>
-                <p className="text-xs opacity-90">Estamos aquí para ayudarte</p>
+                <h3 className="font-serif text-xl tracking-tight">Como Caído <span className="text-[#C89F6A]">del Cielo</span></h3>
+                <p className="text-[10px] uppercase tracking-[0.2em] opacity-70">Asistente Virtual</p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="hover:bg-white/20 p-1 rounded-full transition"
+                className="hover:bg-white/10 p-2 rounded-full transition-all active:scale-90"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white/50 backdrop-blur-sm">
               {messages.map((message, index) => (
                 <div
                   key={index}
                   className={`flex ${message.isUser ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] p-3 rounded-2xl ${
+                    className={`max-w-[85%] p-4 rounded-2xl shadow-sm text-sm ${
                       message.isUser
-                        ? "bg-[#8B6F47] text-white"
-                        : "bg-[#F5EFE6] text-[#2A2419]"
+                        ? "bg-[#3B2A22] text-white rounded-tr-none"
+                        : "bg-white text-[#2A2419] border border-[#E8DED0] rounded-tl-none"
                     }`}
                   >
-                    <p className="text-sm">{message.text}</p>
+                    <p className="leading-relaxed">{message.text}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-[#E8DED0]">
+            <div className="p-4 bg-white border-t border-[#F5EFE6]">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -95,13 +95,13 @@ export function ChatAssistant() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Escribe tu mensaje..."
-                  className="flex-1 px-4 py-2 bg-[#F5EFE6] rounded-full focus:outline-none focus:ring-2 focus:ring-[#8B6F47]"
+                  className="flex-1 px-5 py-3 bg-[#F5EFE6] rounded-full focus:outline-none focus:ring-2 focus:ring-[#3B2A22]/20 text-sm"
                 />
                 <button
                   onClick={handleSend}
-                  className="bg-[#8B6F47] text-white p-2 rounded-full hover:bg-[#6B5337] transition"
+                  className="bg-[#3B2A22] text-white p-3 rounded-full hover:bg-[#2A1F19] transition-all shadow-md active:scale-95"
                 >
-                  <Send size={20} />
+                  <Send size={18} />
                 </button>
               </div>
             </div>
@@ -111,12 +111,12 @@ export function ChatAssistant() {
 
       {/* Floating Button */}
       <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.1, rotate: 5 }}
+        whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 bg-[#8B6F47] text-white p-4 rounded-full shadow-2xl hover:bg-[#6B5337] transition z-50"
+        className="fixed bottom-6 right-6 bg-[#3B2A22] text-white p-5 rounded-full shadow-[0_10px_30px_rgba(59,42,34,0.3)] hover:bg-[#2A1F19] transition-all z-50 border border-white/10"
       >
-        {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
+        {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </motion.button>
     </>
   );

@@ -78,7 +78,10 @@ export function InfoSection() {
           <p className="mb-6 text-lg text-[#D6BFA6]">
             Nuestro asistente está disponible para resolver todas tus dudas y ayudarte con tu reservación.
           </p>
-          <button className="px-8 py-4 bg-[#3B2A22] text-white rounded-full hover:bg-[#D6BFA6] hover:text-[#3B2A22] transition-all">
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent("open-chat"))}
+            className="px-8 py-4 bg-[#3B2A22] text-white rounded-full hover:bg-[#D6BFA6] hover:text-[#3B2A22] transition-all"
+          >
             Hablar con el asistente
           </button>
         </motion.div>
