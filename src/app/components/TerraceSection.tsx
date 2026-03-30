@@ -21,7 +21,7 @@ export function TerraceSection({
 
   // Imágenes específicas para cada narrativa
   const sunsetImage =
-    "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/518384564_772781415234243_3646475887664757925_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=104&ccb=1-7&_nc_sid=7b2446&_nc_ohc=VMcfjqT2pbgQ7kNvwHKfLDc&_nc_oc=AdqWtwqHLpYY2K_LpirRxn93U7KwyoHNVJ692RlOK40UJpl4HmgmwXaW-acGQNf2MJnx6eWOyCzQopvfh4lLYoNC&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=VHEEw73g2JmhRadxcmFOLA&_nc_ss=7a30f&oh=00_AfweYVpMzO65ZuwskrVRki2-TFk0MNvYh_VRfdpVZUuvvA&oe=69CE8412";
+    "/assets/Terrazas/AtardeceresUnicos.png";
   const firePitImage =
     "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/528742789_772783145234070_2635304566584130279_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=105&ccb=1-7&_nc_sid=7b2446&_nc_ohc=qe9szhpUzzcQ7kNvwENhpIv&_nc_oc=Adq_hf-Is7XXHd763MucYch7e-cqFsfK6cpnTnPSOAnwvBPsaEyd-9k0md3-DEx9jw4HDUXHJNpTBvFxqkFaykKs&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=qIL6X_zj8HdsK2raQHRvlg&_nc_ss=7a30f&oh=00_AfyGkGPk95ZVQ9H6eyHq5oH9X1HYyovfKBfWeYJC8lyyNA&oe=69CEAE5D";
   const panoramicImage =
@@ -32,7 +32,7 @@ export function TerraceSection({
     "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/523324473_759345633244488_1789929945342545752_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=7b2446&_nc_ohc=rfXoyJfUFfoQ7kNvwFx_ini&_nc_oc=AdpV3H8-PG51WqJIlwlq2c-R-aNxcCKvBmmOrOLg4yMhP0sY0czGVzJwieiGJUx5143NMeufllF4d6B4_X_noAen&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=1ZV38o-vJhJZ-o5LwqopRA&_nc_ss=7a30f&oh=00_Afzll2CPPTPRNPN9pgL3lYNc1lNlYZkVEd26_UcAyA6eHg&oe=69CE8063",
     "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/528799632_772783265234058_3686448046153879140_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=101&ccb=1-7&_nc_sid=7b2446&_nc_ohc=3ArnWVsgM_4Q7kNvwHfYXlF&_nc_oc=AdoT4za9KT0jrH0IZ3N4i7h7NEm8GHS3QrY2anHuPiXnZGFYU1M4Pxd7RSeur33YNvj4cg_PS8JyFD0VVakmqwxl&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=qMEyJYZx0p2p21d5ZjaxBw&_nc_ss=7a30f&oh=00_AfweFLmTdwtOwb05SmLtnkFqyjvW32M_XmpJ27z6ivDq8Q&oe=69CEB1DF",
     "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/528328773_772783318567386_4762488151465554044_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=7b2446&_nc_ohc=3yO4St2kJiIQ7kNvwEXXwSe&_nc_oc=AdpXLPk3WMfgwaZ32AgTvKlxYEueab_C_8LjVIjec1QIEgUSFOtTDkbJhDwxTl-7-NS1r-oZALuZ89WKDwdoty67&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=4SAf2qDTsBP9_Z7p0VtAhg&_nc_ss=7a30f&oh=00_AfzVebMOA2eY8nWQGgVefGpsvZqCxfPM3xK87WmJmPlgKw&oe=69CE9ABF",
-    "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/518384564_772781415234243_3646475887664757925_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=104&ccb=1-7&_nc_sid=7b2446&_nc_ohc=VMcfjqT2pbgQ7kNvwHKfLDc&_nc_oc=AdqWtwqHLpYY2K_LpirRxn93U7KwyoHNVJ692RlOK40UJpl4HmgmwXaW-acGQNf2MJnx6eWOyCzQopvfh4lLYoNC&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=VHEEw73g2JmhRadxcmFOLA&_nc_ss=7a30f&oh=00_AfweYVpMzO65ZuwskrVRki2-TFk0MNvYh_VRfdpVZUuvvA&oe=69CE8412",
+    "/assets/Terrazas/AtardeceresUnicos.png",
   ];
 
   // Narrativas detalladas para cada característica
