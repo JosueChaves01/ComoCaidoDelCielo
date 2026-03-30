@@ -15,14 +15,18 @@ export function Footer() {
             <div className="flex gap-4">
               <motion.a
                 whileHover={{ scale: 1.1 }}
-                href="#"
+                href="https://www.instagram.com/comocaidodelcielo_sr/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-[#3B2A22] text-white p-2 rounded-full hover:bg-[#7A553A] transition"
               >
                 <Instagram size={20} />
               </motion.a>
               <motion.a
                 whileHover={{ scale: 1.1 }}
-                href="#"
+                href="https://www.facebook.com/profile.php?id=100066375234150"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-[#3B2A22] text-white p-2 rounded-full hover:bg-[#7A553A] transition"
               >
                 <Facebook size={20} />

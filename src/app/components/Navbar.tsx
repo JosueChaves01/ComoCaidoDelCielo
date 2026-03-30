@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, ChevronRight, Home, Sunset, Calendar, Utensils, ChefHat, Bed } from "lucide-react";
+import { Menu, X, ChevronRight, Home, Sunset, Calendar, Utensils, ChefHat, Bed, Instagram, Facebook } from "lucide-react";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const SOCIAL_LINKS = {
+    instagram: "https://www.instagram.com/comocaidodelcielo_sr/",
+    facebook: "https://www.facebook.com/profile.php?id=100066375234150"
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,22 +63,44 @@ export function Navbar() {
           </a>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-10">
-            {menuItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className="text-sm uppercase tracking-[0.2em] font-medium text-white/70 hover:text-[#C89F6A] transition-all duration-300 relative group"
+          <div className="hidden md:flex items-center gap-8">
+            <div className="flex items-center gap-6 mr-4 border-r border-white/10 pr-8">
+              {menuItems.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="text-[11px] uppercase tracking-[0.2em] font-medium text-white/70 hover:text-[#C89F6A] transition-all duration-300 relative group"
+                >
+                  {item.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#C89F6A] transition-all duration-300 group-hover:w-full"></span>
+                </a>
+              ))}
+            </div>
+
+            {/* Social Icons Desktop */}
+            <div className="flex items-center gap-4">
+              <a 
+                href={SOCIAL_LINKS.instagram} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white/60 hover:text-[#C89F6A] transition-colors p-2"
               >
-                {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#C89F6A] transition-all duration-300 group-hover:w-full"></span>
+                <Instagram size={20} strokeWidth={1.5} />
               </a>
-            ))}
-            <button
-              className="px-8 py-2.5 rounded-full bg-[#C89F6A] text-black text-sm font-bold tracking-widest uppercase hover:scale-105 hover:bg-[#D4A574] transition-all shadow-[0_0_20px_rgba(200,159,106,0.2)]"
-            >
-              Reservar
-            </button>
+              <a 
+                href={SOCIAL_LINKS.facebook} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-white/60 hover:text-[#C89F6A] transition-colors p-2 mr-2"
+              >
+                <Facebook size={20} strokeWidth={1.5} />
+              </a>
+              <button
+                className="px-8 py-2.5 rounded-full bg-[#C89F6A] text-black text-sm font-bold tracking-widest uppercase hover:scale-105 hover:bg-[#D4A574] transition-all shadow-[0_0_20px_rgba(200,159,106,0.2)]"
+              >
+                Reservar
+              </button>
+            </div>
           </div>
 
           {/* Mobile Toggle Button */}
@@ -121,39 +148,56 @@ export function Navbar() {
             <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#C89F6A]/10 rounded-full blur-[120px]" />
             <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#7A553A]/20 rounded-full blur-[120px]" />
 
-            <div className="relative w-full px-10 flex flex-col items-center text-center space-y-8">
-              {menuItems.map((item, index) => {
-                const Icon = item.icon;
-                return (
-                  <motion.a
-                    key={item.label}
-                    href={item.href}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="group flex items-center justify-center gap-4 text-3xl font-serif text-white hover:text-[#C89F6A] transition-colors"
-                  >
-                    <div className="bg-white/5 p-3 rounded-xl group-hover:bg-[#C89F6A]/20 transition-all border border-white/5 group-hover:border-[#C89F6A]/30">
-                      <Icon className="w-6 h-6 text-[#C89F6A]" strokeWidth={1.5} />
-                    </div>
-                    {item.label}
-                    <ChevronRight className="w-6 h-6 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-[#C89F6A]" />
-                  </motion.a>
-                );
-              })}
+            <div className="relative w-full px-10 flex flex-col items-center text-center">
+              <div className="space-y-6 w-full">
+                {menuItems.map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.a
+                      key={item.label}
+                      href={item.href}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: index * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="group flex items-center justify-center gap-4 text-2xl font-serif text-white hover:text-[#C89F6A] transition-colors"
+                    >
+                      <div className="bg-white/5 p-2.5 rounded-xl group-hover:bg-[#C89F6A]/20 transition-all border border-white/5 group-hover:border-[#C89F6A]/30">
+                        <Icon className="w-5 h-5 text-[#C89F6A]" strokeWidth={1.5} />
+                      </div>
+                      {item.label}
+                    </motion.a>
+                  );
+                })}
+              </div>
 
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
                 className="pt-10 w-full"
               >
-                <button className="w-full max-w-[280px] px-10 py-5 bg-[#C89F6A] text-black font-bold tracking-widest uppercase rounded-full shadow-[0_15px_30px_rgba(200,159,106,0.2)]">
+                <button className="w-full max-w-[280px] px-10 py-4 bg-[#C89F6A] text-black font-bold tracking-widest uppercase rounded-full shadow-[0_15px_30px_rgba(200,159,106,0.2)]">
                   Reservar Ahora
                 </button>
+              </motion.div>
+
+              {/* Mobile Social Links */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ delay: 0.6 }}
+                className="flex items-center gap-8 pt-12"
+              >
+                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-full text-white/60 hover:text-[#C89F6A] transition-all">
+                  <Instagram size={24} strokeWidth={1.5} />
+                </a>
+                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-full text-white/60 hover:text-[#C89F6A] transition-all">
+                  <Facebook size={24} strokeWidth={1.5} />
+                </a>
               </motion.div>
 
               <motion.div
@@ -161,7 +205,7 @@ export function Navbar() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ delay: 0.8 }}
-                className="pt-12 text-white/30 text-xs tracking-widest uppercase"
+                className="pt-10 text-white/20 text-[10px] tracking-widest uppercase"
               >
                 Como Caído del Cielo — Costa Rica
               </motion.div>
