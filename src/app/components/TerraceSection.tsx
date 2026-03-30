@@ -172,7 +172,7 @@ export function TerraceSection({
                 transition={{ duration: 0.8 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
+                <span className="text-sm uppercase tracking-wider text-[#966F40] mb-2 block">
                   Experiencia Sensorial
                 </span>
                 <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
@@ -198,10 +198,10 @@ export function TerraceSection({
                       duration: 0.6,
                       delay: 0.4 + index * 0.15,
                     }}
-                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#C19A6B]/40 transition-all duration-300 hover:shadow-lg"
+                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-300 hover:shadow-lg"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#C19A6B] to-[#8B7355] flex items-center justify-center text-white text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#966F40] to-[#8A7254] flex items-center justify-center text-white text-sm">
                         {index + 1}
                       </div>
                       <div className="flex-1">
@@ -211,7 +211,7 @@ export function TerraceSection({
                         <p className="text-[#6B5D4F] mb-3">
                           {step.description}
                         </p>
-                        <p className="text-sm text-[#C19A6B] italic">
+                        <p className="text-sm text-[#966F40] italic">
                           {step.highlight}
                         </p>
                       </div>
@@ -291,7 +291,7 @@ export function TerraceSection({
                 transition={{ duration: 0.8, delay: 0.5 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
+                <span className="text-sm uppercase tracking-wider text-[#966F40] mb-2 block">
                   Espacios Versátiles
                 </span>
                 <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
@@ -316,10 +316,10 @@ export function TerraceSection({
                       duration: 0.6,
                       delay: 0.6 + index * 0.15,
                     }}
-                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#C19A6B]/40 transition-all duration-300 hover:shadow-lg"
+                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-300 hover:shadow-lg"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#8B7355] to-[#6B5D4F] flex items-center justify-center text-white text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#8A7254] to-[#6B5D4F] flex items-center justify-center text-white text-sm">
                         {index + 1}
                       </div>
                       <div className="flex-1">
@@ -329,7 +329,7 @@ export function TerraceSection({
                         <p className="text-[#6B5D4F] mb-3">
                           {step.description}
                         </p>
-                        <p className="text-sm text-[#C19A6B] italic">
+                        <p className="text-sm text-[#966F40] italic">
                           {step.highlight}
                         </p>
                       </div>
@@ -357,7 +357,7 @@ export function TerraceSection({
                 transition={{ duration: 0.8, delay: 0.7 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
+                <span className="text-sm uppercase tracking-wider text-[#966F40] mb-2 block">
                   Experiencia Nocturna
                 </span>
                 <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
@@ -383,10 +383,10 @@ export function TerraceSection({
                       duration: 0.6,
                       delay: 0.8 + index * 0.15,
                     }}
-                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#C19A6B]/40 transition-all duration-300 hover:shadow-lg"
+                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-300 hover:shadow-lg"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#C19A6B] to-[#8B7355] flex items-center justify-center text-white text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#966F40] to-[#8A7254] flex items-center justify-center text-white text-sm">
                         {index + 1}
                       </div>
                       <div className="flex-1">
@@ -396,7 +396,7 @@ export function TerraceSection({
                         <p className="text-[#6B5D4F] mb-3">
                           {step.description}
                         </p>
-                        <p className="text-sm text-[#C19A6B] italic">
+                        <p className="text-sm text-[#966F40] italic">
                           {step.highlight}
                         </p>
                       </div>
@@ -438,15 +438,15 @@ export function TerraceSection({
             </p>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C19A6B]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#966F40]"></span>
                 Leña premium seleccionada
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C19A6B]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#966F40]"></span>
                 Kit para tostar malvaviscos
               </li>
               <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C19A6B]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#966F40]"></span>
                 Mantas acogedoras para la noche
               </li>
             </ul>
@@ -488,10 +488,10 @@ export function TerraceSection({
                 transition={{ duration: 0.8, delay: 0.9 }}
                 className="mb-6"
               >
-                <span className="text-sm uppercase tracking-wider text-[#C19A6B] mb-2 block">
+                <span className="text-sm uppercase tracking-wider text-[#966F40] mb-2 block">
                   Naturaleza Inmersiva
                 </span>
-                <h3 className="text-4xl md:text-5xl text-[#df9138ff] mb-4">
+                <h3 className="text-4xl md:text-5xl text-[#B1630A] mb-4">
                   Vistas Que Quitan el Aliento
                 </h3>
                 <p className="text-lg text-[#6B5D4F] leading-relaxed">
@@ -514,10 +514,10 @@ export function TerraceSection({
                       duration: 0.6,
                       delay: 1.0 + index * 0.15,
                     }}
-                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#C19A6B]/40 transition-all duration-300 hover:shadow-lg"
+                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-300 hover:shadow-lg"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#8B7355] to-[#6B5D4F] flex items-center justify-center text-white text-sm">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#8A7254] to-[#6B5D4F] flex items-center justify-center text-white text-sm">
                         {index + 1}
                       </div>
                       <div className="flex-1">
@@ -527,7 +527,7 @@ export function TerraceSection({
                         <p className="text-[#6B5D4F] mb-3">
                           {step.description}
                         </p>
-                        <p className="text-sm text-[#C19A6B] italic">
+                        <p className="text-sm text-[#966F40] italic">
                           {step.highlight}
                         </p>
                       </div>
@@ -540,7 +540,7 @@ export function TerraceSection({
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 1.5 }}
-                className="mt-8 bg-gradient-to-br from-[#C19A6B] to-[#8B7355] rounded-2xl p-6 text-white"
+                className="mt-8 bg-gradient-to-br from-[#966F40] to-[#8A7254] rounded-2xl p-6 text-white"
               >
                 <p className="text-sm uppercase tracking-wider mb-3 opacity-90">
                   Lo Que Verás

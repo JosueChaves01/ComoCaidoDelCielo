@@ -58,6 +58,11 @@ export function EventsSection({ mainEvents, upcomingPosters }: EventsSectionProp
 
   return (
     <section id="eventos" ref={ref} className="relative py-24 px-6 md:px-12 bg-[#090b10] overflow-hidden">
+      {/* Neon separator between Terrazas and Eventos (full-bleed aligned to top) */}
+      <div className="absolute left-0 top-0 w-screen pointer-events-none z-20">
+        <div className="h-1.5 w-full neon-bar" />
+      </div>
+      <style>{`@keyframes neon { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} } .neon-bar { height:6px; background: linear-gradient(90deg, #B1630A, #966F40, #8A7254, #B1630A); background-size: 200% 100%; box-shadow: 0 0 12px rgba(177,99,10,0.95), 0 0 40px rgba(150,111,64,0.6); animation: neon 6s linear infinite; }`}</style>
       
       {/* Starry Background Parallax */}
       <div className="absolute inset-0 w-full h-full pointer-events-none">
