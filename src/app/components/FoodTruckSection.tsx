@@ -36,30 +36,32 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
   const specialEvents: SpecialEvent[] = [
     {
       id: "1",
-      name: "Homenaje a la Música",
+      name: "Homenaje a la Música Italiana",
       image: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.82787-15/649222232_18059093615690161_7500198547217970010_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=13d280&_nc_ohc=IC0RjAE9n2wQ7kNvwEkQoYz&_nc_oc=AdopRmWAl7K1d7Mje7xvgqNisLdeON_bj1GNTzjFGmL4CzgUUrQrvw7RITFMjY8tqDspXyRaB4Dk16oLc-c5SVBG&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=hbjPiypO-0ivZzxp9mNaJg&_nc_ss=7a389&oh=00_Afwn5cgK0XkMbAIXZIx6R01feTud3PEhn3MRrNvSlKubqg&oe=69CFD92B",
       date: "Sábado 15 de Marzo",
-      description: "Una noche mágica donde la música toma el protagonismo. Disfruta de en vivo bandas locales mientras saboreas nuestro menú especial temático.",
+      description: "Una noche mágica donde la música italiana toma el protagonismo. Disfruta de una cena temática con nuestras pastas y pizzas artesanales mientras escuchas los mejores clásicos.",
       menu: [
-        "Cocktail 'Melodía Nocturna' - Gin con hierbas aromáticas",
-        "Mini 'Croquetas Jazz' - Pollo con salsa blues",
-        "Tostadas 'Ritmo Latino' - Aguacate y tomate cherry",
-        "Brownie 'Rock Clásico' - Con nueces y helado",
-        "Bebidas 'Acústicas' - Aguas frescas artesanales"
+        "Penne Bolognesa (Pasta) - ₡4.500",
+        "Fusili al Pesto con Pollo (Pasta) - ₡4.500",
+        "Pizza Margarita Artesanal - ₡8.000",
+        "Pizza Jamón y Queso - ₡8.000",
+        "Pizza Jamón y Hongos - ₡8.000",
+        "Pizza Pepperoni - ₡8.000"
       ]
     },
     {
       id: "2", 
-      name: "Noche de Fogata",
+      name: "Cena de Gratitud",
       image: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.82787-15/573270359_18045450638690161_7929014585758110399_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=YdPvSKnihBQQ7kNvwEgfr0D&_nc_oc=AdqHZWEZdTI4abaWx0a9o_GPcEEFUB03-ldZRRkzG4BmDaDhyZM1bYnE-XxsA8HhncJKi9gUUqywyVfnhrZEXDNu&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=v2d6UkFf2HY4IaN9J1t_Wg&_nc_ss=7a389&oh=00_Afzc1oMg72Mf4mKD1Q0kOLXGucJ_0fEmadSrqdUYnC_oDw&oe=69CFDD42",
-      date: "Viernes 22 de Marzo",
-      description: "Reúnete alrededor de la fogata para compartir historias, música y deliciosas comidas al aire libre bajo las estrellas.",
+      date: "Sábado 29 de Noviembre",
+      description: "Una experiencia al atardecer para agradecer y compartir. Disfruta de una cena especial diseñada para celebrar los momentos más importantes del año.",
       menu: [
-        "Malteadas 'Fogata' - Chocolate con marshmallow",
-        "Sándwiches 'Calor' - Tostados con queso derretido",
-        "Papas 'Brasa' - Asadas con hierbas",
-        "Galletas 'Chispas' - Con chocolate caliente",
-        "Café 'Noche Estrellada' - Espresso con canela"
+        "Pavo al Horno con hierbas finas y gravy",
+        "Puré de Camote rústico con malvaviscos",
+        "Ensalada de Frutos Secos y Manzana fresca",
+        "Relleno Tradicional de la casa con especias",
+        "Pie de Calabaza o Nuez artesanal",
+        "Ponche de Frutas Caliente o Vino de la casa"
       ]
     }
   ];
