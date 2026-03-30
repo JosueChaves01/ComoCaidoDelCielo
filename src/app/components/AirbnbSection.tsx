@@ -101,7 +101,7 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
             onClick={() => setIsModalOpen(true)}
             className="px-8 py-4 bg-[#8B6F47] text-white rounded-full hover:bg-[#6B5337] transition-all hover:shadow-xl"
           >
-            Ver hospedaje en Airbnb
+            Detalles del Hospedaje
           </button>
         </motion.div>
       </div>

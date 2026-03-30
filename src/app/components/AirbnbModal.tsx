@@ -50,10 +50,10 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
       title: "Exterior y Relax",
       icon: <TreePine className="w-5 h-5" />,
       amenities: [
-        "Jacuzzi privado",
         "Área de fogatas",
         "Parrilla y asador",
-        "Patio con vistas"
+        "Patio con vistas",
+        "Jardín privado"
       ]
     },
     {
@@ -83,15 +83,15 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative max-w-6xl w-full max-h-[90vh] overflow-y-auto bg-white rounded-3xl shadow-2xl"
+            className="relative max-w-6xl w-full max-h-[90vh] overflow-y-auto bg-gradient-to-b from-[#8B6F47] via-[#D4A574] to-[#F5EFE6] rounded-3xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 rounded-t-3xl p-6">
+            <div className="sticky top-0 z-10 bg-[#8B6F47]/95 backdrop-blur-sm border-b border-[#C19A6B]/30 rounded-t-3xl p-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-3xl font-bold text-[#2A2419]">Cabaña en las Terrazas</h2>
-                  <div className="flex items-center gap-4 mt-2 text-[#6B5D4F]">
+                  <h2 className="text-3xl font-bold text-white">Cabaña en las Terrazas</h2>
+                  <div className="flex items-center gap-4 mt-2 text-white/80">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
                       <span>Nicoya, Guanacaste</span>
@@ -104,10 +104,10 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
                   aria-label="Cerrar modal"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-6 h-6 text-white" />
                 </button>
               </div>
             </div>
@@ -166,9 +166,9 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
             {/* Content */}
             <div className="p-6 md:p-8 space-y-8">
               {/* About This Space */}
-              <section className="bg-gradient-to-r from-[#F8F6F2] to-[#E8DCC4]/30 rounded-2xl p-8 border border-[#E8DCC4]/40">
+              <section className="bg-gradient-to-r from-[#F5F2E8] to-[#E8DCC4]/30 rounded-2xl p-8 border border-[#C19A6B]/20">
                 <div className="flex items-start gap-4 mb-6">
-                  <div className="p-3 bg-[#C19A6B]/10 rounded-xl">
+                  <div className="p-3 bg-[#C19A6B]/20 rounded-xl">
                     <HomeIcon className="w-6 h-6 text-[#C19A6B]" />
                   </div>
                   <div>
@@ -195,8 +195,8 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                       <span>Fogatas interior y exterior</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Waves className="w-4 h-4 text-[#C19A6B]" />
-                      <span>Jacuzzi privado</span>
+                      <Wifi className="w-4 h-4 text-[#C19A6B]" />
+                      <span>WiFi gratuito</span>
                     </div>
                   </div>
                   <div className="space-y-2 text-sm leading-relaxed">
@@ -213,7 +213,7 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
               </section>
 
               {/* Guest Access */}
-              <section className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30">
+              <section className="bg-[#F5F2E8]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#C19A6B]/20">
                 <div className="flex items-center gap-3 mb-3">
                   <Shield className="w-5 h-5 text-[#8B7355]" />
                   <h3 className="text-xl font-semibold text-[#2A2419]">Acceso de los huéspedes</h3>
@@ -227,7 +227,7 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
 
               {/* Amenities */}
               <section>
-                <h3 className="text-2xl font-bold text-[#2A2419] mb-6">Lo que este lugar ofrece</h3>
+                <h3 className="text-2xl font-bold text-white mb-6">Lo que este lugar ofrece</h3>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {amenityCategories.map((category, index) => (
                     <motion.div
@@ -235,10 +235,10 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="bg-[#F8F6F2] rounded-2xl p-4 border border-[#E8DCC4]/30 hover:border-[#C19A6B]/40 transition-all duration-300 hover:shadow-lg"
+                      className="bg-[#F5F2E8] rounded-2xl p-4 border border-[#C19A6B]/20 hover:border-[#C19A6B]/40 transition-all duration-300 hover:shadow-lg"
                     >
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-[#C19A6B]/10 rounded-lg text-[#C19A6B]">
+                        <div className="p-2 bg-[#C19A6B]/20 rounded-lg text-[#C19A6B]">
                           {category.icon}
                         </div>
                         <h4 className="text-lg font-semibold text-[#2A2419]">{category.title}</h4>
@@ -258,31 +258,31 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
 
               {/* Location Features */}
               <section>
-                <h3 className="text-2xl font-bold text-[#2A2419] mb-4">Características de la ubicación</h3>
+                <h3 className="text-2xl font-bold text-white mb-4">Características de la ubicación</h3>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-4 bg-[#F8F6F2] rounded-xl">
-                    <div className="p-2 bg-[#8B7355]/10 rounded-lg">
+                  <div className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
+                    <div className="p-2 bg-[#8B7355]/20 rounded-lg">
                       <Car className="w-5 h-5 text-[#8B7355]" />
                     </div>
                     <span className="text-[#6B5D4F]">Estacionamiento gratuito en las instalaciones</span>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-[#F8F6F2] rounded-xl">
-                    <div className="p-2 bg-[#8B7355]/10 rounded-lg">
+                  <div className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
+                    <div className="p-2 bg-[#8B7355]/20 rounded-lg">
                       <HomeIcon className="w-5 h-5 text-[#8B7355]" />
                     </div>
                     <span className="text-[#6B5D4F]">Entrada independiente</span>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-[#F8F6F2] rounded-xl">
-                    <div className="p-2 bg-[#8B7355]/10 rounded-lg">
+                  <div className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
+                    <div className="p-2 bg-[#8B7355]/20 rounded-lg">
                       <Flame className="w-5 h-5 text-[#8B7355]" />
                     </div>
                     <span className="text-[#6B5D4F]">Lugar para hacer fogata</span>
                   </div>
-                  <div className="flex items-center gap-3 p-4 bg-[#F8F6F2] rounded-xl">
-                    <div className="p-2 bg-[#8B7355]/10 rounded-lg">
-                      <Waves className="w-5 h-5 text-[#8B7355]" />
+                  <div className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
+                    <div className="p-2 bg-[#8B7355]/20 rounded-lg">
+                      <TreePine className="w-5 h-5 text-[#8B7355]" />
                     </div>
-                    <span className="text-[#6B5D4F]">Jacuzzi</span>
+                    <span className="text-[#6B5D4F]">Jardín privado</span>
                   </div>
                 </div>
               </section>
