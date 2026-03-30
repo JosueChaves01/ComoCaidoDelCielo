@@ -79,7 +79,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                 </h3>
                 <p className="text-lg text-gray-300 leading-relaxed">
                   Más que comida, es un lugar para desconectar y disfrutar.
-                  Vení a compartir con amigos, ver el atardecer y acompañar el momento con algo rico del carrito.
+                  Vení a compartir con amigos, ver el atardecer y acompañar el momento con algo rico .
                 </p>
               </motion.div>
 
