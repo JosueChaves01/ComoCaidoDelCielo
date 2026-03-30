@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List } from "lucide-react";
+import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { supabase } from "../../../lib/supabase";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"upcoming" | "carousel">("upcoming");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "carousel" | "menu">("upcoming");
   const [activeSubTab, setActiveSubTab] = useState<"create" | "list">("create");
+  const [editingItem, setEditingItem] = useState<any>(null);
   
   // Auth Check
   useEffect(() => {
@@ -101,9 +102,9 @@ export default function AdminDashboard() {
               </div>
               <div className="space-y-1">
                 <button
-                  onClick={() => { setActiveTab("upcoming"); setActiveSubTab("create"); }}
+                  onClick={() => { setActiveTab("upcoming"); setActiveSubTab("create"); setEditingItem(null); }}
                   className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${
-                    activeTab === "upcoming" && activeSubTab === "create"
+                    activeTab === "upcoming" && activeSubTab === "create" && !editingItem
                       ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium" 
                       : "text-white/60 hover:bg-white/5 hover:text-white"
                   }`}
@@ -111,7 +112,7 @@ export default function AdminDashboard() {
                   <Plus className="w-4 h-4" /> Nuevo Evento
                 </button>
                 <button
-                  onClick={() => { setActiveTab("upcoming"); setActiveSubTab("list"); }}
+                  onClick={() => { setActiveTab("upcoming"); setActiveSubTab("list"); setEditingItem(null); }}
                   className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${
                     activeTab === "upcoming" && activeSubTab === "list"
                       ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium" 
@@ -130,9 +131,9 @@ export default function AdminDashboard() {
               </div>
               <div className="space-y-1">
                 <button
-                  onClick={() => { setActiveTab("carousel"); setActiveSubTab("create"); }}
+                  onClick={() => { setActiveTab("carousel"); setActiveSubTab("create"); setEditingItem(null); }}
                   className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${
-                    activeTab === "carousel" && activeSubTab === "create"
+                    activeTab === "carousel" && activeSubTab === "create" && !editingItem
                       ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium" 
                       : "text-white/60 hover:bg-white/5 hover:text-white"
                   }`}
@@ -140,9 +141,38 @@ export default function AdminDashboard() {
                   <Plus className="w-4 h-4" /> Nuevo Carrusel
                 </button>
                 <button
-                  onClick={() => { setActiveTab("carousel"); setActiveSubTab("list"); }}
+                  onClick={() => { setActiveTab("carousel"); setActiveSubTab("list"); setEditingItem(null); }}
                   className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${
                     activeTab === "carousel" && activeSubTab === "list"
+                      ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium" 
+                      : "text-white/60 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <List className="w-4 h-4" /> Gestionar
+                </button>
+              </div>
+            </div>
+
+            {/* Menú Rincón del Atardecer Group */}
+            <div>
+              <div className="flex items-center gap-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-2">
+                <ChefHat className="w-4 h-4" /> Menú Rincón
+              </div>
+              <div className="space-y-1">
+                <button
+                  onClick={() => { setActiveTab("menu"); setActiveSubTab("create"); setEditingItem(null); }}
+                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${
+                    activeTab === "menu" && activeSubTab === "create" && !editingItem
+                      ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium" 
+                      : "text-white/60 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <Plus className="w-4 h-4" /> Nuevo Platillo
+                </button>
+                <button
+                  onClick={() => { setActiveTab("menu"); setActiveSubTab("list"); setEditingItem(null); }}
+                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${
+                    activeTab === "menu" && activeSubTab === "list"
                       ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium" 
                       : "text-white/60 hover:bg-white/5 hover:text-white"
                   }`}
@@ -203,6 +233,20 @@ export default function AdminDashboard() {
                <List className="w-3 h-3" /> Ver
              </button>
            </div>
+           <div className="flex gap-2">
+             <button 
+               onClick={() => { setActiveTab('menu'); setActiveSubTab('create'); }}
+               className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'menu' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}
+             >
+               <ChefHat className="w-3 h-3" /> + Plato
+             </button>
+             <button 
+               onClick={() => { setActiveTab('menu'); setActiveSubTab('list'); }}
+               className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'menu' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}
+             >
+               <List className="w-3 h-3" /> Ver
+             </button>
+           </div>
         </div>
 
         <motion.div
@@ -211,7 +255,13 @@ export default function AdminDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          {activeTab === "upcoming" ? <UpcomingEventsManager subTab={activeSubTab} setSubTab={setActiveSubTab} /> : <CarouselEventsManager subTab={activeSubTab} setSubTab={setActiveSubTab} />}
+          {activeTab === "upcoming" ? (
+             <UpcomingEventsManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
+          ) : activeTab === "carousel" ? (
+             <CarouselEventsManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
+          ) : (
+             <MenuItemsManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
+          )}
         </motion.div>
       </main>
     </div>
@@ -249,10 +299,9 @@ const deleteImageFromUrl = async (publicUrl: string) => {
 // MANAGERS (TABS)
 // ----------------------------------------------------
 
-function UpcomingEventsManager({ subTab, setSubTab }: { subTab: "create"|"list", setSubTab: (tab:"create"|"list")=>void }) {
+function UpcomingEventsManager({ subTab, setSubTab, editingItem, setEditingItem }: any) {
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null); // To auto-fill create form
 
   const fetchEvents = async () => {
     setIsLoading(true);
@@ -324,10 +373,10 @@ function UpcomingEventsManager({ subTab, setSubTab }: { subTab: "create"|"list",
   );
 }
 
-function CarouselEventsManager({ subTab, setSubTab }: { subTab: "create"|"list", setSubTab: (tab:"create"|"list")=>void }) {
+function CarouselEventsManager({ subTab, setSubTab, editingItem, setEditingItem }: any) {
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+
 
   const fetchEvents = async () => {
     setIsLoading(true);
@@ -799,3 +848,313 @@ function CarouselList({ events, isLoading, onDelete, onEdit }: any) {
     </div>
   );
 }
+
+// ----------------------------------------------------
+// MENU ITEMS MANAGER
+// ----------------------------------------------------
+
+function MenuItemsManager({ subTab, setSubTab, editingItem, setEditingItem }: any) {
+  const [items, setItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchItems = async () => {
+    setIsLoading(true);
+    const { data } = await supabase.from('menu_items').select('*').order('category', { ascending: true }).order('sort_order', { ascending: true });
+    if (data) setItems(data);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (subTab === "list") fetchItems();
+  }, [subTab]);
+
+  const handleDelete = async (item: any) => {
+    if (!confirm("¿Seguro que deseas eliminar este platillo?")) return;
+    const toastId = toast.loading("Eliminando...");
+    try {
+      if (item.image && item.image.includes('supabase')) await deleteImageFromUrl(item.image);
+      await supabase.from('menu_items').delete().eq('id', item.id);
+      setItems(prev => prev.filter(i => i.id !== item.id));
+      toast.success("Platillo eliminado", { id: toastId });
+    } catch (e: any) {
+      toast.error(e.message, { id: toastId });
+    }
+  };
+
+  const handleEdit = (item: any) => {
+    setEditingItem(item);
+    setSubTab("create");
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-light text-white mb-2">
+            Menú <span className="text-[#C89F6A] font-semibold">Rincón del Atardecer</span>
+          </h1>
+          <p className="text-white/50 mt-2">
+            Gestiona los productos, precios y categorías que aparecen en el menú interactivo.
+          </p>
+        </div>
+        
+        {editingItem && subTab === "create" && (
+          <div className="px-6 py-2 rounded-lg bg-[#C89F6A] text-black font-semibold shadow-lg flex items-center gap-2">
+            <Pencil className="w-4 h-4" /> Editando: {editingItem.name}
+          </div>
+        )}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {subTab === "create" ? (
+          <motion.div key="create" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+            <MenuItemCreateForm 
+              editingItem={editingItem} 
+              onSuccess={() => { fetchItems(); setSubTab("list"); setEditingItem(null); }} 
+              onCancel={() => { setSubTab("list"); setEditingItem(null); }}
+            />
+          </motion.div>
+        ) : (
+          <motion.div key="list" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+            <MenuItemList items={items} isLoading={isLoading} onDelete={handleDelete} onEdit={handleEdit} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function MenuItemCreateForm({ editingItem, onSuccess, onCancel }: any) {
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    price: 0,
+    category: "Bebidas Calientes",
+    sort_order: 0,
+    is_available: true
+  });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Sync data when editingItem changes
+  useEffect(() => {
+    if (editingItem) {
+      setFormData({
+        name: editingItem.name || "",
+        description: editingItem.description || "",
+        price: editingItem.price || 0,
+        category: editingItem.category || "Bebidas Calientes",
+        sort_order: editingItem.sort_order || 0,
+        is_available: editingItem.is_available ?? true
+      });
+      setImageFile(null);
+    } else {
+      setFormData({
+        name: "",
+        description: "",
+        price: 0,
+        category: "Bebidas Calientes",
+        sort_order: 0,
+        is_available: true
+      });
+      setImageFile(null);
+    }
+  }, [editingItem]);
+
+  const categories = ["Bebidas Calientes", "Comida", "Repostería Dulce", "Opciones Saladas"];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const toastId = toast.loading(editingItem ? "Actualizando..." : "Creando...");
+
+    try {
+      let imageUrl = editingItem?.image;
+      if (imageFile) {
+        if (editingItem && imageUrl && imageUrl.includes('supabase')) await deleteImageFromUrl(imageUrl);
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      const payload = { 
+        name: formData.name,
+        description: formData.description,
+        price: Number(formData.price),
+        category: formData.category,
+        sort_order: Number(formData.sort_order),
+        is_available: Boolean(formData.is_available),
+        image: imageUrl
+      };
+
+      if (editingItem) {
+        const { error } = await supabase.from('menu_items').update(payload).eq('id', editingItem.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('menu_items').insert([payload]);
+        if (error) throw error;
+      }
+
+      toast.success("Guardado exitosamente", { id: toastId });
+      onSuccess();
+    } catch (e: any) {
+      toast.error(e.message, { id: toastId });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-black/40 border border-white/10 p-8 rounded-2xl backdrop-blur-md space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <label className="text-sm font-medium text-white/70">Nombre del Producto</label>
+          <input 
+            type="text" 
+            value={formData.name} 
+            onChange={e => setFormData({...formData, name: e.target.value})} 
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#C89F6A]" 
+            required 
+          />
+        </div>
+        <div className="space-y-4">
+          <label className="text-sm font-medium text-white/70">Categoría</label>
+          <select 
+            value={formData.category} 
+            onChange={e => setFormData({...formData, category: e.target.value})} 
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white appearance-none focus:border-[#C89F6A]"
+          >
+            {categories.map(c => <option key={c} value={c} className="bg-slate-900">{c}</option>)}
+          </select>
+        </div>
+        <div className="space-y-4">
+          <label className="text-sm font-medium text-white/70">Precio (₡)</label>
+          <input 
+            type="number" 
+            value={formData.price} 
+            onChange={e => setFormData({...formData, price: parseInt(e.target.value)})} 
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#C89F6A]" 
+            required 
+          />
+        </div>
+        <div className="space-y-4">
+          <label className="text-sm font-medium text-white/70">Orden de Aparición</label>
+          <input 
+            type="number" 
+            value={formData.sort_order} 
+            onChange={e => setFormData({...formData, sort_order: parseInt(e.target.value)})} 
+            className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#C89F6A]" 
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <label className="text-sm font-medium text-white/70">Descripción</label>
+        <textarea 
+          value={formData.description} 
+          onChange={e => setFormData({...formData, description: e.target.value})} 
+          rows={3} 
+          className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white resize-none focus:border-[#C89F6A]" 
+        />
+      </div>
+
+      <div className="space-y-4 border-2 border-dashed border-white/5 p-6 rounded-2xl hover:border-[#C89F6A]/30 transition-colors cursor-pointer relative">
+        <label className="text-sm font-medium text-white/70 block mb-2">Imagen del Producto</label>
+        <input 
+          type="file" 
+          onChange={e => e.target.files && setImageFile(e.target.files[0])} 
+          className="absolute inset-0 opacity-0 cursor-pointer z-10" 
+        />
+        {imageFile ? (
+          <div className="flex items-center gap-4 text-green-400">
+            <CheckCircle2 className="w-8 h-8" /> <span>{imageFile.name} (Lista)</span>
+          </div>
+        ) : editingItem?.image ? (
+          <div className="flex items-center gap-4 overflow-hidden">
+            <img src={editingItem.image} className="w-16 h-16 rounded-lg object-cover" />
+            <span className="text-white/50">Clic para subir otra imagen</span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 text-white/40">
+            <UploadCloud className="w-8 h-8" />
+            <span>Selecciona una foto cuadrada (Ej: 800x800)</span>
+          </div>
+        )}
+      </div>
+
+      <button 
+        type="button"
+        className="w-full flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 hover:border-[#C89F6A]/30 transition-all group/toggle" 
+        onClick={() => setFormData(prev => ({ ...prev, is_available: !prev.is_available }))}
+      >
+        <div className="text-left space-y-0.5">
+          <label className="text-sm font-medium text-white block cursor-pointer">Disponible actualmente</label>
+          <span className="text-xs text-white/40 group-hover/toggle:text-white/60 transition-colors">Si se desactiva, el producto aparecerá como "Agotado" en el menú.</span>
+        </div>
+        <div className={`w-12 h-6 rounded-full p-1 transition-all duration-300 ${formData.is_available ? 'bg-[#C89F6A]' : 'bg-white/10'}`}>
+          <div className={`w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300 transform ${formData.is_available ? 'translate-x-6' : 'translate-x-0'}`} />
+        </div>
+      </button>
+
+      <div className="flex gap-4 justify-end pt-6">
+        <button type="button" onClick={onCancel} className="px-6 py-3 text-white/50 hover:text-white">Cancelar</button>
+        <button 
+          type="submit" 
+          disabled={isLoading}
+          className="bg-[#C89F6A] text-black font-bold px-10 py-3 rounded-xl hover:scale-105 transition-all disabled:opacity-50 shadow-[0_0_20px_rgba(200,159,106,0.3)]"
+        >
+          {isLoading ? "Guardando..." : editingItem ? "Actualizar Platillo" : "Agregar al Menú"}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function MenuItemList({ items, isLoading, onDelete, onEdit }: any) {
+  if (isLoading) return <div className="text-center py-20 text-white/40">Cargando menú...</div>;
+  if (!items.length) return <div className="text-center py-20 text-white/40">El menú está vacío.</div>;
+
+  const categories = Array.from(new Set(items.map((i: any) => i.category)));
+
+  return (
+    <div className="space-y-12 pb-20">
+      {categories.map((cat: any) => (
+        <section key={cat} className="space-y-4">
+          <h2 className="text-xl font-bold text-[#C89F6A] border-b border-white/5 pb-2 flex items-center gap-2 italic tracking-wider">
+            <ChefHat className="w-5 h-5" /> {cat}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.filter((i: any) => i.category === cat).map((item: any) => (
+              <div key={item.id} className={`bg-black/40 border border-white/5 rounded-2xl overflow-hidden group hover:border-[#C89F6A]/30 transition-all ${!item.is_available ? 'grayscale opacity-70' : ''}`}>
+                <div className="p-4 flex gap-4">
+                  <div className="w-24 h-24 rounded-xl overflow-hidden bg-white/10 flex-shrink-0 relative">
+                    {item.image && <img src={item.image} className="w-full h-full object-cover" />}
+                    {!item.is_available && (
+                      <div className="absolute inset-0 bg-red-900/50 flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-white uppercase tracking-tighter">Agotado</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start gap-2">
+                       <h3 className="font-bold text-white truncate text-lg group-hover:text-[#C89F6A] transition-colors">{item.name}</h3>
+                       <span className="text-sm font-bold text-[#C89F6A]">₡{item.price}</span>
+                    </div>
+                    <p className="text-xs text-white/50 line-clamp-2 mt-1 h-8">{item.description}</p>
+                    <div className="flex gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                       <button onClick={() => onEdit(item)} className="p-2 bg-white/5 hover:bg-[#C89F6A] hover:text-black rounded-lg transition-all">
+                         <Pencil className="w-3 h-3" />
+                       </button>
+                       <button onClick={() => onDelete(item)} className="p-2 bg-white/5 hover:bg-red-500 rounded-lg transition-all">
+                         <Trash2 className="w-3 h-3" />
+                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
