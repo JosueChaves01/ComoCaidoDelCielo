@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronRight } from "lucide-react";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -8,12 +8,24 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      setIsScrolled(window.scrollY > 20);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Bloquear scroll cuando el menú móvil está abierto
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMobileMenuOpen]);
 
   const menuItems = [
     { label: "Inicio", href: "#" },
@@ -25,87 +37,135 @@ export function Navbar() {
   ];
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/95 backdrop-blur-md shadow-lg"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo/Brand */}
-        <a
-          href="#"
-          className={`text-2xl transition-colors ${
-            isScrolled ? "text-[#8B6F47]" : "text-white"
-          }`}
-        >
-          Como Caído del Cielo
-        </a>
-
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8">
-          {menuItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className={`transition-colors hover:opacity-70 ${
-                isScrolled ? "text-[#2A2419]" : "text-white"
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
-          <button
-            className={`px-6 py-2 rounded-full transition-all ${
-              isScrolled
-                ? "bg-[#7A553A] text-white hover:bg-[#3B2A22]"
-                : "bg-white/20 backdrop-blur-sm text-white border border-white/40 hover:bg-white/30"
+    <>
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-500 ${
+          isScrolled || isMobileMenuOpen
+            ? "bg-black/60 backdrop-blur-xl border-b border-white/10 py-3"
+            : "bg-transparent py-6"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          {/* Logo/Brand */}
+          <a
+            href="#"
+            className={`text-xl md:text-2xl font-serif tracking-tight transition-all duration-500 ${
+              isMobileMenuOpen ? "text-white opacity-100" : (isScrolled ? "text-white" : "text-white")
             }`}
           >
-            Reservar
+            Como Caído <span className="text-[#C89F6A]">del Cielo</span>
+          </a>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-10">
+            {menuItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="text-sm uppercase tracking-[0.2em] font-medium text-white/70 hover:text-[#C89F6A] transition-all duration-300 relative group"
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#C89F6A] transition-all duration-300 group-hover:w-full"></span>
+              </a>
+            ))}
+            <button
+              className="px-8 py-2.5 rounded-full bg-[#C89F6A] text-black text-sm font-bold tracking-widest uppercase hover:scale-105 hover:bg-[#D4A574] transition-all shadow-[0_0_20px_rgba(200,159,106,0.2)]"
+            >
+              Reservar
+            </button>
+          </div>
+
+          {/* Mobile Toggle Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden relative z-50 p-2 text-white hover:text-[#C89F6A] transition-colors"
+            aria-label="Toggle menu"
+          >
+            <AnimatePresence mode="wait">
+              {isMobileMenuOpen ? (
+                <motion.div
+                  key="close"
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                >
+                  <X size={28} strokeWidth={1.5} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="menu"
+                  initial={{ rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: -90, opacity: 0 }}
+                >
+                  <Menu size={28} strokeWidth={1.5} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </button>
         </div>
+      </motion.nav>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className={`md:hidden ${isScrolled ? "text-[#2A2419]" : "text-white"}`}
-        >
-          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t border-[#E8DED0]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="fixed inset-0 z-[50] flex flex-col items-center justify-center bg-black/95 backdrop-blur-2xl md:hidden"
           >
-            <div className="px-6 py-4 space-y-4">
-              {menuItems.map((item) => (
-                <a
+            {/* Background elements */}
+            <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#C89F6A]/10 rounded-full blur-[120px]" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#7A553A]/20 rounded-full blur-[120px]" />
+
+            <div className="relative w-full px-10 flex flex-col items-center text-center space-y-8">
+              {menuItems.map((item, index) => (
+                <motion.a
                   key={item.label}
                   href={item.href}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -30 }}
+                  transition={{ delay: index * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block text-[#2A2419] hover:text-[#8B6F47] transition-colors"
+                  className="group flex items-center justify-center gap-4 text-3xl font-serif text-white hover:text-[#C89F6A] transition-colors"
                 >
+                  <span className="text-sm font-sans font-medium text-[#C89F6A]/50 group-hover:text-[#C89F6A] transition-colors tracking-tighter">0{index + 1}</span>
                   {item.label}
-                </a>
+                  <ChevronRight className="w-6 h-6 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-[#C89F6A]" />
+                </motion.a>
               ))}
-              <button className="w-full px-6 py-3 bg-[#7A553A] text-white rounded-full hover:bg-[#3B2A22] transition-all">
-                Reservar
-              </button>
+
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="pt-10 w-full"
+              >
+                <button className="w-full max-w-[280px] px-10 py-5 bg-[#C89F6A] text-black font-bold tracking-widest uppercase rounded-full shadow-[0_15px_30px_rgba(200,159,106,0.2)]">
+                  Reservar Ahora
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: 0.8 }}
+                className="pt-12 text-white/30 text-xs tracking-widest uppercase"
+              >
+                Como Caído del Cielo — Costa Rica
+              </motion.div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </>
   );
 }

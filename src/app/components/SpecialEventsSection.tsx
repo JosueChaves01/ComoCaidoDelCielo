@@ -35,7 +35,7 @@ export function SpecialEventsSection({ events }: SpecialEventsSectionProps) {
   };
 
   return (
-    <section ref={ref} className="py-24 px-6 md:px-12 bg-[#7A553A]">
+    <section ref={ref} className="pt-24 pb-10 px-6 md:px-12 bg-[#7A553A]">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -53,7 +53,7 @@ export function SpecialEventsSection({ events }: SpecialEventsSectionProps) {
         </motion.div>
 
         {/* Events Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {events.map((event, index) => (
             <SpecialEventCard
               key={event.id}
