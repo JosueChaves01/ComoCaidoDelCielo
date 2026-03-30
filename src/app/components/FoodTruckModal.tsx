@@ -95,7 +95,7 @@ export function FoodTruckModal({ isOpen, onClose, images }: FoodTruckModalProps)
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-4 md:inset-12 lg:inset-20 bg-gradient-to-br from-[#0F0F0A] via-[#2A3A25] to-[#3A4F35] rounded-3xl overflow-hidden z-50 flex flex-col"
+            className="fixed inset-4 md:inset-12 lg:inset-20 max-w-6xl mx-auto bg-gradient-to-br from-[#8B6F47] via-[#D4A574] to-[#F5EFE6] rounded-3xl overflow-hidden z-50 flex flex-col"
           >
             {/* Header */}
             <div className="sticky top-0 z-10 bg-[#8B6F47]/95 backdrop-blur-sm border-b border-[#C19A6B]/30 p-6">

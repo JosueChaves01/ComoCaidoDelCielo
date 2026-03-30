@@ -19,12 +19,12 @@ export function MenuItem({ name, price, description, image, category }: MenuItem
       transition={{ duration: 0.5 }}
       className="bg-[#F5F2E8] rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group"
     >
-      <div className="relative aspect-square overflow-hidden max-h-52">
+      <div className="relative aspect-square overflow-hidden max-h-72">
         {!imageError ? (
           <img
             src={image}
             alt={name}
-            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-72 object-cover rounded-t-lg transition-all duration-300 group-hover:scale-105 group-hover:brightness-110 group-hover:contrast-105"
             onError={() => setImageError(true)}
             style={{
               transform: 'scale(1.05)',
