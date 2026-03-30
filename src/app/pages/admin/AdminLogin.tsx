@@ -10,7 +10,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const heroImage = "https://scontent.fsjo8-1.fna.fbcdn.net/v/t39.30808-6/474073411_988019740087191_996796627425577335_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=7b2446&_nc_ohc=jC4ynTK0_RQQ7kNvwH78VgQ&_nc_oc=Adp_5TUxoLvAJI3UUVBmMbkOlx5OvcONZG1j4_t4TnuMh6CouZpG_y3yUyaodeY7t-j_UUxlCPNGpZNGgMU1-S-z&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=A8STgCoqxKqKS5emqKySXA&_nc_ss=7a30f&oh=00_AfzyBRQPZ3lP8oaVjsevRRD5Yq0k-AAaJy8CqSNd0LDZ8g&oe=69CE23CC";
+  const heroImage = "/assets/Hero/Atardecer.png";
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
