@@ -39,22 +39,38 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="grid md:grid-cols-2 gap-6 mb-12"
         >
-          <div className="relative h-[400px] rounded-3xl overflow-hidden group">
+          {/* First Image with Special Event Effect */}
+          <div className="relative h-[400px] rounded-3xl overflow-hidden shadow-2xl group border border-white/5 cursor-pointer">
             <img
               src={images[0]}
               alt="Habitación acogedora"
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              className="w-full h-full object-cover group-hover:scale-110 group-hover:blur-[2px] transition-all duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+              <h3 className="text-2xl text-white font-medium translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
+                Descanso profundo
+              </h3>
+              <p className="text-white/80 text-sm mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-150">
+                Desconecta del ruido y reconecta contigo
+              </p>
+            </div>
           </div>
 
-          <div className="relative h-[400px] rounded-3xl overflow-hidden group">
+          {/* Second Image with Special Event Effect */}
+          <div className="relative h-[400px] rounded-3xl overflow-hidden shadow-2xl group border border-white/5 cursor-pointer">
             <img
               src={images[1]}
               alt="Interior del hospedaje"
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              className="w-full h-full object-cover group-hover:scale-110 group-hover:blur-[2px] transition-all duration-700"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+              <h3 className="text-2xl text-white font-medium translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">
+                Entorno natural
+              </h3>
+              <p className="text-white/80 text-sm mt-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-150">
+                Despierta rodeado de verde
+              </p>
+            </div>
           </div>
         </motion.div>
 

@@ -3,6 +3,7 @@ import { useInView } from "motion/react";
 import { useRef, useState } from "react";
 import { Coffee, Cake, Cookie } from "lucide-react";
 import { FoodTruckModal } from "./FoodTruckModal";
+import { SpecialEventsSection, SpecialEvent } from "./SpecialEventsSection";
 
 interface FoodTruckSectionProps {
   images: string[];
@@ -30,6 +31,37 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
       description: "Fogatas, atardeceres, noches especiales y espacios para relajarse. Más que venir a comer, es venir a pasarla bien.",
       highlight: "Cada visita es diferente",
     },
+  ];
+
+  const specialEvents: SpecialEvent[] = [
+    {
+      id: "1",
+      name: "Homenaje a la Música",
+      image: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.82787-15/649222232_18059093615690161_7500198547217970010_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=13d280&_nc_ohc=IC0RjAE9n2wQ7kNvwEkQoYz&_nc_oc=AdopRmWAl7K1d7Mje7xvgqNisLdeON_bj1GNTzjFGmL4CzgUUrQrvw7RITFMjY8tqDspXyRaB4Dk16oLc-c5SVBG&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=hbjPiypO-0ivZzxp9mNaJg&_nc_ss=7a389&oh=00_Afwn5cgK0XkMbAIXZIx6R01feTud3PEhn3MRrNvSlKubqg&oe=69CFD92B",
+      date: "Sábado 15 de Marzo",
+      description: "Una noche mágica donde la música toma el protagonismo. Disfruta de en vivo bandas locales mientras saboreas nuestro menú especial temático.",
+      menu: [
+        "Cocktail 'Melodía Nocturna' - Gin con hierbas aromáticas",
+        "Mini 'Croquetas Jazz' - Pollo con salsa blues",
+        "Tostadas 'Ritmo Latino' - Aguacate y tomate cherry",
+        "Brownie 'Rock Clásico' - Con nueces y helado",
+        "Bebidas 'Acústicas' - Aguas frescas artesanales"
+      ]
+    },
+    {
+      id: "2", 
+      name: "Noche de Fogata",
+      image: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.82787-15/573270359_18045450638690161_7929014585758110399_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=YdPvSKnihBQQ7kNvwEgfr0D&_nc_oc=AdqHZWEZdTI4abaWx0a9o_GPcEEFUB03-ldZRRkzG4BmDaDhyZM1bYnE-XxsA8HhncJKi9gUUqywyVfnhrZEXDNu&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=v2d6UkFf2HY4IaN9J1t_Wg&_nc_ss=7a389&oh=00_Afzc1oMg72Mf4mKD1Q0kOLXGucJ_0fEmadSrqdUYnC_oDw&oe=69CFDD42",
+      date: "Viernes 22 de Marzo",
+      description: "Reúnete alrededor de la fogata para compartir historias, música y deliciosas comidas al aire libre bajo las estrellas.",
+      menu: [
+        "Malteadas 'Fogata' - Chocolate con marshmallow",
+        "Sándwiches 'Calor' - Tostados con queso derretido",
+        "Papas 'Brasa' - Asadas con hierbas",
+        "Galletas 'Chispas' - Con chocolate caliente",
+        "Café 'Noche Estrellada' - Espresso con canela"
+      ]
+    }
   ];
 
   return (
@@ -120,25 +152,26 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="order-1 md:order-2 relative h-[500px] md:h-[700px] rounded-3xl overflow-hidden group shadow-2xl sticky top-8"
+              className="order-1 md:order-2 relative h-[500px] md:h-[700px] sticky top-8"
             >
-              <img
-                src={images[0]}
-                alt="Food truck con gastronomía artesanal"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8 right-8 text-white">
-                <p className="text-sm uppercase tracking-wider mb-2 opacity-90">
-                  FOOD TRUCK
-                </p>
-                <p className="text-2xl">Todo el día</p>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="mt-4 px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-colors border border-white/30"
-                >
-                  Ver menú completo
-                </button>
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl group border border-white/5 cursor-pointer">
+                <img
+                  src={images[0]}
+                  alt="Food truck con gastronomía artesanal"
+                  className="w-full h-full object-cover group-hover:scale-110 group-hover:blur-[2px] transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                  <p className="text-sm uppercase tracking-wider mb-2 opacity-90">
+                    FOOD TRUCK
+                  </p>
+                  <p className="text-2xl">Todo el día</p>
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="mt-4 px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-colors border border-white/30"
+                  >
+                    Ver menú completo
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -150,6 +183,9 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
         onClose={() => setIsModalOpen(false)}
         images={images}
       />
+
+      {/* Special Events Section */}
+      <SpecialEventsSection events={specialEvents} />
     </section>
   );
 }
