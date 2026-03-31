@@ -7,7 +7,7 @@ import { supabase } from "../../../lib/supabase";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"upcoming" | "carousel" | "menu" | "terraces" | "special_events" | "terrace_reservations" | "business_rules">("upcoming");
+  const [activeTab, setActiveTab] = useState<"home" | "upcoming" | "carousel" | "menu" | "terraces" | "special_events" | "terrace_reservations" | "business_rules">("home");
   const [activeSubTab, setActiveSubTab] = useState<"create" | "list" | "reservations" | "settings">("create");
   const [editingItem, setEditingItem] = useState<any>(null);
 
@@ -94,6 +94,18 @@ export default function AdminDashboard() {
             Cielo Admin
           </h2>
           <nav className="space-y-8">
+            {/* Dashboard Home */}
+            <div>
+              <button
+                onClick={() => { setActiveTab("home"); setEditingItem(null); }}
+                className={`flex items-center gap-3 w-full p-3 rounded-xl text-left transition-all text-sm font-semibold tracking-wide ${activeTab === "home"
+                  ? "bg-[#C89F6A] text-black shadow-[0_0_20px_rgba(200,159,106,0.3)]"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
+                  }`}
+              >
+                <LayoutTemplate className="w-5 h-5" /> Dashboard
+              </button>
+            </div>
 
             {/* Próximos Eventos Group */}
             <div>
@@ -272,6 +284,11 @@ export default function AdminDashboard() {
         {/* Mobile Tabs */}
         <div className="md:hidden flex flex-col space-y-2 mb-8 bg-black/40 p-2 rounded-xl">
            <div className="flex gap-2">
+             <button onClick={() => { setActiveTab('home'); setEditingItem(null); }} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 rounded-lg transition-all font-bold ${activeTab === 'home' ? 'bg-[#C89F6A] text-black' : 'text-white/50 bg-white/5'}`}>
+               <LayoutTemplate className="w-4 h-4" /> DASHBOARD
+             </button>
+           </div>
+           <div className="flex gap-2">
              <button onClick={() => { setActiveTab('upcoming'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'upcoming' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
                <Calendar className="w-3 h-3" /> + Próximo
              </button>
@@ -329,7 +346,9 @@ export default function AdminDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          {activeTab === "upcoming" ? (
+          {activeTab === "home" ? (
+            <HomeManager setActiveTab={setActiveTab} setActiveSubTab={setActiveSubTab} />
+          ) : activeTab === "upcoming" ? (
             <UpcomingEventsManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
           ) : activeTab === "carousel" ? (
             <CarouselEventsManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
@@ -2048,6 +2067,216 @@ function BusinessRulesManager() {
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+function HomeManager({ setActiveTab, setActiveSubTab }: any) {
+  const [stats, setStats] = useState({
+    menuItems: 0,
+    upcomingEvents: 0,
+    reservations: 0,
+    specialEvents: 0
+  });
+  const [recentReservations, setRecentReservations] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setIsLoading(true);
+      try {
+        const [
+          { count: menuCount },
+          { count: upcomingCount },
+          { count: reservationsCount },
+          { count: specialCount },
+          { data: recentRes }
+        ] = await Promise.all([
+          supabase.from('menu_items').select('*', { count: 'exact', head: true }),
+          supabase.from('upcoming_events').select('*', { count: 'exact', head: true }),
+          supabase.from('terrace_reservations').select('*', { count: 'exact', head: true }),
+          supabase.from('special_events').select('*', { count: 'exact', head: true }),
+          supabase.from('terrace_reservations').select('*, terraces(title)').order('created_at', { ascending: false }).limit(5)
+        ]);
+
+        setStats({
+          menuItems: menuCount || 0,
+          upcomingEvents: upcomingCount || 0,
+          reservations: reservationsCount || 0,
+          specialEvents: specialCount || 0
+        });
+        setRecentReservations(recentRes || []);
+      } catch (e) {
+        console.error("Error al cargar estadísticas", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const cards = [
+    { title: "Platillos en Menú", value: stats.menuItems, icon: < ChefHat className="w-6 h-6 text-[#C89F6A]" />, tab: "menu", color: "from-amber-500/10 to-orange-500/10" },
+    { title: "Eventos Próximos", value: stats.upcomingEvents, icon: < Calendar className="w-6 h-6 text-blue-400" />, tab: "upcoming", color: "from-blue-500/10 to-indigo-500/10" },
+    { title: "Reservas Totales", value: stats.reservations, icon: < CalendarCheck className="w-6 h-6 text-green-400" />, tab: "terrace_reservations", color: "from-green-500/10 to-emerald-500/10" },
+    { title: "Eventos Especiales", value: stats.specialEvents, icon: < Sparkles className="w-6 h-6 text-purple-400" />, tab: "special_events", color: "from-purple-500/10 to-pink-500/10" }
+  ];
+
+  return (
+    <div className="max-w-6xl mx-auto space-y-12">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-4xl md:text-5xl font-light text-white mb-3">
+            Bienvenido, <span className="text-[#C89F6A] font-semibold">Administrador</span>
+          </h1>
+          <p className="text-white/40 text-lg">
+            Aquí tienes un resumen de lo que está sucediendo en <span className="text-white/60 italic">Como Caído del Cielo</span>.
+          </p>
+        </div>
+        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-xl">
+          <div className="w-12 h-12 rounded-full bg-[#C89F6A]/20 flex items-center justify-center text-[#C89F6A]">
+            <Store className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-xs text-white/40 uppercase tracking-widest font-bold">Estado del Sistema</p>
+            <p className="text-white font-medium flex items-center gap-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /> Operativo
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {cards.map((card, i) => (
+          <motion.button
+            key={card.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            onClick={() => { setActiveTab(card.tab); setActiveSubTab('list'); }}
+            className={`p-6 rounded-2xl bg-gradient-to-br ${card.color} border border-white/5 hover:border-white/20 transition-all text-left group relative overflow-hidden`}
+          >
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-125 duration-500">
+              {card.icon}
+            </div>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="p-3 bg-black/40 rounded-xl group-hover:bg-black/60 transition-colors">
+                {card.icon}
+              </div>
+            </div>
+            <p className="text-white/40 text-sm font-medium tracking-wide uppercase">{card.title}</p>
+            <p className="text-4xl font-bold text-white mt-1">
+              {isLoading ? "..." : card.value}
+            </p>
+          </motion.button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Recent Activity */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-light text-white flex items-center gap-3">
+              <CalendarCheck className="w-6 h-6 text-[#C89F6A]" /> Reservas <span className="text-[#C89F6A] font-semibold">Recientes</span>
+            </h2>
+            <button
+              onClick={() => { setActiveTab('terrace_reservations'); setActiveSubTab('list'); }}
+              className="text-xs text-[#C89F6A] hover:underline"
+            >
+              Ver todas
+            </button>
+          </div>
+
+          <div className="bg-black/40 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-white/5 text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold">
+                  <tr>
+                    <th className="px-6 py-4">Cliente</th>
+                    <th className="px-6 py-4">Terraza</th>
+                    <th className="px-6 py-4">Fecha</th>
+                    <th className="px-6 py-4">Estado</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {isLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <tr key={i} className="animate-pulse">
+                        <td colSpan={4} className="px-6 py-4 h-16 bg-white/5"></td>
+                      </tr>
+                    ))
+                  ) : recentReservations.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-12 text-center text-white/30 italic">No hay reservas recientes.</td>
+                    </tr>
+                  ) : (
+                    recentReservations.map((res: any) => (
+                      <tr key={res.id} className="hover:bg-white/5 transition-colors group">
+                        <td className="px-6 py-4">
+                          <p className="text-white font-medium text-sm">{res.customer_name}</p>
+                          <p className="text-white/30 text-xs mt-0.5">{res.customer_phone}</p>
+                        </td>
+                        <td className="px-6 py-4 text-white/70 text-sm">{res.terraces?.title || 'Terraza'}</td>
+                        <td className="px-6 py-4 text-[#C89F6A] font-bold text-xs">{res.reservation_date}</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${res.status === 'confirmed' ? 'bg-green-500/10 text-green-400' :
+                            res.status === 'cancelled' ? 'bg-red-500/10 text-red-400' :
+                              'bg-yellow-500/10 text-yellow-500'
+                            }`}>
+                            {res.status === 'pending' ? 'Pendiente' : res.status === 'confirmed' ? 'Confirmado' : 'Cancelado'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-light text-white flex items-center gap-3">
+            <Sparkles className="w-6 h-6 text-[#C89F6A]" /> Acciones <span className="text-[#C89F6A] font-semibold">Rápidas</span>
+          </h2>
+          <div className="grid grid-cols-1 gap-4">
+            {[
+              { label: "Nuevo Platillo", icon: <ChefHat className="w-5 h-5 text-[#C89F6A]" />, tab: "menu", subTab: "create" },
+              { label: "Anunciar Evento", icon: <Calendar className="w-5 h-5 text-blue-400" />, tab: "upcoming", subTab: "create" },
+              { label: "Evento Especial", icon: <Sparkles className="w-5 h-5 text-purple-400" />, tab: "special_events", subTab: "create" },
+              { label: "Configurar Precios", icon: <Store className="w-5 h-5 text-green-400" />, tab: "business_rules", subTab: "settings" }
+            ].map((action, i) => (
+              <motion.button
+                key={action.label}
+                whileHover={{ scale: 1.02, x: 10 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => { setActiveTab(action.tab); setActiveSubTab(action.subTab); }}
+                className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-[#C89F6A]/30 transition-all text-left"
+              >
+                <div className="p-3 bg-black/40 rounded-xl">
+                  {action.icon}
+                </div>
+                <span className="text-white font-medium">{action.label}</span>
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Tips / Info Section */}
+          <div className="mt-8 p-6 rounded-3xl bg-gradient-to-br from-[#C89F6A]/20 to-transparent border border-[#C89F6A]/20 relative overflow-hidden group">
+            <div className="relative z-10">
+              <h4 className="text-[#C89F6A] font-bold text-sm uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Store className="w-4 h-4" /> Tip de Admin
+              </h4>
+              <p className="text-white/60 text-sm leading-relaxed">
+                Recuerda actualizar el menú regularmente para mantener la frescura de tus platillos y la sorpresa de tus clientes.
+              </p>
+            </div>
+            <ChefHat className="absolute -bottom-4 -right-4 w-24 h-24 text-[#C89F6A]/10 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
