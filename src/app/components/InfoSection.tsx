@@ -31,37 +31,37 @@ export function InfoSection() {
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {/* Location */}
-          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-            <MapPin className="text-[#D6BFA6] mb-4" size={40} />
-            <h3 className="text-2xl mb-3">Ubicación</h3>
-            <p className="text-white/70">
+          <div className="bg-[#D6BFA6] p-8 rounded-3xl hover:bg-[#E2CFBB] transition-colors duration-300 group">
+            <MapPin className="text-[#7A553A] mb-4" size={40} />
+            <h3 className="text-2xl mb-3 text-[#3B2A22]">Ubicación</h3>
+            <p className="text-[#3B2A22]/70">
               A solo 45 minutos de la ciudad. Camino panorámico, fácil acceso y estacionamiento disponible.
             </p>
           </div>
 
           {/* Hours */}
-          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-            <Clock className="text-[#D6BFA6] mb-4" size={40} />
-            <h3 className="text-2xl mb-3">Horarios</h3>
-            <p className="text-white/70">
+          <div className="bg-[#D6BFA6] p-8 rounded-3xl hover:bg-[#E2CFBB] transition-colors duration-300 group">
+            <Clock className="text-[#7A553A] mb-4" size={40} />
+            <h3 className="text-2xl mb-3 text-[#3B2A22]">Horarios</h3>
+            <p className="text-[#3B2A22]/70">
               Viernes a domingo de 2:00 PM a 10:00 PM. Eventos especiales con horarios extendidos.
             </p>
           </div>
 
           {/* Season */}
-          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-            <CalendarIcon className="text-[#D6BFA6] mb-4" size={40} />
-            <h3 className="text-2xl mb-3">Temporada</h3>
-            <p className="text-white/70">
+          <div className="bg-[#D6BFA6] p-8 rounded-3xl hover:bg-[#E2CFBB] transition-colors duration-300 group">
+            <CalendarIcon className="text-[#7A553A] mb-4" size={40} />
+            <h3 className="text-2xl mb-3 text-[#3B2A22]">Temporada</h3>
+            <p className="text-[#3B2A22]/70">
               Abierto todo el año. Cada estación ofrece una experiencia única y diferente.
             </p>
           </div>
 
           {/* Important Info */}
-          <div className="bg-white/5 backdrop-blur-sm p-8 rounded-3xl border border-white/10 hover:bg-white/10 transition-colors">
-            <Info className="text-[#D6BFA6] mb-4" size={40} />
-            <h3 className="text-2xl mb-3">Importante</h3>
-            <p className="text-white/70">
+          <div className="bg-[#D6BFA6] p-8 rounded-3xl hover:bg-[#E2CFBB] transition-colors duration-300 group">
+            <Info className="text-[#7A553A] mb-4" size={40} />
+            <h3 className="text-2xl mb-3 text-[#3B2A22]">Importante</h3>
+            <p className="text-[#3B2A22]/70">
               Reserva con anticipación. Cupo limitado para preservar la experiencia.
             </p>
           </div>

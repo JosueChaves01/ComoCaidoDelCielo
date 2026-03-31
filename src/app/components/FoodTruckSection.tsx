@@ -102,8 +102,8 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
             Rincón del Atardecer
           </span>
           <h2 className="text-4xl md:text-6xl text-white mb-4">
-            Sabores Para Disfrutar El
-            <span className="block text-white">atardecer</span>
+            Sabores Para Disfrutar
+            <span className="block text-white">El atardecer</span>
           </h2>
           <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
             Nuestro food truck no es solo comida, es parte de la experiencia.
@@ -170,7 +170,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                 ))}
                 {/* Mobile Menu Button CTA */}
                 <div className="md:hidden pt-8">
-                  <button 
+                  <button
                     onClick={() => setIsModalOpen(true)}
                     className="w-full py-5 bg-[#C89F6A] text-black font-bold tracking-widest uppercase rounded-2xl shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform"
                   >

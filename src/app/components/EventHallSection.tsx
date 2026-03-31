@@ -129,13 +129,13 @@ export function EventHallSection({ images }: EventHallSectionProps) {
               return (
                 <div
                   key={use.title}
-                  className="bg-[#332D26] p-8 rounded-2xl hover:bg-[#3D362E] transition-colors duration-300 group"
+                  className="bg-[#D6BFA6] p-8 rounded-2xl hover:bg-[#E2CFBB] transition-colors duration-300 group"
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-[#C89F6A]/15 flex items-center justify-center mb-4 group-hover:bg-[#C89F6A]/25 transition-colors">
-                    <Icon className="text-[#C89F6A]" size={22} />
+                  <div className="w-12 h-12 rounded-2xl bg-[#7A553A]/10 flex items-center justify-center mb-4 group-hover:bg-[#7A553A]/20 transition-colors">
+                    <Icon className="text-[#7A553A]" size={22} />
                   </div>
-                  <h3 className="text-lg text-white mb-2">{use.title}</h3>
-                  <p className="text-white/50 text-sm leading-relaxed">
+                  <h3 className="text-lg text-[#3B2A22] mb-2">{use.title}</h3>
+                  <p className="text-[#3B2A22]/70 text-sm leading-relaxed">
                     {use.desc}
                   </p>
                 </div>

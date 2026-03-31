@@ -32,7 +32,7 @@ export function Hero({ imageUrl }: HeroProps) {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="text-5xl md:text-7xl font-semibold text-white mb-6 leading-tight"
           >
-            Donde El Paisaje Se Convierte En Experiencias
+            Donde el paisaje se convierte en experiencias
           </motion.h1>
 
           <motion.p
