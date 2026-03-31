@@ -3,6 +3,7 @@ import { useInView } from "motion/react";
 import { useRef, useState, useEffect } from "react";
 import BackgroundEffectLocal from "./BackgroundEffectLocal";
 import { supabase } from "../../lib/supabase";
+import { TerraceReservationModal } from "./TerraceReservationModal";
 
 interface TerraceSectionProps {
   images: { description: string; url: string }[];
@@ -20,6 +21,7 @@ export function TerraceSection({
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [dbTerraces, setDbTerraces] = useState<any[]>([]);
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchTerraces = async () => {
@@ -168,11 +170,17 @@ export function TerraceSection({
           <h2 className="text-4xl md:text-6xl text-[#2A2419] mb-6">
             Nuestras Terrazas
           </h2>
-          <p className="text-lg md:text-xl text-[#6B5D4F] max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-[#6B5D4F] max-w-3xl mx-auto mb-8">
             Un viaje sensorial donde cada espacio cuenta su
             propia historia. Descubre la magia de estar en el
             lugar perfecto, en el momento perfecto.
           </p>
+          <button
+            onClick={() => setIsReservationModalOpen(true)}
+            className="px-8 py-4 bg-gradient-to-r from-[#B1630A] to-[#C89F6A] text-white font-bold rounded-xl hover:shadow-[0_4px_20px_rgba(200,159,106,0.4)] transition-all hover:-translate-y-1 transform uppercase tracking-widest text-sm"
+          >
+            Ver Disponibilidad y Reservar
+          </button>
         </motion.div>
 
         {/* EXPERIENCIA 1: Atardeceres Únicos */}
@@ -590,6 +598,11 @@ export function TerraceSection({
           </div>
         </motion.div>
       </div>
+
+      <TerraceReservationModal 
+        isOpen={isReservationModalOpen} 
+        onClose={() => setIsReservationModalOpen(false)} 
+      />
     </section>
   );
 }

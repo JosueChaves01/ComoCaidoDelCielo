@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat, LayoutTemplate, Sparkles } from "lucide-react";
+import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat, LayoutTemplate, Sparkles, CalendarCheck, Check, Store } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { supabase } from "../../../lib/supabase";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"upcoming" | "carousel" | "menu" | "terraces" | "special_events">("upcoming");
-  const [activeSubTab, setActiveSubTab] = useState<"create" | "list">("create");
+  const [activeTab, setActiveTab] = useState<"upcoming" | "carousel" | "menu" | "terraces" | "special_events" | "terrace_reservations" | "business_rules">("upcoming");
+  const [activeSubTab, setActiveSubTab] = useState<"create" | "list" | "reservations" | "settings">("create");
   const [editingItem, setEditingItem] = useState<any>(null);
 
   // Auth Check
@@ -230,6 +230,24 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* Reglas de Negocio Group */}
+            <div>
+              <div className="flex items-center gap-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-2">
+                <Store className="w-4 h-4" /> Configuración
+              </div>
+              <div className="space-y-1">
+                <button
+                  onClick={() => { setActiveTab("business_rules"); setActiveSubTab("settings"); setEditingItem(null); }}
+                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "business_rules" && activeSubTab === "settings"
+                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
+                    : "text-white/60 hover:bg-white/5 hover:text-white"
+                    }`}
+                >
+                  <Store className="w-4 h-4" /> Reglas de Negocio
+                </button>
+              </div>
+            </div>
+
           </nav>
         </div>
         <button
@@ -293,6 +311,16 @@ export default function AdminDashboard() {
                <List className="w-3 h-3" /> Ver
              </button>
            </div>
+           <div className="flex gap-2">
+             <button onClick={() => { setActiveTab('terrace_reservations'); setActiveSubTab('list'); }} className={`w-full py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'terrace_reservations' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+               <CalendarCheck className="w-3 h-3" /> Ver Reservas de Terrazas
+             </button>
+           </div>
+           <div className="flex gap-2">
+             <button onClick={() => { setActiveTab('business_rules'); setActiveSubTab('settings'); }} className={`w-full py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'business_rules' && activeSubTab === 'settings' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+               <Store className="w-3 h-3" /> Reglas de Negocio
+             </button>
+           </div>
         </div>
 
         <motion.div
@@ -309,8 +337,12 @@ export default function AdminDashboard() {
             <MenuItemsManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
           ) : activeTab === "terraces" ? (
             <TerracesManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
-          ) : (
+          ) : activeTab === "special_events" ? (
             <SpecialEventsManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
+          ) : activeTab === "terrace_reservations" ? (
+            <TerraceReservationsManager subTab={activeSubTab} setSubTab={setActiveSubTab} />
+          ) : (
+            <BusinessRulesManager />
           )}
         </motion.div>
       </main>
@@ -1288,6 +1320,7 @@ function TerraceCreateForm({ editingItem, onSuccess, onCancelEdit }: { editingIt
   const [title, setTitle] = useState(editingItem?.title || "");
   const [description, setDescription] = useState(editingItem?.description || "");
   const [highlight, setHighlight] = useState(editingItem?.highlight || "");
+  const [maxCapacity, setMaxCapacity] = useState<number>(editingItem?.max_capacity || 6);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -1296,6 +1329,7 @@ function TerraceCreateForm({ editingItem, onSuccess, onCancelEdit }: { editingIt
       setTitle(editingItem.title);
       setDescription(editingItem.description);
       setHighlight(editingItem.highlight);
+      setMaxCapacity(editingItem.max_capacity || 6);
       setImageFile(null);
     }
   }, [editingItem]);
@@ -1312,11 +1346,11 @@ function TerraceCreateForm({ editingItem, onSuccess, onCancelEdit }: { editingIt
         finalImageUrl = await uploadImage(imageFile, 'terraces');
       }
       if (editingItem) {
-        const { error } = await supabase.from('terraces').update({ title, description, highlight, image_url: finalImageUrl }).eq('id', editingItem.id);
+        const { error } = await supabase.from('terraces').update({ title, description, highlight, max_capacity: maxCapacity, image_url: finalImageUrl }).eq('id', editingItem.id);
         if (error) throw error;
         toast.success("¡Terraza actualizada!", { id: loadingToast });
       } else {
-        const { error } = await supabase.from('terraces').insert([{ title, description, highlight, image_url: finalImageUrl }]);
+        const { error } = await supabase.from('terraces').insert([{ title, description, highlight, max_capacity: maxCapacity, image_url: finalImageUrl }]);
         if (error) throw error;
         toast.success("¡Terraza creada!", { id: loadingToast });
       }
@@ -1338,6 +1372,10 @@ function TerraceCreateForm({ editingItem, onSuccess, onCancelEdit }: { editingIt
         <div className="space-y-4">
           <label className="block text-sm font-medium tracking-wide text-white/80">Frase/Destacado (Highlight)</label>
           <input type="text" value={highlight} onChange={(e) => setHighlight(e.target.value)} placeholder="Ej: Perfecto para aniversarios" className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-[#C89F6A] transition-colors" required />
+        </div>
+        <div className="space-y-4 md:col-span-2">
+          <label className="block text-sm font-medium tracking-wide text-white/80">Capacidad Máxima (personas)</label>
+          <input type="number" min="1" value={maxCapacity} onChange={(e) => setMaxCapacity(parseInt(e.target.value) || 1)} placeholder="Ej: 6" className="w-full md:w-1/2 bg-black/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-[#C89F6A] transition-colors" required />
         </div>
       </div>
       <div className="space-y-4">
@@ -1690,6 +1728,326 @@ function SpecialEventList({ events, isLoading, onDelete, onEdit }: any) {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+// ----------------------------------------------------
+// TERRACE RESERVATIONS MANAGER
+// ----------------------------------------------------
+
+function TerraceReservationsManager({ subTab, setSubTab }: any) {
+  const [reservations, setReservations] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // We fetch reservations and join with terraces table to get terrace title
+  const fetchReservations = async () => {
+    setIsLoading(true);
+    const { data } = await supabase
+      .from('terrace_reservations')
+      .select('*, terraces(title)')
+      .order('created_at', { ascending: false });
+    
+    if (data) setReservations(data);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (subTab === "list") fetchReservations();
+  }, [subTab]);
+
+  const updateStatus = async (id: string, newStatus: string) => {
+    const toastId = toast.loading("Actualizando estado...");
+    try {
+      const { error } = await supabase.from('terrace_reservations').update({ status: newStatus }).eq('id', id);
+      if (error) throw error;
+      setReservations(prev => prev.map(res => res.id === id ? { ...res, status: newStatus } : res));
+      toast.success("Estado actualizado", { id: toastId });
+    } catch (e: any) {
+      toast.error(e.message, { id: toastId });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("¿Seguro que deseas eliminar esta reservación del historial?")) return;
+    const toastId = toast.loading("Eliminando...");
+    try {
+      const { error } = await supabase.from('terrace_reservations').delete().eq('id', id);
+      if (error) throw error;
+      setReservations(prev => prev.filter(res => res.id !== id));
+      toast.success("Eliminada correctamente", { id: toastId });
+    } catch (e: any) {
+      toast.error(e.message, { id: toastId });
+    }
+  };
+
+  if (isLoading) return <div className="text-white/50 text-center py-20">Cargando reservaciones...</div>;
+
+  return (
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-light text-white mb-2">
+          Reservas de <span className="text-[#C89F6A] font-semibold">Terrazas</span>
+        </h1>
+        <p className="text-white/50 mt-2">
+          Gestiona las reservaciones de día completo hechas por los clientes.
+        </p>
+      </div>
+
+      <div className="bg-[#11141D] border border-white/5 rounded-2xl overflow-hidden overflow-x-auto shadow-2xl">
+        <table className="w-full text-left border-collapse min-w-[800px]">
+          <thead>
+            <tr className="bg-black/50 border-b border-white/10 text-xs uppercase tracking-widest text-[#C89F6A]">
+              <th className="px-6 py-4 font-medium">Cliente</th>
+              <th className="px-6 py-4 font-medium">Terraza & Fecha</th>
+              <th className="px-6 py-4 font-medium">Nº Entradas</th>
+              <th className="px-6 py-4 font-medium">Ingreso Estimado</th>
+              <th className="px-6 py-4 font-medium">Estado</th>
+              <th className="px-6 py-4 font-medium text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5 text-sm">
+            {reservations.length === 0 ? (
+              <tr><td colSpan={6} className="px-6 py-10 text-center text-white/40">No hay reservas registradas.</td></tr>
+            ) : (
+              reservations.map((res: any) => (
+                <tr key={res.id} className="hover:bg-white/5 transition-colors group">
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="text-white font-medium">{res.customer_name}</span>
+                      <span className="text-white/40 text-xs">{res.customer_phone}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className="text-white">{res.terraces?.title || 'Terraza Desaparecida'}</span>
+                      <span className="text-[#C89F6A] font-bold text-xs">{res.reservation_date}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-white/70">
+                    <div className="flex flex-col gap-1">
+                      <span>{res.adults_count} Adultos</span>
+                      {res.children_count > 0 && <span className="text-xs">{(res.children_count)} Niños</span>}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-green-400 font-medium tracking-wide">
+                    ₡{(res.total_amount || res.adults_count * 3500).toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
+                      res.status === 'confirmed' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                      res.status === 'cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                      'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+                    }`}>
+                      {res.status === 'pending' ? 'Pendiente' : res.status === 'confirmed' ? 'Confirmado' : 'Cancelado'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                      {res.status !== 'confirmed' && (
+                        <button onClick={() => updateStatus(res.id, 'confirmed')} className="p-2 bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white rounded-lg transition-colors border border-green-500/20 shadow-lg" title="Confirmar">
+                          <Check className="w-4 h-4" />
+                        </button>
+                      )}
+                      {res.status !== 'cancelled' && (
+                        <button onClick={() => updateStatus(res.id, 'cancelled')} className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-500/20 shadow-lg" title="Cancelar Reserva">
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                      <button onClick={() => handleDelete(res.id)} className="p-2 bg-white/5 text-white/50 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-white/10 shadow-lg ml-2" title="Eliminar Registro">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ----------------------------------------------------
+// BUSINESS RULES MANAGER
+// ----------------------------------------------------
+
+function BusinessRulesManager() {
+  const [rules, setRules] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Form states
+  const [adultPrice, setAdultPrice] = useState(3500);
+  const [childPrice, setChildPrice] = useState(2500);
+  const [openingTime, setOpeningTime] = useState("15:00:00");
+  const [closingTime, setClosingTime] = useState("01:00:00");
+  const [workingDays, setWorkingDays] = useState<string[]>([]);
+
+  const DAYS_OF_WEEK = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+  useEffect(() => {
+    const fetchRules = async () => {
+      setIsLoading(true);
+      const { data, error } = await supabase.from('business_rules').select('*').eq('id', 1).single();
+      if (data && !error) {
+        setRules(data);
+        setAdultPrice(data.adult_price);
+        setChildPrice(data.child_price);
+        setOpeningTime(data.opening_time);
+        setClosingTime(data.closing_time);
+        setWorkingDays(data.working_days || []);
+      }
+      setIsLoading(false);
+    };
+    fetchRules();
+  }, []);
+
+  const toggleDay = (day: string) => {
+    if (workingDays.includes(day)) {
+      setWorkingDays(workingDays.filter(d => d !== day));
+    } else {
+      setWorkingDays([...workingDays, day]);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (workingDays.length === 0) return toast.error("Debes seleccionar al menos un día de trabajo.");
+    
+    setIsSaving(true);
+    const toastId = toast.loading("Guardando reglas de negocio...");
+    try {
+      const payload = {
+        adult_price: adultPrice,
+        child_price: childPrice,
+        opening_time: openingTime,
+        closing_time: closingTime,
+        working_days: workingDays
+      };
+      
+      const { error } = await supabase.from('business_rules').update(payload).eq('id', 1);
+      if (error) throw error;
+      toast.success("Reglas guardadas exitosamente.", { id: toastId });
+    } catch (err: any) {
+      toast.error(err.message || "Error al guardar.", { id: toastId });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) return <div className="text-white/50 text-center py-20">Cargando reglas de negocio...</div>;
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-light text-white mb-2">
+          Reglas del <span className="text-[#C89F6A] font-semibold">Negocio</span>
+        </h1>
+        <p className="text-white/50 mt-2">
+          Configura los precios base de las reservas, los días operativos y los horarios de la terraza.
+        </p>
+      </div>
+
+      <form onSubmit={handleSave} className="bg-[#11141D] border border-white/5 rounded-2xl p-6 md:p-8 shadow-2xl space-y-8">
+        {/* Precios Section */}
+        <div>
+          <h3 className="text-xl text-white mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
+            <Sparkles className="text-[#C89F6A] w-5 h-5" /> Precios de Entrada / Reserva
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Precio por Adulto (₡)</label>
+              <input 
+                type="number" 
+                min="0"
+                required
+                value={adultPrice} 
+                onChange={e => setAdultPrice(parseInt(e.target.value) || 0)} 
+                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A]" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Precio por Niño (₡)</label>
+              <input 
+                type="number" 
+                min="0"
+                required
+                value={childPrice} 
+                onChange={e => setChildPrice(parseInt(e.target.value) || 0)} 
+                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A]" 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Horarios Section */}
+        <div>
+          <h3 className="text-xl text-white mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
+            <Calendar className="text-[#C89F6A] w-5 h-5" /> Horarios de Operación
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Hora de Apertura</label>
+              <input 
+                type="time" 
+                required
+                value={openingTime} 
+                onChange={e => setOpeningTime(e.target.value)} 
+                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A] [color-scheme:dark]" 
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Hora de Cierre</label>
+              <input 
+                type="time" 
+                required
+                value={closingTime} 
+                onChange={e => setClosingTime(e.target.value)} 
+                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A] [color-scheme:dark]" 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Días Operativos Section */}
+        <div>
+          <h3 className="text-xl text-white mb-4 flex items-center gap-2 border-b border-white/10 pb-2">
+            <CheckCircle2 className="text-[#C89F6A] w-5 h-5" /> Días de Trabajo de las Terrazas
+          </h3>
+          <p className="text-sm text-white/50 mb-4">Selecciona los días en los que se permite reservar terrazas.</p>
+          <div className="flex flex-wrap gap-3">
+            {DAYS_OF_WEEK.map(day => {
+              const isActive = workingDays.includes(day);
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => toggleDay(day)}
+                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
+                    isActive 
+                      ? 'bg-[#C89F6A] border-[#C89F6A] text-black shadow-lg shadow-[#C89F6A]/20' 
+                      : 'bg-[#090B10] border-white/10 text-white/50 hover:border-white/30'
+                  }`}
+                >
+                  {day}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="pt-6 flex justify-end">
+          <button 
+            type="submit" 
+            disabled={isSaving}
+            className={`px-8 py-4 bg-[#C89F6A] hover:bg-[#D5B285] text-black font-semibold rounded-xl transition-colors shadow-lg shadow-[#C89F6A]/20 flex items-center gap-2 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
