@@ -1,9 +1,10 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Coffee, Cake, Cookie, Utensils } from "lucide-react";
 import { FoodTruckModal } from "./FoodTruckModal";
 import { SpecialEventsSection, SpecialEvent } from "./SpecialEventsSection";
+import { supabase } from "../../lib/supabase";
 
 interface FoodTruckSectionProps {
   images: string[];
@@ -19,6 +20,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [specialEvents, setSpecialEvents] = useState<SpecialEvent[]>([]);
 
   const menuNarrative: NarrativeStep[] = [
     {
@@ -33,7 +35,8 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
     },
   ];
 
-  const specialEvents: SpecialEvent[] = [
+  // Static fallback data
+  const fallbackEvents: SpecialEvent[] = [
     {
       id: "1",
       name: "Homenaje a la Música Italiana",
@@ -50,7 +53,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
       ]
     },
     {
-      id: "2", 
+      id: "2",
       name: "Cena de Gratitud",
       image: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.82787-15/573270359_18045450638690161_7929014585758110399_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=YdPvSKnihBQQ7kNvwEgfr0D&_nc_oc=AdqHZWEZdTI4abaWx0a9o_GPcEEFUB03-ldZRRkzG4BmDaDhyZM1bYnE-XxsA8HhncJKi9gUUqywyVfnhrZEXDNu&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=v2d6UkFf2HY4IaN9J1t_Wg&_nc_ss=7a389&oh=00_Afzc1oMg72Mf4mKD1Q0kOLXGucJ_0fEmadSrqdUYnC_oDw&oe=69CFDD42",
       date: "Sábado 29 de Noviembre",
@@ -65,6 +68,25 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
       ]
     }
   ];
+
+  useEffect(() => {
+    const fetchSpecialEvents = async () => {
+      const { data } = await supabase.from('special_events').select('*').order('created_at', { ascending: true });
+      if (data && data.length > 0) {
+        setSpecialEvents(data.map(e => ({
+          id: e.id,
+          name: e.name,
+          image: e.image_url,
+          date: e.date || undefined,
+          description: e.description,
+          menu: e.menu
+        })));
+      } else {
+        setSpecialEvents(fallbackEvents);
+      }
+    };
+    fetchSpecialEvents();
+  }, []);
 
   return (
     <section id="foodtruck" ref={ref} className="py-24 px-6 md:px-12 bg-[#7A553A] text-white">

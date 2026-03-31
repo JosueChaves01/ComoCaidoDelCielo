@@ -1,7 +1,8 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import BackgroundEffectLocal from "./BackgroundEffectLocal";
+import { supabase } from "../../lib/supabase";
 
 interface TerraceSectionProps {
   images: { description: string; url: string }[];
@@ -18,6 +19,17 @@ export function TerraceSection({
 }: TerraceSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const [dbTerraces, setDbTerraces] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchTerraces = async () => {
+      const { data } = await supabase.from('terraces').select('*').order('created_at', { ascending: true });
+      if (data && data.length > 0) {
+        setDbTerraces(data);
+      }
+    };
+    fetchTerraces();
+  }, []);
 
   // Imágenes específicas para cada narrativa
   const sunsetImage =
@@ -128,6 +140,14 @@ export function TerraceSection({
       highlight: "Un lugar para sentirse vivo",
     },
   ];
+
+  const currentTerraceGallery = dbTerraces.length > 0 
+    ? dbTerraces.map(t => t.image_url)
+    : terraceGallery;
+
+  const currentTerraceTypesNarrative: NarrativeStep[] = dbTerraces.length > 0
+    ? dbTerraces.map(t => ({ title: t.title, description: t.description, highlight: t.highlight }))
+    : terraceTypesNarrative;
 
   return (
     <section
@@ -261,7 +281,7 @@ export function TerraceSection({
               className="relative sticky top-8"
             >
               <div className="grid grid-cols-2 gap-4">
-                {terraceGallery.map((image, index) => (
+                {currentTerraceGallery.slice(0, 4).map((image, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
@@ -306,7 +326,7 @@ export function TerraceSection({
 
               {/* Guía narrativa de tipos de terrazas */}
               <div className="space-y-6">
-                {terraceTypesNarrative.map((step, index) => (
+                {currentTerraceTypesNarrative.map((step, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, x: 20 }}
