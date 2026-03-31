@@ -4,6 +4,10 @@ import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2,
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { supabase } from "../../../lib/supabase";
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, 
+  AreaChart, Area, PieChart, Pie, Cell 
+} from 'recharts';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -2075,7 +2079,11 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
     menuItems: 0,
     upcomingEvents: 0,
     reservations: 0,
-    specialEvents: 0
+    specialEvents: 0,
+    incomeMonth: 0,
+    customerVariation: 0,
+    terraceData: [] as any[],
+    monthlyTrend: [] as any[]
   });
   const [recentReservations, setRecentReservations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -2084,25 +2092,73 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
     const fetchStats = async () => {
       setIsLoading(true);
       try {
+        const now = new Date();
+        const firstDayMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+        const lastDayLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).toISOString();
+
         const [
           { count: menuCount },
           { count: upcomingCount },
           { count: reservationsCount },
           { count: specialCount },
-          { data: recentRes }
+          { data: recentRes },
+          { data: currentMonthRes },
+          { data: lastMonthRes },
+          { data: allEvents }
         ] = await Promise.all([
           supabase.from('menu_items').select('*', { count: 'exact', head: true }),
           supabase.from('upcoming_events').select('*', { count: 'exact', head: true }),
           supabase.from('terrace_reservations').select('*', { count: 'exact', head: true }),
           supabase.from('special_events').select('*', { count: 'exact', head: true }),
-          supabase.from('terrace_reservations').select('*, terraces(title)').order('created_at', { ascending: false }).limit(5)
+          supabase.from('terrace_reservations').select('*, terraces(title)').order('created_at', { ascending: false }).limit(5),
+          supabase.from('terrace_reservations').select('*').gte('created_at', firstDayMonth),
+          supabase.from('terrace_reservations').select('*').gte('created_at', firstDayLastMonth).lte('created_at', lastDayLastMonth),
+          supabase.from('terrace_reservations').select('*, terraces(title)')
         ]);
+
+        // Calculate Income
+        const incomeCurrent = currentMonthRes?.filter(r => r.status === 'confirmed').reduce((sum, r) => sum + Number(r.total_amount || 0), 0) || 0;
+        
+        // Variation
+        const countCurrent = currentMonthRes?.length || 0;
+        const countLast = lastMonthRes?.length || 0;
+        const variation = countLast === 0 ? (countCurrent > 0 ? 100 : 0) : ((countCurrent - countLast) / countLast) * 100;
+
+        // Terrace Popularity
+        const terraceCounts: any = {};
+        allEvents?.forEach(r => {
+          const tName = r.terraces?.title || 'Otros';
+          terraceCounts[tName] = (terraceCounts[tName] || 0) + 1;
+        });
+        const terraceData = Object.keys(terraceCounts).map(name => ({
+          name,
+          value: terraceCounts[name]
+        })).sort((a,b) => b.value - a.value);
+
+        // Monthly Trend (Last 6 months)
+        const monthlyTrendData = [];
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const monthName = d.toLocaleString('es-ES', { month: 'short' });
+          const mStart = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+          const mEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString();
+          
+          const monthRes = allEvents?.filter(r => r.created_at >= mStart && r.created_at <= mEnd);
+          const income = monthRes?.filter(r => r.status === 'confirmed').reduce((sum, r) => sum + Number(r.total_amount || 0), 0) || 0;
+          
+          monthlyTrendData.push({ name: monthName, income, reservations: monthRes?.length || 0 });
+        }
 
         setStats({
           menuItems: menuCount || 0,
           upcomingEvents: upcomingCount || 0,
           reservations: reservationsCount || 0,
-          specialEvents: specialCount || 0
+          specialEvents: specialCount || 0,
+          incomeMonth: incomeCurrent,
+          customerVariation: variation,
+          terraceData,
+          monthlyTrend: monthlyTrendData
         });
         setRecentReservations(recentRes || []);
       } catch (e) {
@@ -2116,29 +2172,29 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
   }, []);
 
   const cards = [
-    { title: "Platillos en Menú", value: stats.menuItems, icon: < ChefHat className="w-6 h-6 text-[#C89F6A]" />, tab: "menu", color: "from-amber-500/10 to-orange-500/10" },
-    { title: "Eventos Próximos", value: stats.upcomingEvents, icon: < Calendar className="w-6 h-6 text-blue-400" />, tab: "upcoming", color: "from-blue-500/10 to-indigo-500/10" },
-    { title: "Reservas Totales", value: stats.reservations, icon: < CalendarCheck className="w-6 h-6 text-green-400" />, tab: "terrace_reservations", color: "from-green-500/10 to-emerald-500/10" },
-    { title: "Eventos Especiales", value: stats.specialEvents, icon: < Sparkles className="w-6 h-6 text-purple-400" />, tab: "special_events", color: "from-purple-500/10 to-pink-500/10" }
+    { title: "Platillos en Menú", value: stats.menuItems, icon: < ChefHat className="w-6 h-6 text-[#C89F6A]" />, tab: "menu", color: "from-amber-500/10 to-[#090B10]" },
+    { title: "Eventos Próximos", value: stats.upcomingEvents, icon: < Calendar className="w-6 h-6 text-blue-400" />, tab: "upcoming", color: "from-blue-500/10 to-[#090B10]" },
+    { title: "Reservas Totales", value: stats.reservations, icon: < CalendarCheck className="w-6 h-6 text-green-400" />, tab: "terrace_reservations", color: "from-green-500/10 to-[#090B10]" },
+    { title: "Eventos Especiales", value: stats.specialEvents, icon: < Sparkles className="w-6 h-6 text-purple-400" />, tab: "special_events", color: "from-purple-500/10 to-[#090B10]" }
   ];
 
   return (
     <div className="max-w-6xl mx-auto space-y-12">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl md:text-5xl font-light text-white mb-3">
-            Bienvenido, <span className="text-[#C89F6A] font-semibold">Administrador</span>
+          <h1 className="text-4xl md:text-5xl font-light text-white mb-3 tracking-tight">
+            Bienvenido, <span className="text-[#C89F6A] font-semibold">Admin</span>
           </h1>
           <p className="text-white/40 text-lg">
-            Aquí tienes un resumen de lo que está sucediendo en <span className="text-white/60 italic">Como Caído del Cielo</span>.
+            Análisis detallado de <span className="text-white/60 italic font-medium">Como Caído del Cielo</span>.
           </p>
         </div>
-        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-xl">
+        <div className="flex items-center gap-4 bg-white/5 p-4 rounded-3xl border border-white/10 backdrop-blur-xl">
           <div className="w-12 h-12 rounded-full bg-[#C89F6A]/20 flex items-center justify-center text-[#C89F6A]">
             <Store className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-white/40 uppercase tracking-widest font-bold">Estado del Sistema</p>
+            <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">Estado del Sistema</p>
             <p className="text-white font-medium flex items-center gap-2">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /> Operativo
             </p>
@@ -2148,14 +2204,63 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {cards.map((card, i) => (
+        {/* Main Stats with Analytics */}
+        <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           className="p-6 rounded-2xl bg-gradient-to-br from-[#C89F6A]/20 to-orange-500/10 border border-white/5 hover:border-[#C89F6A]/30 transition-all text-left relative overflow-hidden shadow-2xl"
+        >
+           <div className="flex justify-between items-start mb-4">
+             <div className="p-2 bg-black/40 rounded-lg">
+               <Store className="w-5 h-5 text-[#C89F6A]" />
+             </div>
+             <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Mes Actual</span>
+           </div>
+           <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Ingresos de Marzo</p>
+           <p className="text-4xl font-bold text-white tracking-tighter">
+             ₡{isLoading ? "..." : stats.incomeMonth.toLocaleString()}
+           </p>
+           <div className="mt-4 flex items-center gap-2">
+              <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                <motion.div initial={{width:0}} animate={{width:'65%'}} className="h-full bg-gradient-to-r from-[#C89F6A] to-orange-400" />
+              </div>
+           </div>
+        </motion.div>
+
+        <motion.div
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.1 }}
+           className="p-6 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-white/5 hover:border-blue-500/30 transition-all text-left relative overflow-hidden shadow-2xl"
+        >
+           <div className="flex justify-between items-start mb-4">
+             <div className="p-2 bg-black/40 rounded-lg">
+               <Calendar className="w-5 h-5 text-blue-400" />
+             </div>
+             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter ${stats.customerVariation >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+               {stats.customerVariation >= 0 ? 'Crecimiento' : 'Descenso'}
+             </span>
+           </div>
+           <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Crecimiento Clientes</p>
+           <div className="flex items-baseline gap-2">
+             <p className="text-4xl font-bold text-white tracking-tighter">
+               {isLoading ? "..." : `${stats.customerVariation >= 0 ? '+' : ''}${stats.customerVariation.toFixed(1)}%`}
+             </p>
+             <span className={`text-xs font-bold ${stats.customerVariation >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+               {stats.customerVariation >= 0 ? '↑' : '↓'}
+             </span>
+           </div>
+           <p className="text-white/20 text-[9px] mt-4 uppercase font-bold tracking-widest">Comparado con Febrero</p>
+        </motion.div>
+
+        {cards.slice(2).map((card, i) => (
           <motion.button
             key={card.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: (i + 2) * 0.1 }}
             onClick={() => { setActiveTab(card.tab); setActiveSubTab('list'); }}
-            className={`p-6 rounded-2xl bg-gradient-to-br ${card.color} border border-white/5 hover:border-white/20 transition-all text-left group relative overflow-hidden`}
+            className={`p-6 rounded-2xl bg-gradient-to-br ${card.color} border border-white/5 hover:border-white/20 transition-all text-left group relative overflow-hidden shadow-2xl`}
           >
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-125 duration-500">
               {card.icon}
@@ -2165,12 +2270,149 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
                 {card.icon}
               </div>
             </div>
-            <p className="text-white/40 text-sm font-medium tracking-wide uppercase">{card.title}</p>
-            <p className="text-4xl font-bold text-white mt-1">
+            <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em] mb-1">{card.title}</p>
+            <p className="text-4xl font-bold text-white tracking-tighter">
               {isLoading ? "..." : card.value}
             </p>
           </motion.button>
         ))}
+      </div>
+
+      {/* Analytics Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Trend Chart */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-black/40 border border-white/5 p-8 rounded-3xl backdrop-blur-md relative overflow-hidden shadow-2xl"
+        >
+          <div className="absolute top-0 left-0 w-1 h-full bg-[#C89F6A]/20" />
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+            <div>
+              <h3 className="text-white font-light text-xl flex items-center gap-2">
+                 <CalendarCheck className="w-5 h-5 text-[#C89F6A]" /> Tendencia de <span className="text-[#C89F6A] font-semibold">Reservas</span>
+              </h3>
+              <p className="text-white/30 text-[10px] uppercase font-bold tracking-[0.2em] mt-1">Últimos 6 meses</p>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#C89F6A]" />
+                <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Ingresos</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">Reservas</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="h-[280px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={stats.monthlyTrend}>
+                <defs>
+                  <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#C89F6A" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#C89F6A" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#ffffff40', fontSize: 10, fontWeight: 'bold' }}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#ffffff40', fontSize: 10 }}
+                  tickFormatter={(val) => `₡${(val/1000)}k`}
+                />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: '#090B10', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '12px', fontSize: '12px' }}
+                  itemStyle={{ color: '#EFEAE2' }}
+                  cursor={{ stroke: '#C89F6A', strokeWidth: 1 }}
+                />
+                <Area type="monotone" dataKey="income" stroke="#C89F6A" strokeWidth={3} fillOpacity={1} fill="url(#colorIncome)" />
+                <Area type="monotone" dataKey="reservations" stroke="#3b82f6" strokeWidth={2} fill="transparent" dot={{ r: 4, fill: '#3b82f6' }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
+        {/* Terrace Popularity Chart */}
+        <motion.div 
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.4 }}
+           className="bg-black/40 border border-white/5 p-8 rounded-3xl backdrop-blur-md relative overflow-hidden shadow-2xl"
+        >
+          <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/20" />
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h3 className="text-white font-light text-xl flex items-center gap-2">
+                 <ChefHat className="w-5 h-5 text-[#C89F6A]" /> Popularidad de <span className="text-[#C89F6A] font-semibold">Terrazas</span>
+              </h3>
+              <p className="text-white/30 text-[10px] uppercase font-bold tracking-[0.2em] mt-1">Distribución histórica</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
+            <div className="h-[240px] relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={stats.terraceData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={95}
+                    paddingAngle={8}
+                    dataKey="value"
+                  >
+                    {stats.terraceData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={[
+                        '#C89F6A', '#D5B285', '#B68E56', '#947547', '#3b82f6'
+                      ][index % 5]} stroke="transparent" />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip 
+                     contentStyle={{ backgroundColor: '#090B10', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '10px' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none hidden md:block">
+                 <p className="text-2xl font-bold text-white">{stats.reservations}</p>
+                 <p className="text-[8px] text-white/40 uppercase font-bold tracking-widest">Total</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              {stats.terraceData.slice(0, 4).map((item, i) => (
+                <div key={item.name} className="flex flex-col gap-1 group">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full" style={{ backgroundColor: ['#C89F6A', '#D5B285', '#B68E56', '#947547'][i % 4] }} />
+                      <span className="text-white/60 text-[11px] font-bold uppercase tracking-wider truncate w-32">{item.name}</span>
+                    </div>
+                    <span className="text-white font-bold text-xs">{item.value}</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(item.value / (stats.reservations || 1)) * 100}%` }}
+                      transition={{ duration: 1, delay: 0.5 }}
+                      className="h-full bg-[#C89F6A]" 
+                    />
+                  </div>
+                </div>
+              ))}
+              {stats.terraceData.length === 0 && <p className="text-white/20 text-xs text-center py-10">Sin datos de terrazas</p>}
+              {stats.terraceData.length > 4 && <p className="text-[10px] text-white/30 italic text-right">+ {stats.terraceData.length - 4} más</p>}
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -2188,7 +2430,7 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
             </button>
           </div>
 
-          <div className="bg-black/40 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md">
+          <div className="bg-black/40 border border-white/5 rounded-3xl overflow-hidden backdrop-blur-md shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead className="bg-white/5 text-[10px] uppercase tracking-[0.2em] text-white/50 font-bold">
@@ -2253,9 +2495,9 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
                 whileHover={{ scale: 1.02, x: 10 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => { setActiveTab(action.tab); setActiveSubTab(action.subTab); }}
-                className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-[#C89F6A]/30 transition-all text-left"
+                className="flex items-center gap-4 p-5 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 hover:border-[#C89F6A]/30 transition-all text-left shadow-lg"
               >
-                <div className="p-3 bg-black/40 rounded-xl">
+                <div className="p-3 bg-black/40 rounded-2xl">
                   {action.icon}
                 </div>
                 <span className="text-white font-medium">{action.label}</span>
@@ -2270,7 +2512,7 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
                 <Store className="w-4 h-4" /> Tip de Admin
               </h4>
               <p className="text-white/60 text-sm leading-relaxed">
-                Recuerda actualizar el menú regularmente para mantener la frescura de tus platillos y la sorpresa de tus clientes.
+                El análisis mes a mes te ayuda a predecir épocas de alta demanda y ajustar el personal necesario.
               </p>
             </div>
             <ChefHat className="absolute -bottom-4 -right-4 w-24 h-24 text-[#C89F6A]/10 transform -rotate-12 group-hover:scale-110 transition-transform duration-700" />
