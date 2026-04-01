@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat, LayoutTemplate, Sparkles, CalendarCheck, Check, Store } from "lucide-react";
+import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat, LayoutTemplate, Sparkles, CalendarCheck, Check, Store, ChevronDown, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { supabase } from "../../../lib/supabase";
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, 
-  AreaChart, Area, PieChart, Pie, Cell 
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
+  AreaChart, Area, PieChart, Pie, Cell
 } from 'recharts';
 
 export default function AdminDashboard() {
@@ -14,6 +14,63 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<"home" | "upcoming" | "carousel" | "menu" | "terraces" | "special_events" | "terrace_reservations" | "business_rules">("home");
   const [activeSubTab, setActiveSubTab] = useState<"create" | "list" | "reservations" | "settings">("create");
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+
+  const SIDEBAR_ITEMS = useMemo(() => [
+    {
+      id: "upcoming",
+      title: "Próximos Eventos",
+      icon: Calendar,
+      items: [
+        { label: "Nuevo Evento", icon: Plus, tab: "upcoming", subTab: "create" },
+        { label: "Gestionar", icon: List, tab: "upcoming", subTab: "list" },
+      ]
+    },
+    {
+      id: "carousel",
+      title: "Carrusel Histórico",
+      icon: Images,
+      items: [
+        { label: "Nuevo Carrusel", icon: Plus, tab: "carousel", subTab: "create" },
+        { label: "Gestionar", icon: List, tab: "carousel", subTab: "list" },
+      ]
+    },
+    {
+      id: "menu",
+      title: "Menú Rincón",
+      icon: ChefHat,
+      items: [
+        { label: "Nuevo Platillo", icon: Plus, tab: "menu", subTab: "create" },
+        { label: "Gestionar", icon: List, tab: "menu", subTab: "list" },
+      ]
+    },
+    {
+      id: "terraces",
+      title: "Terrazas",
+      icon: LayoutTemplate,
+      items: [
+        { label: "Nueva Terraza", icon: Plus, tab: "terraces", subTab: "create" },
+        { label: "Gestionar", icon: List, tab: "terraces", subTab: "list" },
+      ]
+    },
+    {
+      id: "special_events",
+      title: "Eventos Especiales",
+      icon: Sparkles,
+      items: [
+        { label: "Nuevo Evento", icon: Plus, tab: "special_events", subTab: "create" },
+        { label: "Gestionar", icon: List, tab: "special_events", subTab: "list" },
+      ]
+    },
+    {
+      id: "terrace_reservations",
+      title: "Reservaciones",
+      icon: CalendarCheck,
+      items: [
+        { label: "Ver Reservas", icon: List, tab: "terrace_reservations", subTab: "list" },
+      ]
+    }
+  ], []);
 
   // Auth Check
   useEffect(() => {
@@ -47,7 +104,7 @@ export default function AdminDashboard() {
   const stars3 = useMemo(() => generateStars(15, true, true), []);
 
   return (
-    <div className="min-h-screen bg-[#090B10] flex text-[#EFEAE2] font-sans relative overflow-hidden">
+    <div className="h-screen w-full bg-[#090B10] flex text-[#EFEAE2] font-sans relative overflow-hidden">
 
       {/* Starry Background Layers */}
       <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
@@ -92,7 +149,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/5 bg-[#090B10]/80 backdrop-blur-md p-6 flex flex-col justify-between hidden md:flex relative z-10 shadow-[4px_0_24px_rgba(0,0,0,0.5)]">
+      <aside className="w-64 border-r border-white/5 bg-[#090B10]/80 backdrop-blur-md p-6 flex flex-col justify-between hidden md:flex shrink-0 z-10 shadow-[4px_0_24px_rgba(0,0,0,0.5)]">
         <div>
           <h2 className="text-xl font-bold tracking-widest text-[#C89F6A] mb-12 uppercase">
             Cielo Admin
@@ -111,237 +168,153 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            {/* Próximos Eventos Group */}
-            <div>
-              <div className="flex items-center gap-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-2">
-                <Calendar className="w-4 h-4" /> Próximos Eventos
-              </div>
-              <div className="space-y-1">
-                <button
-                  onClick={() => { setActiveTab("upcoming"); setActiveSubTab("create"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "upcoming" && activeSubTab === "create" && !editingItem
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <Plus className="w-4 h-4" /> Nuevo Evento
-                </button>
-                <button
-                  onClick={() => { setActiveTab("upcoming"); setActiveSubTab("list"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "upcoming" && activeSubTab === "list"
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <List className="w-4 h-4" /> Gestionar
-                </button>
-              </div>
-            </div>
+            {SIDEBAR_ITEMS.map((group) => {
+              const Icon = group.icon;
+              const isOpen = openMenu === group.id;
 
-            {/* Carrusel Group */}
-            <div>
-              <div className="flex items-center gap-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-2">
-                <Images className="w-4 h-4" /> Carrusel Histórico
-              </div>
-              <div className="space-y-1">
-                <button
-                  onClick={() => { setActiveTab("carousel"); setActiveSubTab("create"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "carousel" && activeSubTab === "create" && !editingItem
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <Plus className="w-4 h-4" /> Nuevo Carrusel
-                </button>
-                <button
-                  onClick={() => { setActiveTab("carousel"); setActiveSubTab("list"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "carousel" && activeSubTab === "list"
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <List className="w-4 h-4" /> Gestionar
-                </button>
-              </div>
-            </div>
+              return (
+                <div key={group.id} className="mb-2">
+                  <button
+                    onClick={() => setOpenMenu(isOpen ? null : group.id)}
+                    className="w-full flex items-center justify-between text-white/40 hover:text-white/80 transition-colors py-2 px-3 rounded-lg hover:bg-white/5 group/button"
+                  >
+                    <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] group-hover/button:text-white transition-colors">
+                      <Icon className="w-4 h-4" /> {group.title}
+                    </div>
+                    <motion.div
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronDown className="w-4 h-4 opacity-50 group-hover/button:opacity-100" />
+                    </motion.div>
+                  </button>
 
-            {/* Menú Rincón del Atardecer Group */}
-            <div>
-              <div className="flex items-center gap-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-2">
-                <ChefHat className="w-4 h-4" /> Menú Rincón
-              </div>
-              <div className="space-y-1">
-                <button
-                  onClick={() => { setActiveTab("menu"); setActiveSubTab("create"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "menu" && activeSubTab === "create" && !editingItem
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <Plus className="w-4 h-4" /> Nuevo Platillo
-                </button>
-                <button
-                  onClick={() => { setActiveTab("menu"); setActiveSubTab("list"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "menu" && activeSubTab === "list"
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <List className="w-4 h-4" /> Gestionar
-                </button>
-              </div>
-            </div>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="space-y-1 mt-2">
+                          {group.items.map((item, index) => {
+                            const ItemIcon = item.icon;
+                            // Check exact tab match. (For editing, activeSubTab handles the edit form correctly but editingItem nullifies active appearance, which matches existing behavior)
+                            const isActive = activeTab === item.tab && activeSubTab === item.subTab && !editingItem;
 
-            {/* Terrazas Group */}
-            <div>
-              <div className="flex items-center gap-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-2">
-                <LayoutTemplate className="w-4 h-4" /> Terrazas
-              </div>
-              <div className="space-y-1">
-                <button
-                  onClick={() => { setActiveTab("terraces"); setActiveSubTab("create"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "terraces" && activeSubTab === "create" && !editingItem
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <Plus className="w-4 h-4" /> Nueva Terraza
-                </button>
-                <button
-                  onClick={() => { setActiveTab("terraces"); setActiveSubTab("list"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "terraces" && activeSubTab === "list"
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <List className="w-4 h-4" /> Gestionar
-                </button>
-              </div>
-            </div>
-
-            {/* Eventos Especiales Group */}
-            <div>
-              <div className="flex items-center gap-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-2">
-                <Sparkles className="w-4 h-4" /> Eventos Especiales
-              </div>
-              <div className="space-y-1">
-                <button
-                  onClick={() => { setActiveTab("special_events"); setActiveSubTab("create"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "special_events" && activeSubTab === "create" && !editingItem
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <Plus className="w-4 h-4" /> Nuevo Evento
-                </button>
-                <button
-                  onClick={() => { setActiveTab("special_events"); setActiveSubTab("list"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "special_events" && activeSubTab === "list"
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <List className="w-4 h-4" /> Gestionar
-                </button>
-              </div>
-            </div>
-
-            {/* Reglas de Negocio Group */}
-            <div>
-              <div className="flex items-center gap-2 text-white/40 text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-2">
-                <Store className="w-4 h-4" /> Configuración
-              </div>
-              <div className="space-y-1">
-                <button
-                  onClick={() => { setActiveTab("business_rules"); setActiveSubTab("settings"); setEditingItem(null); }}
-                  className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${activeTab === "business_rules" && activeSubTab === "settings"
-                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium"
-                    : "text-white/60 hover:bg-white/5 hover:text-white"
-                    }`}
-                >
-                  <Store className="w-4 h-4" /> Reglas de Negocio
-                </button>
-              </div>
-            </div>
+                            return (
+                              <button
+                                key={index}
+                                onClick={() => { setActiveTab(item.tab as any); setActiveSubTab(item.subTab as any); setEditingItem(null); }}
+                                className={`flex items-center gap-3 w-full p-2 pl-4 rounded-lg text-left transition-all text-sm ${isActive
+                                    ? "bg-[#C89F6A]/20 text-[#C89F6A] font-medium border-l-2 border-[#C89F6A]"
+                                    : "text-white/60 hover:bg-white/5 hover:text-white border-l-2 border-transparent"
+                                  }`}
+                              >
+                                <ItemIcon className="w-4 h-4" /> {item.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
 
           </nav>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 w-full p-3 rounded-lg text-left text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-colors mt-auto"
-        >
-          <LogOut className="w-5 h-5" />
-          Cerrar Sesión
-        </button>
+        <div className="space-y-4">
+          <button
+            onClick={() => { setActiveTab("business_rules"); setActiveSubTab("settings"); setEditingItem(null); setOpenMenu(null); }}
+            className={`flex items-center gap-3 w-full p-3 rounded-xl text-left transition-all text-sm font-semibold tracking-wide ${activeTab === "business_rules"
+              ? "bg-[#C89F6A]/20 text-[#C89F6A] shadow-[0_0_20px_rgba(200,159,106,0.1)] border border-[#C89F6A]/30"
+              : "text-white/60 hover:bg-white/5 hover:text-white"
+              }`}
+          >
+            <Store className="w-5 h-5" /> Configuración
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full p-3 rounded-lg text-left text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            Cerrar Sesión
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-12 overflow-y-auto relative z-10">
+      <main className="flex-1 h-full overflow-y-auto p-6 md:p-12 relative z-10">
         {/* Mobile Header */}
         <div className="md:hidden flex justify-between items-center mb-8 bg-black/40 p-4 rounded-xl border border-white/5">
-           <h2 className="text-lg font-bold tracking-widest text-[#C89F6A] uppercase">Cielo Admin</h2>
-           <button onClick={handleLogout} className="text-white/50 hover:text-red-400">
-             <LogOut className="w-5 h-5" />
-           </button>
+          <h2 className="text-lg font-bold tracking-widest text-[#C89F6A] uppercase">Cielo Admin</h2>
+          <button onClick={handleLogout} className="text-white/50 hover:text-red-400">
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Mobile Tabs */}
         <div className="md:hidden flex flex-col space-y-2 mb-8 bg-black/40 p-2 rounded-xl">
-           <div className="flex gap-2">
-             <button onClick={() => { setActiveTab('home'); setEditingItem(null); }} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 rounded-lg transition-all font-bold ${activeTab === 'home' ? 'bg-[#C89F6A] text-black' : 'text-white/50 bg-white/5'}`}>
-               <LayoutTemplate className="w-4 h-4" /> DASHBOARD
-             </button>
-           </div>
-           <div className="flex gap-2">
-             <button onClick={() => { setActiveTab('upcoming'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'upcoming' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <Calendar className="w-3 h-3" /> + Próximo
-             </button>
-             <button onClick={() => { setActiveTab('upcoming'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'upcoming' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <List className="w-3 h-3" /> Ver
-             </button>
-           </div>
-           <div className="flex gap-2">
-             <button onClick={() => { setActiveTab('carousel'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'carousel' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <Images className="w-3 h-3" /> + Carrusel
-             </button>
-             <button onClick={() => { setActiveTab('carousel'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'carousel' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <List className="w-3 h-3" /> Ver
-             </button>
-           </div>
-           <div className="flex gap-2">
-             <button onClick={() => { setActiveTab('menu'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'menu' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <ChefHat className="w-3 h-3" /> + Plato
-             </button>
-             <button onClick={() => { setActiveTab('menu'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'menu' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <List className="w-3 h-3" /> Ver
-             </button>
-           </div>
-           <div className="flex gap-2">
-             <button onClick={() => { setActiveTab('terraces'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'terraces' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <LayoutTemplate className="w-3 h-3" /> + Terraza
-             </button>
-             <button onClick={() => { setActiveTab('terraces'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'terraces' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <List className="w-3 h-3" /> Ver
-             </button>
-           </div>
-           <div className="flex gap-2">
-             <button onClick={() => { setActiveTab('special_events'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'special_events' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <Sparkles className="w-3 h-3" /> + Especial
-             </button>
-             <button onClick={() => { setActiveTab('special_events'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'special_events' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <List className="w-3 h-3" /> Ver
-             </button>
-           </div>
-           <div className="flex gap-2">
-             <button onClick={() => { setActiveTab('terrace_reservations'); setActiveSubTab('list'); }} className={`w-full py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'terrace_reservations' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <CalendarCheck className="w-3 h-3" /> Ver Reservas de Terrazas
-             </button>
-           </div>
-           <div className="flex gap-2">
-             <button onClick={() => { setActiveTab('business_rules'); setActiveSubTab('settings'); }} className={`w-full py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'business_rules' && activeSubTab === 'settings' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
-               <Store className="w-3 h-3" /> Reglas de Negocio
-             </button>
-           </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('home'); setEditingItem(null); }} className={`flex-1 py-3 text-xs flex items-center justify-center gap-2 rounded-lg transition-all font-bold ${activeTab === 'home' ? 'bg-[#C89F6A] text-black' : 'text-white/50 bg-white/5'}`}>
+              <LayoutTemplate className="w-4 h-4" /> DASHBOARD
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('upcoming'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'upcoming' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <Calendar className="w-3 h-3" /> + Próximo
+            </button>
+            <button onClick={() => { setActiveTab('upcoming'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'upcoming' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <List className="w-3 h-3" /> Ver
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('carousel'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'carousel' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <Images className="w-3 h-3" /> + Carrusel
+            </button>
+            <button onClick={() => { setActiveTab('carousel'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'carousel' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <List className="w-3 h-3" /> Ver
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('menu'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'menu' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <ChefHat className="w-3 h-3" /> + Plato
+            </button>
+            <button onClick={() => { setActiveTab('menu'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'menu' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <List className="w-3 h-3" /> Ver
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('terraces'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'terraces' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <LayoutTemplate className="w-3 h-3" /> + Terraza
+            </button>
+            <button onClick={() => { setActiveTab('terraces'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'terraces' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <List className="w-3 h-3" /> Ver
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('special_events'); setActiveSubTab('create'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'special_events' && activeSubTab === 'create' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <Sparkles className="w-3 h-3" /> + Especial
+            </button>
+            <button onClick={() => { setActiveTab('special_events'); setActiveSubTab('list'); }} className={`flex-1 py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'special_events' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <List className="w-3 h-3" /> Ver
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('terrace_reservations'); setActiveSubTab('list'); }} className={`w-full py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'terrace_reservations' && activeSubTab === 'list' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <CalendarCheck className="w-3 h-3" /> Ver Reservas de Terrazas
+            </button>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => { setActiveTab('business_rules'); setActiveSubTab('settings'); }} className={`w-full py-2 text-xs flex items-center justify-center gap-1 rounded-lg transition-all ${activeTab === 'business_rules' && activeSubTab === 'settings' ? 'bg-[#C89F6A]/20 text-[#C89F6A]' : 'text-white/50'}`}>
+              <Store className="w-3 h-3" /> Reglas de Negocio
+            </button>
+          </div>
         </div>
 
         <motion.div
@@ -1322,7 +1295,7 @@ function TerracesManager({ subTab, setSubTab, editingItem, setEditingItem }: any
 
       <AnimatePresence mode="wait">
         {subTab === "create" ? (
-          <motion.div key="create" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
+          <motion.div key="create" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <TerraceCreateForm
               editingItem={editingItem}
               onSuccess={() => { setSubTab("list"); setEditingItem(null); }}
@@ -1330,7 +1303,7 @@ function TerracesManager({ subTab, setSubTab, editingItem, setEditingItem }: any
             />
           </motion.div>
         ) : (
-          <motion.div key="list" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
+          <motion.div key="list" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <TerraceList terraces={terraces} isLoading={isLoading} onDelete={handleDelete} onEdit={handleEdit} />
           </motion.div>
         )}
@@ -1537,7 +1510,7 @@ function SpecialEventsManager({ subTab, setSubTab, editingItem, setEditingItem }
 
       <AnimatePresence mode="wait">
         {subTab === "create" ? (
-          <motion.div key="create" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
+          <motion.div key="create" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <SpecialEventCreateForm
               editingItem={editingItem}
               onSuccess={() => { setSubTab("list"); setEditingItem(null); }}
@@ -1545,7 +1518,7 @@ function SpecialEventsManager({ subTab, setSubTab, editingItem, setEditingItem }
             />
           </motion.div>
         ) : (
-          <motion.div key="list" initial={{opacity:0, y:10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}}>
+          <motion.div key="list" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <SpecialEventList events={events} isLoading={isLoading} onDelete={handleDelete} onEdit={handleEdit} />
           </motion.div>
         )}
@@ -1759,18 +1732,31 @@ function SpecialEventList({ events, isLoading, onDelete, onEdit }: any) {
 // TERRACE RESERVATIONS MANAGER
 // ----------------------------------------------------
 
-function TerraceReservationsManager({ subTab, setSubTab }: any) {
+const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
+  sin_confirmar:      { label: 'Sin Confirmar',      className: 'bg-gray-500/10 text-gray-400 border-gray-500/20' },
+  pendiente_revision: { label: 'Pendiente Revisión', className: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+  pendiente_pago:     { label: 'Pendiente Pago',     className: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
+  aprobada:           { label: 'Aprobada',            className: 'bg-green-500/10 text-green-400 border-green-500/20' },
+  confirmed:          { label: 'Confirmado',          className: 'bg-green-500/10 text-green-400 border-green-500/20' },
+  pending:            { label: 'Pendiente',           className: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' },
+  rechazada:           { label: 'Rechazada',            className: 'bg-red-500/10 text-red-400 border-red-500/20' },
+  cancelled:           { label: 'Cancelada',            className: 'bg-red-500/10 text-red-400 border-red-500/20' },
+  pendiente_reembolso:    { label: 'Pendiente Reembolso',    className: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
+  pendiente_cancelacion:  { label: 'Pendiente Cancelación',  className: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
+};
+
+function TerraceReservationsManager({ subTab }: any) {
   const [reservations, setReservations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'pendiente_revision'>(subTab === 'pending' ? 'pendiente_revision' : 'all');
+  const [proofUrl, setProofUrl] = useState<string | null>(null);
 
-  // We fetch reservations and join with terraces table to get terrace title
   const fetchReservations = async () => {
     setIsLoading(true);
     const { data } = await supabase
       .from('terrace_reservations')
       .select('*, terraces(title)')
       .order('created_at', { ascending: false });
-    
     if (data) setReservations(data);
     setIsLoading(false);
   };
@@ -1784,7 +1770,7 @@ function TerraceReservationsManager({ subTab, setSubTab }: any) {
     try {
       const { error } = await supabase.from('terrace_reservations').update({ status: newStatus }).eq('id', id);
       if (error) throw error;
-      setReservations(prev => prev.map(res => res.id === id ? { ...res, status: newStatus } : res));
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
       toast.success("Estado actualizado", { id: toastId });
     } catch (e: any) {
       toast.error(e.message, { id: toastId });
@@ -1797,25 +1783,59 @@ function TerraceReservationsManager({ subTab, setSubTab }: any) {
     try {
       const { error } = await supabase.from('terrace_reservations').delete().eq('id', id);
       if (error) throw error;
-      setReservations(prev => prev.filter(res => res.id !== id));
+      setReservations(prev => prev.filter(r => r.id !== id));
       toast.success("Eliminada correctamente", { id: toastId });
     } catch (e: any) {
       toast.error(e.message, { id: toastId });
     }
   };
 
+  const filtered = filter === 'pendiente_revision'
+    ? reservations.filter(r => r.status === 'pendiente_revision')
+    : reservations;
+
+  const pendingCount = reservations.filter(r => r.status === 'pendiente_revision').length;
+
   if (isLoading) return <div className="text-white/50 text-center py-20">Cargando reservaciones...</div>;
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="mb-10">
+      <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-light text-white mb-2">
           Reservas de <span className="text-[#C89F6A] font-semibold">Terrazas</span>
         </h1>
-        <p className="text-white/50 mt-2">
-          Gestiona las reservaciones de día completo hechas por los clientes.
-        </p>
+        <p className="text-white/50 mt-2">Gestiona reservaciones y revisa comprobantes de pago.</p>
       </div>
+
+      {/* Filtros */}
+      <div className="flex gap-2 mb-6">
+        <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg text-sm transition-all border ${filter === 'all' ? 'bg-[#C89F6A]/20 text-[#C89F6A] border-[#C89F6A]/30' : 'text-white/50 bg-white/5 hover:bg-white/10 border-white/10'}`}>
+          Todas
+        </button>
+        <button onClick={() => setFilter('pendiente_revision')} className={`px-4 py-2 rounded-lg text-sm transition-all border flex items-center gap-2 ${filter === 'pendiente_revision' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' : 'text-white/50 bg-white/5 hover:bg-white/10 border-white/10'}`}>
+          Pendientes de Revisión
+          {pendingCount > 0 && <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">{pendingCount}</span>}
+        </button>
+      </div>
+
+      {/* Modal comprobante */}
+      <AnimatePresence>
+        {proofUrl && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setProofUrl(null)}>
+            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
+              className="bg-[#11141D] rounded-2xl overflow-hidden max-w-lg w-full border border-white/10"
+              onClick={e => e.stopPropagation()}>
+              <div className="flex justify-between items-center p-4 border-b border-white/10">
+                <span className="text-white font-medium text-sm">Comprobante de Pago</span>
+                <button onClick={() => setProofUrl(null)} className="text-white/50 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
+              </div>
+              <img src={proofUrl} alt="Comprobante" className="w-full object-contain max-h-[70vh]" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="bg-[#11141D] border border-white/5 rounded-2xl overflow-hidden overflow-x-auto shadow-2xl">
         <table className="w-full text-left border-collapse min-w-[800px]">
@@ -1823,67 +1843,89 @@ function TerraceReservationsManager({ subTab, setSubTab }: any) {
             <tr className="bg-black/50 border-b border-white/10 text-xs uppercase tracking-widest text-[#C89F6A]">
               <th className="px-6 py-4 font-medium">Cliente</th>
               <th className="px-6 py-4 font-medium">Terraza & Fecha</th>
-              <th className="px-6 py-4 font-medium">Nº Entradas</th>
-              <th className="px-6 py-4 font-medium">Ingreso Estimado</th>
+              <th className="px-6 py-4 font-medium">Personas</th>
+              <th className="px-6 py-4 font-medium">Total</th>
               <th className="px-6 py-4 font-medium">Estado</th>
               <th className="px-6 py-4 font-medium text-right">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5 text-sm">
-            {reservations.length === 0 ? (
-              <tr><td colSpan={6} className="px-6 py-10 text-center text-white/40">No hay reservas registradas.</td></tr>
+            {filtered.length === 0 ? (
+              <tr><td colSpan={6} className="px-6 py-10 text-center text-white/40">
+                {filter === 'pendiente_revision' ? 'No hay comprobantes pendientes de revisión.' : 'No hay reservas registradas.'}
+              </td></tr>
             ) : (
-              reservations.map((res: any) => (
-                <tr key={res.id} className="hover:bg-white/5 transition-colors group">
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="text-white font-medium">{res.customer_name}</span>
-                      <span className="text-white/40 text-xs">{res.customer_phone}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col">
-                      <span className="text-white">{res.terraces?.title || 'Terraza Desaparecida'}</span>
-                      <span className="text-[#C89F6A] font-bold text-xs">{res.reservation_date}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-white/70">
-                    <div className="flex flex-col gap-1">
-                      <span>{res.adults_count} Adultos</span>
-                      {res.children_count > 0 && <span className="text-xs">{(res.children_count)} Niños</span>}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-green-400 font-medium tracking-wide">
-                    ₡{(res.total_amount || res.adults_count * 3500).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${
-                      res.status === 'confirmed' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                      res.status === 'cancelled' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                      'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                    }`}>
-                      {res.status === 'pending' ? 'Pendiente' : res.status === 'confirmed' ? 'Confirmado' : 'Cancelado'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
-                      {res.status !== 'confirmed' && (
-                        <button onClick={() => updateStatus(res.id, 'confirmed')} className="p-2 bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white rounded-lg transition-colors border border-green-500/20 shadow-lg" title="Confirmar">
-                          <Check className="w-4 h-4" />
+              filtered.map((res: any) => {
+                const cfg = STATUS_CONFIG[res.status] ?? { label: res.status, className: 'bg-white/5 text-white/50 border-white/10' };
+                const isPendingReview = res.status === 'pendiente_revision';
+                return (
+                  <tr key={res.id} className={`hover:bg-white/5 transition-colors group ${isPendingReview ? 'bg-blue-500/5' : ''}`}>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-white font-medium">{res.customer_name}</span>
+                        <span className="text-white/40 text-xs">{res.customer_phone}</span>
+                        {res.customer_email && <span className="text-white/30 text-xs">{res.customer_email}</span>}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col">
+                        <span className="text-white">{res.terraces?.title || 'Terraza'}</span>
+                        <span className="text-[#C89F6A] font-bold text-xs">{res.reservation_date}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-white/70">
+                      <div className="flex flex-col gap-0.5">
+                        <span>{res.adults_count} adultos</span>
+                        {res.children_count > 0 && <span className="text-xs">{res.children_count} niños</span>}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-green-400 font-medium">
+                      ₡{(res.total_amount || res.adults_count * 3500).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${cfg.className}`}>
+                        {cfg.label}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                        {res.payment_proof_url && (
+                          <button onClick={() => setProofUrl(res.payment_proof_url)} className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition-colors border border-blue-500/20" title="Ver comprobante">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        )}
+                        {isPendingReview && (
+                          <>
+                            <button onClick={() => updateStatus(res.id, 'aprobada')} className="p-2 bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white rounded-lg transition-colors border border-green-500/20" title="Aprobar">
+                              <Check className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => updateStatus(res.id, 'rechazada')} className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-500/20" title="Rechazar">
+                              <X className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                        {!isPendingReview && res.status !== 'aprobada' && res.status !== 'rechazada' && (
+                          <>
+                            {res.status !== 'confirmed' && (
+                              <button onClick={() => updateStatus(res.id, 'confirmed')} className="p-2 bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white rounded-lg transition-colors border border-green-500/20" title="Confirmar">
+                                <Check className="w-4 h-4" />
+                              </button>
+                            )}
+                            {res.status !== 'cancelled' && (
+                              <button onClick={() => updateStatus(res.id, 'cancelled')} className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-500/20" title="Cancelar">
+                                <X className="w-4 h-4" />
+                              </button>
+                            )}
+                          </>
+                        )}
+                        <button onClick={() => handleDelete(res.id)} className="p-2 bg-white/5 text-white/50 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-white/10 ml-1" title="Eliminar">
+                          <Trash2 className="w-4 h-4" />
                         </button>
-                      )}
-                      {res.status !== 'cancelled' && (
-                        <button onClick={() => updateStatus(res.id, 'cancelled')} className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-red-500/20 shadow-lg" title="Cancelar Reserva">
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button onClick={() => handleDelete(res.id)} className="p-2 bg-white/5 text-white/50 hover:bg-red-500 hover:text-white rounded-lg transition-colors border border-white/10 shadow-lg ml-2" title="Eliminar Registro">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -1938,7 +1980,7 @@ function BusinessRulesManager() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (workingDays.length === 0) return toast.error("Debes seleccionar al menos un día de trabajo.");
-    
+
     setIsSaving(true);
     const toastId = toast.loading("Guardando reglas de negocio...");
     try {
@@ -1949,9 +1991,11 @@ function BusinessRulesManager() {
         closing_time: closingTime,
         working_days: workingDays
       };
-      
-      const { error } = await supabase.from('business_rules').update(payload).eq('id', 1);
+
+      const { data, error } = await supabase.from('business_rules').update(payload).eq('id', 1).select();
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error("Acceso denegado o no se encontró el registro para actualizar (Problema de permisos o RLS).");
+
       toast.success("Reglas guardadas exitosamente.", { id: toastId });
     } catch (err: any) {
       toast.error(err.message || "Error al guardar.", { id: toastId });
@@ -1982,24 +2026,24 @@ function BusinessRulesManager() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Precio por Adulto (₡)</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 required
-                value={adultPrice} 
-                onChange={e => setAdultPrice(parseInt(e.target.value) || 0)} 
-                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A]" 
+                value={adultPrice}
+                onChange={e => setAdultPrice(parseInt(e.target.value) || 0)}
+                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A]"
               />
             </div>
             <div>
               <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Precio por Niño (₡)</label>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 min="0"
                 required
-                value={childPrice} 
-                onChange={e => setChildPrice(parseInt(e.target.value) || 0)} 
-                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A]" 
+                value={childPrice}
+                onChange={e => setChildPrice(parseInt(e.target.value) || 0)}
+                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A]"
               />
             </div>
           </div>
@@ -2013,22 +2057,22 @@ function BusinessRulesManager() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Hora de Apertura</label>
-              <input 
-                type="time" 
+              <input
+                type="time"
                 required
-                value={openingTime} 
-                onChange={e => setOpeningTime(e.target.value)} 
-                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A] [color-scheme:dark]" 
+                value={openingTime}
+                onChange={e => setOpeningTime(e.target.value)}
+                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A] [color-scheme:dark]"
               />
             </div>
             <div>
               <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Hora de Cierre</label>
-              <input 
-                type="time" 
+              <input
+                type="time"
                 required
-                value={closingTime} 
-                onChange={e => setClosingTime(e.target.value)} 
-                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A] [color-scheme:dark]" 
+                value={closingTime}
+                onChange={e => setClosingTime(e.target.value)}
+                className="w-full bg-[#090B10] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C89F6A] [color-scheme:dark]"
               />
             </div>
           </div>
@@ -2048,11 +2092,10 @@ function BusinessRulesManager() {
                   key={day}
                   type="button"
                   onClick={() => toggleDay(day)}
-                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${
-                    isActive 
-                      ? 'bg-[#C89F6A] border-[#C89F6A] text-black shadow-lg shadow-[#C89F6A]/20' 
+                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition-all ${isActive
+                      ? 'bg-[#C89F6A] border-[#C89F6A] text-black shadow-lg shadow-[#C89F6A]/20'
                       : 'bg-[#090B10] border-white/10 text-white/50 hover:border-white/30'
-                  }`}
+                    }`}
                 >
                   {day}
                 </button>
@@ -2062,8 +2105,8 @@ function BusinessRulesManager() {
         </div>
 
         <div className="pt-6 flex justify-end">
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isSaving}
             className={`px-8 py-4 bg-[#C89F6A] hover:bg-[#D5B285] text-black font-semibold rounded-xl transition-colors shadow-lg shadow-[#C89F6A]/20 flex items-center gap-2 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
@@ -2082,6 +2125,7 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
     specialEvents: 0,
     incomeMonth: 0,
     customerVariation: 0,
+    pendingReservations: 0,
     terraceData: [] as any[],
     monthlyTrend: [] as any[]
   });
@@ -2119,7 +2163,7 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
 
         // Calculate Income
         const incomeCurrent = currentMonthRes?.filter(r => r.status === 'confirmed').reduce((sum, r) => sum + Number(r.total_amount || 0), 0) || 0;
-        
+
         // Variation
         const countCurrent = currentMonthRes?.length || 0;
         const countLast = lastMonthRes?.length || 0;
@@ -2134,7 +2178,7 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
         const terraceData = Object.keys(terraceCounts).map(name => ({
           name,
           value: terraceCounts[name]
-        })).sort((a,b) => b.value - a.value);
+        })).sort((a, b) => b.value - a.value);
 
         // Monthly Trend (Last 6 months)
         const monthlyTrendData = [];
@@ -2143,10 +2187,10 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
           const monthName = d.toLocaleString('es-ES', { month: 'short' });
           const mStart = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
           const mEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString();
-          
+
           const monthRes = allEvents?.filter(r => r.created_at >= mStart && r.created_at <= mEnd);
           const income = monthRes?.filter(r => r.status === 'confirmed').reduce((sum, r) => sum + Number(r.total_amount || 0), 0) || 0;
-          
+
           monthlyTrendData.push({ name: monthName, income, reservations: monthRes?.length || 0 });
         }
 
@@ -2155,6 +2199,7 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
           upcomingEvents: upcomingCount || 0,
           reservations: reservationsCount || 0,
           specialEvents: specialCount || 0,
+          pendingReservations: allEvents?.filter(r => r.status === 'pendiente_revision').length || 0,
           incomeMonth: incomeCurrent,
           customerVariation: variation,
           terraceData,
@@ -2171,15 +2216,54 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
     fetchStats();
   }, []);
 
-  const cards = [
-    { title: "Platillos en Menú", value: stats.menuItems, icon: < ChefHat className="w-6 h-6 text-[#C89F6A]" />, tab: "menu", color: "from-amber-500/10 to-[#090B10]" },
-    { title: "Eventos Próximos", value: stats.upcomingEvents, icon: < Calendar className="w-6 h-6 text-blue-400" />, tab: "upcoming", color: "from-blue-500/10 to-[#090B10]" },
-    { title: "Reservas Totales", value: stats.reservations, icon: < CalendarCheck className="w-6 h-6 text-green-400" />, tab: "terrace_reservations", color: "from-green-500/10 to-[#090B10]" },
-    { title: "Eventos Especiales", value: stats.specialEvents, icon: < Sparkles className="w-6 h-6 text-purple-400" />, tab: "special_events", color: "from-purple-500/10 to-[#090B10]" }
+  const topMetrics = [
+    {
+      title: "Ingresos del Mes",
+      value: `₡${isLoading ? "..." : stats.incomeMonth.toLocaleString()}`,
+      label: "Mes Actual",
+      variation: "65%",
+      color: "from-[#C89F6A]/20 to-orange-500/10",
+      borderColor: "hover:border-[#C89F6A]/30",
+      icon: <Store className="w-5 h-5 text-[#C89F6A]" />,
+      type: "income"
+    },
+    {
+      title: "Crecimiento Clientes",
+      value: isLoading ? "..." : `${stats.customerVariation >= 0 ? '+' : ''}${stats.customerVariation.toFixed(1)}%`,
+      label: stats.customerVariation >= 0 ? 'Crecimiento' : 'Descenso',
+      variation: stats.customerVariation >= 0 ? '↑' : '↓',
+      color: "from-blue-500/10 to-indigo-500/10",
+      borderColor: "hover:border-blue-500/30",
+      icon: <Calendar className="w-5 h-5 text-blue-400" />,
+      type: "growth"
+    },
+    {
+      title: "Reservas Pendientes",
+      value: stats.pendingReservations,
+      label: "Acción Requerida",
+      icon: <Eye className="w-6 h-6 text-blue-400" />,
+      tab: "terrace_reservations",
+      subTab: "pending",
+      color: "from-blue-500/20 to-blue-900/10",
+      borderColor: "hover:border-blue-500/50",
+      isAlert: stats.pendingReservations > 0,
+      type: "action"
+    },
+    {
+      title: "Reservas Totales",
+      value: stats.reservations,
+      label: "Histórico",
+      icon: <CalendarCheck className="w-6 h-6 text-green-400" />,
+      tab: "terrace_reservations",
+      subTab: "list",
+      color: "from-green-500/10 to-[#090B10]",
+      borderColor: "hover:border-green-500/30",
+      type: "summary"
+    }
   ];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12">
+    <div className="w-full max-w-6xl mx-auto space-y-12">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl md:text-5xl font-light text-white mb-3 tracking-tight">
@@ -2203,85 +2287,56 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
       </header>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Main Stats with Analytics */}
-        <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           className="p-6 rounded-2xl bg-gradient-to-br from-[#C89F6A]/20 to-orange-500/10 border border-white/5 hover:border-[#C89F6A]/30 transition-all text-left relative overflow-hidden shadow-2xl"
-        >
-           <div className="flex justify-between items-start mb-4">
-             <div className="p-2 bg-black/40 rounded-lg">
-               <Store className="w-5 h-5 text-[#C89F6A]" />
-             </div>
-             <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Mes Actual</span>
-           </div>
-           <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Ingresos de Marzo</p>
-           <p className="text-4xl font-bold text-white tracking-tighter">
-             ₡{isLoading ? "..." : stats.incomeMonth.toLocaleString()}
-           </p>
-           <div className="mt-4 flex items-center gap-2">
-              <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                <motion.div initial={{width:0}} animate={{width:'65%'}} className="h-full bg-gradient-to-r from-[#C89F6A] to-orange-400" />
-              </div>
-           </div>
-        </motion.div>
-
-        <motion.div
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ delay: 0.1 }}
-           className="p-6 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-white/5 hover:border-blue-500/30 transition-all text-left relative overflow-hidden shadow-2xl"
-        >
-           <div className="flex justify-between items-start mb-4">
-             <div className="p-2 bg-black/40 rounded-lg">
-               <Calendar className="w-5 h-5 text-blue-400" />
-             </div>
-             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter ${stats.customerVariation >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-               {stats.customerVariation >= 0 ? 'Crecimiento' : 'Descenso'}
-             </span>
-           </div>
-           <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Crecimiento Clientes</p>
-           <div className="flex items-baseline gap-2">
-             <p className="text-4xl font-bold text-white tracking-tighter">
-               {isLoading ? "..." : `${stats.customerVariation >= 0 ? '+' : ''}${stats.customerVariation.toFixed(1)}%`}
-             </p>
-             <span className={`text-xs font-bold ${stats.customerVariation >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-               {stats.customerVariation >= 0 ? '↑' : '↓'}
-             </span>
-           </div>
-           <p className="text-white/20 text-[9px] mt-4 uppercase font-bold tracking-widest">Comparado con Febrero</p>
-        </motion.div>
-
-        {cards.slice(2).map((card, i) => (
-          <motion.button
-            key={card.title}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+        {topMetrics.map((metric, i) => (
+          <motion.div
+            key={metric.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: (i + 2) * 0.1 }}
-            onClick={() => { setActiveTab(card.tab); setActiveSubTab('list'); }}
-            className={`p-6 rounded-2xl bg-gradient-to-br ${card.color} border border-white/5 hover:border-white/20 transition-all text-left group relative overflow-hidden shadow-2xl`}
+            transition={{ delay: i * 0.1 }}
+            onClick={() => metric.tab && (setActiveTab(metric.tab as any), setActiveSubTab((metric as any).subTab || 'list'))}
+            className={`p-6 rounded-3xl bg-gradient-to-br ${metric.color} border border-white/5 ${metric.borderColor} transition-all text-left relative overflow-hidden shadow-2xl group ${metric.tab ? 'cursor-pointer hover:bg-white/5' : ''} ${metric.isAlert ? 'ring-1 ring-blue-500/40' : ''}`}
           >
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-125 duration-500">
-              {card.icon}
-            </div>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-black/40 rounded-xl group-hover:bg-black/60 transition-colors">
-                {card.icon}
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-2 bg-black/40 rounded-lg group-hover:scale-110 transition-transform">
+                {metric.icon}
               </div>
+              <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter ${metric.isAlert ? 'bg-blue-500 text-white animate-pulse' : 'bg-white/10 text-white/60'}`}>
+                {metric.label}
+              </span>
             </div>
-            <p className="text-white/40 text-xs font-bold uppercase tracking-[0.2em] mb-1">{card.title}</p>
-            <p className="text-4xl font-bold text-white tracking-tighter">
-              {isLoading ? "..." : card.value}
-            </p>
-          </motion.button>
+
+            <p className="text-white/30 text-[9px] font-bold uppercase tracking-[0.2em] mb-1">{metric.title}</p>
+            <div className="flex items-baseline gap-2">
+              <p className={`text-3xl font-bold tracking-tighter ${metric.isAlert ? 'text-blue-400' : 'text-white'}`}>
+                {metric.value}
+              </p>
+              {metric.variation && (
+                <span className={`text-[10px] font-bold ${metric.type === 'income' ? 'text-[#C89F6A]' : (stats.customerVariation >= 0 ? 'text-green-400' : 'text-red-400')}`}>
+                  {metric.variation}
+                </span>
+              )}
+            </div>
+
+            {metric.type === 'income' && (
+              <div className="mt-4 flex items-center gap-2">
+                <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                  <motion.div initial={{ width: 0 }} animate={{ width: metric.variation }} className="h-full bg-gradient-to-r from-[#C89F6A] to-orange-400" />
+                </div>
+              </div>
+            )}
+            
+            {(metric as any).isAlert && (
+               <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-3xl -mr-10 -mt-10" />
+            )}
+          </motion.div>
         ))}
       </div>
 
       {/* Analytics Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Trend Chart */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -2291,7 +2346,7 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
             <div>
               <h3 className="text-white font-light text-xl flex items-center gap-2">
-                 <CalendarCheck className="w-5 h-5 text-[#C89F6A]" /> Tendencia de <span className="text-[#C89F6A] font-semibold">Reservas</span>
+                <CalendarCheck className="w-5 h-5 text-[#C89F6A]" /> Tendencia de <span className="text-[#C89F6A] font-semibold">Reservas</span>
               </h3>
               <p className="text-white/30 text-[10px] uppercase font-bold tracking-[0.2em] mt-1">Últimos 6 meses</p>
             </div>
@@ -2306,30 +2361,30 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
               </div>
             </div>
           </div>
-          
+
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stats.monthlyTrend}>
                 <defs>
                   <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#C89F6A" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#C89F6A" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#C89F6A" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#C89F6A" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
                   tick={{ fill: '#ffffff40', fontSize: 10, fontWeight: 'bold' }}
                 />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
                   tick={{ fill: '#ffffff40', fontSize: 10 }}
-                  tickFormatter={(val) => `₡${(val/1000)}k`}
+                  tickFormatter={(val) => `₡${(val / 1000)}k`}
                 />
-                <RechartsTooltip 
+                <RechartsTooltip
                   contentStyle={{ backgroundColor: '#090B10', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '12px', fontSize: '12px' }}
                   itemStyle={{ color: '#EFEAE2' }}
                   cursor={{ stroke: '#C89F6A', strokeWidth: 1 }}
@@ -2342,17 +2397,17 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
         </motion.div>
 
         {/* Terrace Popularity Chart */}
-        <motion.div 
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ delay: 0.4 }}
-           className="bg-black/40 border border-white/5 p-8 rounded-3xl backdrop-blur-md relative overflow-hidden shadow-2xl"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-black/40 border border-white/5 p-8 rounded-3xl backdrop-blur-md relative overflow-hidden shadow-2xl"
         >
           <div className="absolute top-0 left-0 w-1 h-full bg-blue-500/20" />
           <div className="flex items-center justify-between mb-10">
             <div>
               <h3 className="text-white font-light text-xl flex items-center gap-2">
-                 <ChefHat className="w-5 h-5 text-[#C89F6A]" /> Popularidad de <span className="text-[#C89F6A] font-semibold">Terrazas</span>
+                <ChefHat className="w-5 h-5 text-[#C89F6A]" /> Popularidad de <span className="text-[#C89F6A] font-semibold">Terrazas</span>
               </h3>
               <p className="text-white/30 text-[10px] uppercase font-bold tracking-[0.2em] mt-1">Distribución histórica</p>
             </div>
@@ -2377,17 +2432,17 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
                       ][index % 5]} stroke="transparent" />
                     ))}
                   </Pie>
-                  <RechartsTooltip 
-                     contentStyle={{ backgroundColor: '#090B10', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '10px' }}
+                  <RechartsTooltip
+                    contentStyle={{ backgroundColor: '#090B10', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '10px' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none hidden md:block">
-                 <p className="text-2xl font-bold text-white">{stats.reservations}</p>
-                 <p className="text-[8px] text-white/40 uppercase font-bold tracking-widest">Total</p>
+                <p className="text-2xl font-bold text-white">{stats.reservations}</p>
+                <p className="text-[8px] text-white/40 uppercase font-bold tracking-widest">Total</p>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               {stats.terraceData.slice(0, 4).map((item, i) => (
                 <div key={item.name} className="flex flex-col gap-1 group">
@@ -2399,11 +2454,11 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
                     <span className="text-white font-bold text-xs">{item.value}</span>
                   </div>
                   <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <motion.div 
+                    <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${(item.value / (stats.reservations || 1)) * 100}%` }}
                       transition={{ duration: 1, delay: 0.5 }}
-                      className="h-full bg-[#C89F6A]" 
+                      className="h-full bg-[#C89F6A]"
                     />
                   </div>
                 </div>
@@ -2478,30 +2533,44 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions / Content Management */}
         <div className="space-y-6">
           <h2 className="text-2xl font-light text-white flex items-center gap-3">
-            <Sparkles className="w-6 h-6 text-[#C89F6A]" /> Acciones <span className="text-[#C89F6A] font-semibold">Rápidas</span>
+             <ChefHat className="w-6 h-6 text-[#C89F6A]" /> Gestión <span className="text-[#C89F6A] font-semibold">Contenido</span>
           </h2>
           <div className="grid grid-cols-1 gap-4">
             {[
-              { label: "Nuevo Platillo", icon: <ChefHat className="w-5 h-5 text-[#C89F6A]" />, tab: "menu", subTab: "create" },
-              { label: "Anunciar Evento", icon: <Calendar className="w-5 h-5 text-blue-400" />, tab: "upcoming", subTab: "create" },
-              { label: "Evento Especial", icon: <Sparkles className="w-5 h-5 text-purple-400" />, tab: "special_events", subTab: "create" },
-              { label: "Configurar Precios", icon: <Store className="w-5 h-5 text-green-400" />, tab: "business_rules", subTab: "settings" }
+              { label: "Menú Rincón", value: stats.menuItems, icon: <ChefHat className="w-5 h-5 text-[#C89F6A]" />, tab: "menu", subTab: "list", createLabel: "Nuevo Platillo" },
+              { label: "Próximos Eventos", value: stats.upcomingEvents, icon: <Calendar className="w-5 h-5 text-blue-400" />, tab: "upcoming", subTab: "list", createLabel: "Anunciar" },
+              { label: "Eventos Especiales", value: stats.specialEvents, icon: <Sparkles className="w-5 h-5 text-purple-400" />, tab: "special_events", subTab: "list", createLabel: "Crear" },
+              { label: "Configuración", value: null, icon: <Store className="w-5 h-5 text-green-400" />, tab: "business_rules", subTab: "settings" }
             ].map((action, i) => (
-              <motion.button
+              <motion.div
                 key={action.label}
-                whileHover={{ scale: 1.02, x: 10 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => { setActiveTab(action.tab); setActiveSubTab(action.subTab); }}
-                className="flex items-center gap-4 p-5 bg-white/5 border border-white/10 rounded-3xl hover:bg-white/10 hover:border-[#C89F6A]/30 transition-all text-left shadow-lg"
+                whileHover={{ scale: 1.01 }}
+                className="group p-4 bg-white/5 border border-white/5 hover:border-[#C89F6A]/20 rounded-3xl transition-all shadow-xl flex items-center justify-between gap-4"
               >
-                <div className="p-3 bg-black/40 rounded-2xl">
-                  {action.icon}
-                </div>
-                <span className="text-white font-medium">{action.label}</span>
-              </motion.button>
+                 <div className="flex items-center gap-4 cursor-pointer flex-1" onClick={() => { setActiveTab(action.tab as any); setActiveSubTab(action.subTab as any); }}>
+                    <div className="p-3 bg-black/40 rounded-2xl group-hover:bg-[#C89F6A]/10 transition-colors">
+                      {action.icon}
+                    </div>
+                    <div>
+                      <p className="text-white font-medium group-hover:text-[#C89F6A] transition-colors">{action.label}</p>
+                      {action.value !== null && (
+                         <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest">{action.value} items registrados</p>
+                      )}
+                    </div>
+                 </div>
+                 
+                 {action.createLabel && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setActiveTab(action.tab as any); setActiveSubTab('create'); }}
+                      className="p-2 h-10 px-4 bg-white/5 hover:bg-[#C89F6A] text-white hover:text-black rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all border border-white/10 hover:border-transparent flex items-center gap-2"
+                    >
+                      <Plus className="w-3 h-3" /> {action.createLabel}
+                    </button>
+                 )}
+              </motion.div>
             ))}
           </div>
 
