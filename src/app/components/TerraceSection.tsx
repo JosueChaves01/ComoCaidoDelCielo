@@ -143,7 +143,7 @@ export function TerraceSection({
     },
   ];
 
-  const currentTerraceGallery = dbTerraces.length > 0 
+  const currentTerraceGallery = dbTerraces.length > 0
     ? dbTerraces.map(t => t.image_url)
     : terraceGallery;
 
@@ -455,30 +455,6 @@ export function TerraceSection({
               </div>
             </motion.div>
           </div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 1.2 }}
-            className="mt-8 bg-gradient-to-br from-[#2A2419] to-[#3A3329] rounded-2xl p-6 text-white"
-          >
-            <p className="text-sm tracking-wider mb-2 opacity-80">
-              Incluye
-            </p>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#966F40]"></span>
-                Leña premium seleccionada
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#966F40]"></span>
-                Kit para tostar malvaviscos
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#966F40]"></span>
-                Mantas acogedoras para la noche
-              </li>
-            </ul>
-          </motion.div>
         </motion.div>
 
         {/* EXPERIENCIA 4: Vistas Panorámicas */}
@@ -599,9 +575,9 @@ export function TerraceSection({
         </motion.div>
       </div>
 
-      <TerraceReservationModal 
-        isOpen={isReservationModalOpen} 
-        onClose={() => setIsReservationModalOpen(false)} 
+      <TerraceReservationModal
+        isOpen={isReservationModalOpen}
+        onClose={() => setIsReservationModalOpen(false)}
       />
     </section>
   );
