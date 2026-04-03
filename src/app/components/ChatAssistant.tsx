@@ -2,6 +2,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { MessageCircle, X, Send, ImagePlus, Loader2, Ban, Paperclip } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { parseMessage } from "./chat/parseMessage";
+import { ChatActionWidget } from "./chat/ChatActionWidget";
+import type { ChatAction } from "./chat/types";
 
 const N8N_CHAT_URL =
   (import.meta.env.VITE_N8N_CHAT_URL as string) ||
@@ -12,6 +15,8 @@ interface Message {
   isUser: boolean;
   isImage?: boolean;
   imageUrl?: string;
+  action?: ChatAction | null;
+  actionUsed?: boolean;
 }
 
 export function ChatAssistant() {
@@ -44,23 +49,6 @@ export function ChatAssistant() {
     return (data.output as string) ?? "";
   }, []);
 
-  const handleBotResponse = useCallback((raw: string) => {
-    // Parse [AWAIT_PROOF:{uuid}] to extract reservation ID
-    const awaitMatch = raw.match(/\[AWAIT_PROOF(?::([a-f0-9-]{36}))?\]/);
-    if (awaitMatch) {
-      setShowImageUpload(true);
-      if (awaitMatch[1]) setPendingReservationId(awaitMatch[1]);
-    }
-    if (raw.includes("[PROOF_DONE]")) {
-      setShowImageUpload(false);
-      setPendingReservationId(null);
-    }
-    return raw
-      .replace(/\[AWAIT_PROOF(?::[a-f0-9-]{36})?\]/g, "")
-      .replace(/\[PROOF_DONE\]/g, "")
-      .trim();
-  }, []);
-
   const handleUserInput = useCallback(async (text: string) => {
     if (isProcessingRef.current) return;
     isProcessingRef.current = true;
@@ -71,8 +59,18 @@ export function ChatAssistant() {
 
     try {
       const raw = await sendToN8N(text);
-      const clean = handleBotResponse(raw);
-      setMessages((prev) => [...prev, { text: clean, isUser: false }]);
+      const parsed = parseMessage(raw);
+
+      if (parsed.awaitProofId) {
+        setShowImageUpload(true);
+        setPendingReservationId(parsed.awaitProofId);
+      }
+      if (parsed.proofDone) {
+        setShowImageUpload(false);
+        setPendingReservationId(null);
+      }
+
+      setMessages((prev) => [...prev, { text: parsed.text, isUser: false, action: parsed.action }]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -82,7 +80,7 @@ export function ChatAssistant() {
 
     isProcessingRef.current = false;
     setIsProcessing(false);
-  }, [sendToN8N, handleBotResponse]);
+  }, [sendToN8N]);
 
   // External event from landing page buttons
   useEffect(() => {
@@ -162,8 +160,14 @@ export function ChatAssistant() {
 
     try {
       const raw = await sendToN8N(`Mi comprobante de pago: ${urlData.publicUrl}`);
-      const clean = handleBotResponse(raw);
-      setMessages((prev) => [...prev, { text: clean, isUser: false }]);
+      const parsed = parseMessage(raw);
+
+      if (parsed.proofDone) {
+        setShowImageUpload(false);
+        setPendingReservationId(null);
+      }
+
+      setMessages((prev) => [...prev, { text: parsed.text, isUser: false, action: parsed.action }]);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -204,7 +208,7 @@ export function ChatAssistant() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-white/50 backdrop-blur-sm">
               {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}>
+                <div key={i} className={`flex flex-col ${msg.isUser ? "items-end" : "items-start"}`}>
                   {msg.isImage ? (
                     <div className="max-w-[75%] rounded-2xl rounded-tr-none overflow-hidden shadow-sm border border-[#E8DED0]">
                       <img src={msg.imageUrl} alt="Comprobante" className="w-full object-cover" />
@@ -219,6 +223,18 @@ export function ChatAssistant() {
                     >
                       <p className="leading-relaxed whitespace-pre-line">{msg.text}</p>
                     </div>
+                  )}
+                  {!msg.isUser && msg.action && !msg.actionUsed && (
+                    <ChatActionWidget
+                      action={msg.action}
+                      onSubmit={(value) => {
+                        setMessages((prev) =>
+                          prev.map((m, idx) => (idx === i ? { ...m, actionUsed: true } : m))
+                        );
+                        handleUserInput(value);
+                      }}
+                      disabled={isProcessing}
+                    />
                   )}
                 </div>
               ))}
