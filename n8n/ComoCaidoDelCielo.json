@@ -1,5 +1,5 @@
 {
-  "name": "ComoCaidoDelCielo",
+  "name": "ComoCaidoDelCieloCopia",
   "nodes": [
     {
       "parameters": {
@@ -7,33 +7,31 @@
         "text": "={{ $('Webhook').item.json.body.chatInput }}",
         "needsFallback": true,
         "options": {
-          "systemMessage": "=Eres el asistente virtual de **Como Caido del Cielo**, un restaurante-bar con terrazas exclusivas.\n\n## Contexto temporal\n- Hoy: {{ $now.setZone('America/Costa_Rica').toFormat('yyyy-MM-dd') }} ({{ $now.setZone('America/Costa_Rica').toFormat('EEEE') }})\n- Hora: {{ $now.setZone('America/Costa_Rica').toFormat('HH:mm') }} (UTC-6 Costa Rica)\n- Manana: {{ $now.setZone('America/Costa_Rica').plus({days: 1}).toFormat('yyyy-MM-dd') }}\n- Pasado manana: {{ $now.setZone('America/Costa_Rica').plus({days: 2}).toFormat('yyyy-MM-dd') }}\n- Proxima semana inicia: {{ $now.setZone('America/Costa_Rica').plus({weeks: 1}).startOf('week').toFormat('yyyy-MM-dd') }}\nInterpreta hoy/manana/este finde/la otra semana con estas fechas. NUNCA uses fechas pasadas.\n\n## Tools\n1. listar_terrazas\n2. obtener_precios\n3. buscar_terraza_disponible\n4. buscar_disponibilidad_rango\n5. consultar_disponibilidad\n6. crear_reservacion\n7. email_confirmacion_reserva\n8. confirmar_reservacion\n9. consultar_reservacion\n10. cancelar_reservacion\n11. email_codigo_cancelacion\n12. confirmar_cancelacion\n13. email_cancelada_simple\n14. email_cancelada_reembolso\n15. actualizar_comprobante\n\n---\n## Flujo EXPLORAR\n1. obtener_precios\n2. buscar_disponibilidad_rango\n3. Invita a elegir fecha\n\n---\n## Flujo RESERVAR\n\nRecolecta: fecha, adultos, ninos, nombre, telefono, correo.\n\n1. buscar_terraza_disponible(fecha, adultos+ninos) — Vacio: sin disponibilidad.\n2. obtener_precios -> calcular total\n3. Muestra resumen, pide confirmacion\n4. Si confirma: crear_reservacion\n5. email_confirmacion_reserva(customer_email, customer_name, reservation_date, code=confirmation_code, total_amount, reservation_id=id_de_la_reserva)\n6. 'Codigo enviado a [email mascarado]. Ingresalo aqui. Tienes 20 minutos.'\n7. Espera el codigo\n8. confirmar_reservacion(reservation_id, code)\n   - Vacio: codigo incorrecto o expirado.\n   - nuevo_status='cancelled': La terraza fue reservada por otra persona mientras esperabas. Disculpate y ofrece buscar nueva fecha.\n   - nuevo_status='pendiente_pago': Muestra instrucciones con [AWAIT_PROOF:{uuid_real}]:\n\nReservacion confirmada! Pago de [total]:\nSINPE Movil: 8888-8888\nBanco Nacional - Cuenta: 000-000000-0\nA nombre de: Como Caido del Cielo S.A.\nTienes 20 minutos para enviar el comprobante. [AWAIT_PROOF:{uuid_real}]\n\nIMPORTANTE: {uuid_real} = id retornado por confirmar_reservacion.\n\n---\n## Flujo CANCELAR\n\n1. Pide UUID de reservacion (lo encuentra en su correo).\n2. cancelar_reservacion(reservation_id)\n   - Vacio: no existe o ya cancelada.\n   - cancellation_code=null: inmediata. 'Cancelada. Sin cargo.' NO envies email.\n   - cancellation_code con valor: continua.\n3. email_codigo_cancelacion(customer_email, customer_name, reservation_date, code=cancellation_code)\n4. 'Codigo enviado a [email mascarado]. 15 minutos.'\n5. Espera codigo\n6. confirmar_cancelacion(reservation_id, code) — Vacio: incorrecto/expirado.\n7. Segun nuevo_status:\n   - 'cancelled': email_cancelada_simple(customer_email, customer_name, reservation_date). 'Cancelada. Sin cargo.'\n   - 'pendiente_reembolso': email_cancelada_reembolso(customer_email, customer_name, reservation_date, total_amount). 'Cancelada. Reembolso pendiente.'\n\n---\n## Flujo COMPROBANTE\n\nCuando cliente envie URL:\n1. actualizar_comprobante(reservation_id, payment_proof_url)\n2. Responde: Comprobante recibido! El equipo lo revisara. [PROOF_DONE]\n\n---\n## Reglas\n- Espanol, tono calido\n- NUNCA muestres UUIDs ni codigos\n- Mascara correo: jo***@gmail.com\n- Saluda al inicio\n- Error: disculpate, intenta mas tarde"
+          "systemMessage": "=Eres el asistente virtual de Como Caído del Cielo, un mirador con terrazas exclusivas.\n\n=====================\nCONTEXTO TEMPORAL\n=====================\nHoy: {{ $now.setZone('America/Costa_Rica').toFormat('yyyy-MM-dd') }} ({{ $now.setZone('America/Costa_Rica').toFormat('EEEE') }})\nHora: {{ $now.setZone('America/Costa_Rica').toFormat('HH:mm') }}\nMañana: {{ $now.setZone('America/Costa_Rica').plus({ days: 1 }).toFormat('yyyy-MM-dd') }}\nPasado mañana: {{ $now.setZone('America/Costa_Rica').plus({ days: 2 }).toFormat('yyyy-MM-dd') }}\n\nReglas:\n- Interpreta \"hoy\", \"mañana\", \"fin de semana\", etc.\n- NUNCA uses fechas pasadas\n- Fecha mínima seleccionable = mañana\n\n=====================\nCONTEXTO DEL USUARIO\n=====================\nEl frontend puede enviar:\n\nuserContext = {\n  email: {{ $('Webhook').item.json.body.userContext.email || '' }},\n  name: {{ $('Webhook').item.json.body.userContext.name || '' }},\n  phone: {{ $('Webhook').item.json.body.userContext.phone || '' }}\n}\n\nReglas:\n- email SIEMPRE existe si está autenticado\n- name y phone pueden faltar\n\n=====================\nMANEJO DE DATOS DEL USUARIO\n=====================\n\nSi existen TODOS los datos (name + phone + email):\n\nNO los pidas directamente.\n\nEn fase de confirmación mostrar:\n\n\"Usaré estos datos para tu reserva:\n- Nombre: [name]\n- Correo: [email mascarado]\n- Teléfono: [phone]\n\n¿Deseas usarlos o prefieres cambiarlos?\"\n\n[ACTION:{\"type\":\"quick_reply\",\"options\":[\n{\"label\":\"Usar estos datos\",\"value\":\"usar_datos\"},\n{\"label\":\"Cambiar datos\",\"value\":\"cambiar_datos\"}\n]}]\n\nSi elige \"cambiar_datos\":\n- Pedir datos UNO POR UNO:\n  1. Nombre\n  2. Teléfono\n- NUNCA pedir email si ya existe\n\nSi faltan datos:\n- Pedir SOLO los faltantes, uno por mensaje:\n  - Nombre → texto libre\n  - Teléfono → texto libre\n\n=====================\nTOOLS DISPONIBLES\n=====================\nlistar_terrazas\nobtener_precios\nbuscar_terraza_disponible\nbuscar_disponibilidad_rango\nconsultar_disponibilidad\ncrear_reservacion\nemail_confirmacion_reserva\nconfirmar_reservacion\nconsultar_reservacion\ncancelar_reservacion\nemail_codigo_cancelacion\nconfirmar_cancelacion\nemail_cancelada_simple\nemail_cancelada_reembolso\nactualizar_comprobante\n\n=====================\nFLUJO: EXPLORAR\n=====================\n1. obtener_precios\n2. buscar_disponibilidad_rango\n3. Invitar a elegir fecha\n\n=====================\nFLUJO: RESERVAR\n=====================\n\nREGLA CRÍTICA:\n- NUNCA pedir más de un dato por mensaje\n\n---------------------\n1. PERSONAS\n---------------------\n\"¿Cuántas personas asistirán?\"\n\n[ACTION:{\"type\":\"guest_counter\",\"fields\":[\n{\"key\":\"adults\",\"label\":\"Adultos\",\"min\":1,\"max\":20,\"default\":2},\n{\"key\":\"children\",\"label\":\"Niños\",\"min\":0,\"max\":10,\"default\":0}\n]}]\n\n---------------------\n2. FECHA\n---------------------\nCuando ya tengas el total de personas, pedir fecha.\nINCLUIR \"guests\" en el ACTION con el total (adultos + niños):\n\n\"¡Perfecto! ¿Para qué fecha te gustaría reservar?\"\n\n[ACTION:{\"type\":\"date_picker\",\"min\":\"{{ $now.setZone('America/Costa_Rica').plus({ days: 1 }).toFormat('yyyy-MM-dd') }}\",\"guests\":TOTAL_PERSONAS}]\n\nEjemplo si son 3 adultos y 2 niños (total 5):\n[ACTION:{\"type\":\"date_picker\",\"min\":\"2026-04-04\",\"guests\":5}]\n\n---------------------\n3. DISPONIBILIDAD\n---------------------\nEjecutar:\nbuscar_terraza_disponible(fecha, total_personas)\n\nSi NO hay disponibilidad:\n- Informar al cliente\n- Sugerir probar otra fecha o ajustar el número de personas\n- Volver a pedir fecha con ACTION incluyendo guests\n\n---------------------\n4. PRECIO\n---------------------\nEjecutar:\nobtener_precios\n\nCalcular total\n\n---------------------\n5. DATOS PERSONALES\n---------------------\nAplicar reglas de userContext\n\n---------------------\n6. RESUMEN + CONFIRMACIÓN\n---------------------\nMostrar:\n- Fecha\n- Personas\n- Total\n- Datos del cliente\n\nLuego:\n\n\"¿Deseas confirmar tu reserva?\"\n\n[ACTION:{\"type\":\"quick_reply\",\"options\":[\n{\"label\":\"Sí, confirmar\",\"value\":\"confirmar\"},\n{\"label\":\"Cambiar algo\",\"value\":\"editar\"}\n]}]\n\n=====================\nCONFIRMACIÓN\n=====================\n\nSi confirma:\n1. crear_reservacion\n2. email_confirmacion_reserva(...)\n\nResponder:\n\"Código enviado a [email mascarado]. Ingrésalo aquí. Tienes 20 minutos.\"\n\n---------------------\nVALIDACIÓN DE CÓDIGO\n---------------------\nEjecutar:\nconfirmar_reservacion(reservation_id, code)\n\nResultados:\n\n- Código inválido:\n  \"El código es incorrecto o expiró.\"\n\n- Reserva perdida:\n  \"La terraza fue reservada por otra persona. Te ayudo a buscar otra fecha.\"\n\n- Confirmada:\n\nReservación confirmada. Pago de [total]:\n\nSINPE Móvil: 8888-8888  \nBanco Nacional — Cuenta: 000-000000-0  \nA nombre de: Como Caído del Cielo S.A.\n\nTienes 20 minutos para enviar el comprobante.\n\n[AWAIT_PROOF:{uuid_real}]\n\n=====================\nFLUJO: COMPROBANTE\n=====================\nCuando el usuario envía URL:\n\n1. actualizar_comprobante\n\nResponder:\n\"¡Comprobante recibido! El equipo lo revisará pronto.\"\n\n[PROOF_DONE]\n\n=====================\nFLUJO: CANCELAR\n=====================\n1. Solicitar reservation_id\n2. cancelar_reservacion\n\nResultados:\n\n- No existe → informar\n- cancelación inmediata → \"Cancelada. Sin cargo.\"\n\nSi requiere código:\n3. email_codigo_cancelacion\n4. Pedir código\n5. confirmar_cancelacion\n\nResultado final:\n- cancelled → \"Cancelada. Sin cargo.\"\n- pendiente_reembolso → \"Cancelada. Reembolso pendiente.\"\n\n=====================\nREGLAS GENERALES\n=====================\n- Español\n- Tono cálido y profesional\n- Saludo breve\n- Si hay nombre → usarlo\n- NO mostrar UUIDs ni códigos internos\n- Enmascarar correos: jo***@gmail.com\n- Ante errores: disculparse\n\n=====================\nACTION TAGS (OBLIGATORIO)\n=====================\n\nReglas:\n- Máximo UNO por mensaje\n- SIEMPRE al final\n- Obligatorio para:\n  - Fecha\n  - Personas\n  - Confirmación\n\ndate_picker (SIEMPRE incluir guests con el total de personas):\n[ACTION:{\"type\":\"date_picker\",\"min\":\"YYYY-MM-DD\",\"guests\":NUMERO}]\n\nguest_counter:\n[ACTION:{\"type\":\"guest_counter\",\"fields\":[\n{\"key\":\"adults\",\"label\":\"Adultos\",\"min\":1,\"max\":20},\n{\"key\":\"children\",\"label\":\"Niños\",\"min\":0,\"max\":10}\n]}]\n\nquick_reply:\n[ACTION:{\"type\":\"quick_reply\",\"options\":[\n{\"label\":\"Sí\",\"value\":\"si\"},\n{\"label\":\"No\",\"value\":\"no\"}\n]}]"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        640,
-        -432
+        4464,
+        1456
       ],
-      "id": "841d1596-475e-4410-94d4-f772a077b516",
+      "id": "2bb87c42-ad9f-4153-8b96-9536349bee7d",
       "name": "AI Agent"
     },
     {
       "parameters": {
-        "model": "stepfun/step-3.5-flash:free",
+        "model": "qwen/qwen3.6-plus:free",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        128,
-        -256
+        4032,
+        1696
       ],
-      "id": "899a0d6d-1d17-41f1-8d1b-98964e983dfd",
+      "id": "587ddbb5-cad0-4cfa-8c88-6c78faae534c",
       "name": "OpenRouter Chat Model",
-      "retryOnFail": true,
-      "maxTries": 2,
       "credentials": {
         "openRouterApi": {
           "id": "DlOg2ICSDkVFZMpl",
@@ -49,10 +47,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -224,
-        -160
+        4176,
+        1760
       ],
-      "id": "b3032630-5312-498e-a4ae-3c3f5d83ccac",
+      "id": "dc8dcb38-1580-46e4-bad7-578824e4d26e",
       "name": "Simple Memory"
     },
     {
@@ -66,10 +64,10 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        208,
-        304
+        4032,
+        2192
       ],
-      "id": "f1a2b3c4-0001-0001-0001-000000000001",
+      "id": "6e04dd23-27dc-4c99-affa-da8ba3a05612",
       "name": "listar_terrazas",
       "credentials": {
         "postgres": {
@@ -89,10 +87,10 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        432,
-        304
+        4256,
+        2192
       ],
-      "id": "f1a2b3c4-0002-0002-0002-000000000002",
+      "id": "a142afad-1330-447f-b248-162fec013516",
       "name": "obtener_precios",
       "credentials": {
         "postgres": {
@@ -112,10 +110,10 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        640,
-        304
+        4464,
+        2192
       ],
-      "id": "a971242a-cfa3-405b-aa7f-5b376c927d78",
+      "id": "93a52790-ae0d-4f0f-87b0-f3060d24a7c3",
       "name": "consultar_disponibilidad",
       "credentials": {
         "postgres": {
@@ -135,10 +133,10 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        864,
-        304
+        4688,
+        2192
       ],
-      "id": "bc77555e-e995-4dba-8079-adce2e898d22",
+      "id": "37da945e-80cf-4170-88cc-40c2654da183",
       "name": "crear_reservacion",
       "credentials": {
         "postgres": {
@@ -158,10 +156,10 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        1088,
-        304
+        4912,
+        2192
       ],
-      "id": "c78f8973-a091-4966-8c49-ad5461cf2a54",
+      "id": "e0807b38-ee22-4cf9-8ae4-8415b0a4f29b",
       "name": "consultar_reservacion",
       "credentials": {
         "postgres": {
@@ -181,10 +179,10 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        1312,
-        304
+        5136,
+        2192
       ],
-      "id": "6c4d898b-49af-4a92-8161-3e41e82da839",
+      "id": "19b9d240-8de0-4b2a-bbb9-74d958069fe8",
       "name": "cancelar_reservacion",
       "credentials": {
         "postgres": {
@@ -204,10 +202,10 @@
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        1520,
-        304
+        5344,
+        2192
       ],
-      "id": "211c7a38-745e-4222-b622-4292df4debba",
+      "id": "3cac7fd9-eb2d-422e-9da6-61df44e096de",
       "name": "buscar_disponibilidad_rango",
       "credentials": {
         "postgres": {
@@ -224,13 +222,13 @@
         "query": "SELECT t.id::text, t.title, t.max_capacity FROM terraces t WHERE t.max_capacity >= {{ $fromAI(\"total_personas\") }} AND t.id NOT IN (SELECT terrace_id FROM terrace_reservations WHERE reservation_date = '{{ $fromAI(\"fecha\") }}'::date AND status IN ('pendiente_pago','pendiente_revision','aprobada','pending','confirmed','pendiente_cancelacion')) ORDER BY t.max_capacity ASC LIMIT 1;",
         "options": {}
       },
-      "id": "a89e7439-dc9a-4b98-aa3e-83ed7dff0d8b",
+      "id": "2fb70365-0fa5-4ecb-b064-85cfb40dcde0",
       "name": "buscar_terraza_disponible",
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        1760,
-        304
+        5584,
+        2192
       ],
       "credentials": {
         "postgres": {
@@ -247,13 +245,13 @@
         "query": "UPDATE terrace_reservations SET payment_proof_url = '{{ $fromAI(\"payment_proof_url\") }}', status = 'pendiente_revision' WHERE id = '{{ $fromAI(\"reservation_id\") }}'::uuid RETURNING id::text, customer_name, status;",
         "options": {}
       },
-      "id": "3d1c9551-7b03-4a27-b18b-2c1dd237cee7",
+      "id": "72792e4e-9295-4f7f-8b55-883383a533d7",
       "name": "actualizar_comprobante",
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        1984,
-        304
+        5808,
+        2192
       ],
       "credentials": {
         "postgres": {
@@ -268,29 +266,29 @@
         "responseBody": "={{ { \"output\": $json.output } }}",
         "options": {}
       },
-      "id": "respond-node-001",
+      "id": "486f80d9-a59e-4bf6-8216-808958b02924",
       "name": "Responder al Cliente",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        1072,
-        -432
+        5056,
+        1392
       ]
     },
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "reservas",
+        "path": "nuevas-reservas",
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "webhook-node-001",
+      "id": "8c075afd-1f53-4c75-aa68-db0328191391",
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        384,
-        -432
+        4208,
+        1456
       ],
       "webhookId": "210cc17f-239b-4f05-9c35-bbe4215a5ab4"
     },
@@ -302,13 +300,13 @@
         "query": "WITH verificacion AS (\n  SELECT id, customer_name, customer_email, total_amount, reservation_date::text, previous_status\n  FROM terrace_reservations\n  WHERE id = '{{ $fromAI(\"reservation_id\") }}'::uuid\n  AND status = 'pendiente_cancelacion'\n  AND cancellation_code = '{{ $fromAI(\"code\") }}'\n  AND cancellation_code_expires_at > NOW()\n)\nUPDATE terrace_reservations\nSET\n  status = CASE\n    WHEN (SELECT previous_status FROM verificacion) = 'aprobada' THEN 'pendiente_reembolso'\n    ELSE 'cancelled'\n  END,\n  cancellation_code = NULL,\n  cancellation_code_expires_at = NULL,\n  previous_status = NULL\nWHERE id = (SELECT id FROM verificacion)\nRETURNING\n  id::text,\n  customer_name,\n  customer_email,\n  status AS nuevo_status,\n  total_amount,\n  reservation_date::text;",
         "options": {}
       },
-      "id": "tool-confirm-cancel",
+      "id": "e3b9e4bb-57f0-4afd-9861-6b66ff62a4eb",
       "name": "confirmar_cancelacion",
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        2160,
-        304
+        5984,
+        2192
       ],
       "credentials": {
         "postgres": {
@@ -325,13 +323,13 @@
         "query": "WITH reserva_actual AS (\n  SELECT r.id, r.terrace_id, r.reservation_date, r.customer_name, r.customer_email, r.total_amount\n  FROM terrace_reservations r\n  WHERE r.id = '{{ $fromAI(\"reservation_id\") }}'::uuid\n  AND r.status = 'sin_confirmar'\n  AND r.confirmation_code = '{{ $fromAI(\"code\") }}'\n  AND r.confirmation_code_expires_at > NOW()\n),\nconflicto AS (\n  SELECT COUNT(*) > 0 AS hay_conflicto\n  FROM terrace_reservations\n  WHERE terrace_id = (SELECT terrace_id FROM reserva_actual)\n  AND reservation_date = (SELECT reservation_date FROM reserva_actual)\n  AND id != (SELECT id FROM reserva_actual)\n  AND status IN ('pendiente_pago','pendiente_revision','aprobada','pending','confirmed')\n)\nUPDATE terrace_reservations\nSET\n  status = CASE WHEN (SELECT hay_conflicto FROM conflicto) THEN 'cancelled' ELSE 'pendiente_pago' END,\n  confirmation_code = NULL,\n  confirmation_code_expires_at = NULL,\n  payment_deadline = CASE WHEN (SELECT hay_conflicto FROM conflicto) THEN NULL ELSE NOW() + INTERVAL '20 minutes' END\nWHERE id = (SELECT id FROM reserva_actual)\nRETURNING id::text, customer_name, customer_email, reservation_date::text, total_amount, status AS nuevo_status;",
         "options": {}
       },
-      "id": "tool-confirm-reserva",
+      "id": "eef1ae14-45b0-425d-881c-1074357be6cd",
       "name": "confirmar_reservacion",
       "type": "n8n-nodes-base.postgresTool",
       "typeVersion": 2.6,
       "position": [
-        48,
-        304
+        3872,
+        2192
       ],
       "credentials": {
         "postgres": {
@@ -348,13 +346,13 @@
         "html": "={{ '<html><body style=\"font-family:Georgia,serif;background:#FAF7F2;margin:0;padding:20px\"><div style=\"max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden\"><div style=\"background:#3B2A22;padding:28px;text-align:center\"><h1 style=\"color:#fff;font-size:22px;margin:0\">Como Caído <span style=\"color:#C89F6A\">del Cielo</span></h1></div><div style=\"padding:28px\"><p style=\"color:#2A2419\">Hola, <strong>' + $fromAI('customer_name','Nombre del cliente') + '</strong></p><p style=\"color:#6B5744\">Tu reserva para el <strong>' + $fromAI('reservation_date','Fecha de la reserva, ej: martes 15 de abril') + '</strong> está casi lista. Ingresa este código en el chat:</p><div style=\"background:#3B2A22;border-radius:10px;padding:24px;text-align:center;margin:20px 0\"><span style=\"color:#C89F6A;font-size:40px;font-weight:bold;letter-spacing:.3em;font-family:monospace\">' + $fromAI('code','Codigo de confirmacion de 6 digitos, solo numeros, ejemplo: 482031') + '</span></div><div style=\"background:#FFF8F0;border:1px solid #E8DED0;border-radius:8px;padding:14px\"><p style=\"color:#9B8677;font-size:13px;margin:0\">&#9200; Código válido por <strong>20 minutos</strong>.</p></div><p style=\"color:#6B5744;margin-top:16px\">Total: <strong>₡' + $fromAI('total_amount','Monto total en colones, solo el numero sin simbolo, ejemplo: 45000') + '</strong></p><hr style=\"border:none;border-top:1px solid #E8DED0;margin:20px 0\"><p style=\"color:#9B8677;font-size:12px;margin:0\">Si cierras el chat y vuelves luego, proporciona tu <strong>ID de reserva</strong> para continuar:</p><p style=\"color:#3B2A22;font-size:13px;font-family:monospace;background:#F5EFE6;padding:8px 12px;border-radius:6px;margin:8px 0 0;letter-spacing:.05em\">' + $fromAI('reservation_id','UUID de la reserva, el campo id de terrace_reservations, ejemplo: a1b2c3d4-0001-0001-0001-000000000001') + '</p></div><div style=\"background:#3B2A22;padding:16px;text-align:center\"><p style=\"color:rgba(255,255,255,.5);font-size:12px;margin:0\">Como Caído del Cielo &middot; Reservas</p></div></div></body></html>' }}",
         "options": {}
       },
-      "id": "email-tool-conf",
+      "id": "0f5e2e3a-7407-4e5a-9e23-50b512f31757",
       "name": "email_confirmacion_reserva",
       "type": "n8n-nodes-base.emailSendTool",
       "typeVersion": 2.1,
       "position": [
-        928,
-        -880
+        4752,
+        1008
       ],
       "webhookId": "6d0f206d-b4c5-4734-8ace-ecdef387b652",
       "credentials": {
@@ -372,13 +370,13 @@
         "html": "={{ '<html><body style=\"font-family:Georgia,serif;background:#FAF7F2;margin:0;padding:20px\"><div style=\"max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden\"><div style=\"background:#3B2A22;padding:28px;text-align:center\"><h1 style=\"color:#fff;font-size:22px;margin:0\">Como Caído <span style=\"color:#C89F6A\">del Cielo</span></h1></div><div style=\"padding:28px\"><p style=\"color:#2A2419\">Hola, <strong>' + $fromAI('customer_name','Nombre del cliente') + '</strong></p><p style=\"color:#6B5744\">Solicitud de cancelación para tu reserva del <strong>' + $fromAI('reservation_date','Fecha de la reserva en formato legible') + '</strong>. Ingresa este código para confirmar:</p><div style=\"background:#3B2A22;border-radius:10px;padding:24px;text-align:center;margin:20px 0\"><span style=\"color:#C89F6A;font-size:40px;font-weight:bold;letter-spacing:.3em;font-family:monospace\">' + $fromAI('code','Codigo de cancelacion de 6 digitos, solo numeros, ejemplo: 739201') + '</span></div><p style=\"color:#9B8677;font-size:13px\">Expira en <strong>15 minutos</strong>. Si no solicitaste esto, ignora este mensaje.</p></div><div style=\"background:#3B2A22;padding:16px;text-align:center\"><p style=\"color:rgba(255,255,255,.5);font-size:12px;margin:0\">Como Caído del Cielo &middot; Reservas</p></div></div></body></html>' }}",
         "options": {}
       },
-      "id": "email-tool-cod-cancel",
+      "id": "9a763400-c543-4d9a-a109-e6121beae49e",
       "name": "email_codigo_cancelacion",
       "type": "n8n-nodes-base.emailSendTool",
       "typeVersion": 2.1,
       "position": [
-        1184,
-        -880
+        5008,
+        1008
       ],
       "webhookId": "a7a94bdc-678c-4fc0-877e-025fa1311810",
       "credentials": {
@@ -396,13 +394,13 @@
         "html": "={{ '<html><body style=\"font-family:Georgia,serif;background:#FAF7F2;margin:0;padding:20px\"><div style=\"max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden\"><div style=\"background:#3B2A22;padding:28px;text-align:center\"><h1 style=\"color:#fff;font-size:22px;margin:0\">Como Caído <span style=\"color:#C89F6A\">del Cielo</span></h1></div><div style=\"padding:28px\"><p style=\"color:#2A2419\">Hola, <strong>' + $fromAI('customer_name','Nombre del cliente') + '</strong></p><p style=\"color:#6B5744\">Tu reserva del <strong>' + $fromAI('reservation_date','Fecha de la reserva en formato legible') + '</strong> ha sido cancelada exitosamente.</p><div style=\"background:#F5EFE6;border-radius:8px;padding:14px\"><p style=\"color:#6B5744;margin:0;font-size:14px\">No se realizó ningún cargo a tu cuenta.</p></div></div><div style=\"background:#3B2A22;padding:16px;text-align:center\"><p style=\"color:rgba(255,255,255,.5);font-size:12px;margin:0\">Como Caído del Cielo &middot; Reservas</p></div></div></body></html>' }}",
         "options": {}
       },
-      "id": "email-tool-cancel-simple",
+      "id": "c4eb015f-29f9-4e52-a6b0-b71e8c26cf73",
       "name": "email_cancelada_simple",
       "type": "n8n-nodes-base.emailSendTool",
       "typeVersion": 2.1,
       "position": [
-        1408,
-        -880
+        5232,
+        1008
       ],
       "webhookId": "007b2985-08fa-4791-a769-98f374c55af0",
       "credentials": {
@@ -420,13 +418,13 @@
         "html": "={{ '<html><body style=\"font-family:Georgia,serif;background:#FAF7F2;margin:0;padding:20px\"><div style=\"max-width:560px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden\"><div style=\"background:#3B2A22;padding:28px;text-align:center\"><h1 style=\"color:#fff;font-size:22px;margin:0\">Como Caído <span style=\"color:#C89F6A\">del Cielo</span></h1></div><div style=\"padding:28px\"><p style=\"color:#2A2419\">Hola, <strong>' + $fromAI('customer_name','Nombre del cliente') + '</strong></p><p style=\"color:#6B5744\">Tu reserva del <strong>' + $fromAI('reservation_date','Fecha de la reserva en formato legible') + '</strong> ha sido cancelada.</p><div style=\"background:#FFF3CD;border:1px solid #FFD700;border-radius:8px;padding:14px\"><p style=\"color:#856404;font-weight:bold;margin:0 0 4px\">Reembolso en proceso</p><p style=\"color:#856404;margin:0;font-size:14px\">Tu pago de <strong>₡' + $fromAI('total_amount','Monto total en colones, solo el numero, ejemplo: 45000') + '</strong> será devuelto en los próximos días.</p></div></div><div style=\"background:#3B2A22;padding:16px;text-align:center\"><p style=\"color:rgba(255,255,255,.5);font-size:12px;margin:0\">Como Caído del Cielo &middot; Reservas</p></div></div></body></html>' }}",
         "options": {}
       },
-      "id": "email-tool-reembolso",
+      "id": "1022a487-e835-45ee-958e-ab643ee28cdc",
       "name": "email_cancelada_reembolso",
       "type": "n8n-nodes-base.emailSendTool",
       "typeVersion": 2.1,
       "position": [
-        1600,
-        -880
+        5424,
+        1008
       ],
       "webhookId": "2986be65-d8ef-4e9e-841b-6d3aaa72105c",
       "credentials": {
@@ -438,43 +436,23 @@
     },
     {
       "parameters": {
+        "modelName": "models/gemini-3-flash-preview",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        496,
-        -224
+        3872,
+        1648
       ],
-      "id": "d8758082-e179-4fd0-bf30-d98bfaa14660",
+      "id": "8c177df1-50a0-4182-ac8e-d38603a6f3f6",
       "name": "Google Gemini Chat Model",
       "retryOnFail": true,
-      "waitBetweenTries": 3000,
+      "waitBetweenTries": 5000,
       "credentials": {
         "googlePalmApi": {
           "id": "0nBmZgNOF8crTNq8",
           "name": "Google Gemini(PaLM) Api account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "sessionIdType": "customKey",
-        "sessionKey": "={{ $json.body.sessionId }}",
-        "contextWindowLength": 8
-      },
-      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
-      "typeVersion": 1.3,
-      "position": [
-        288,
-        -208
-      ],
-      "id": "889e9d87-0e39-4661-b165-976b0cc8d487",
-      "name": "Postgres Chat Memory",
-      "credentials": {
-        "postgres": {
-          "id": "ftie3tuenPXRXzAn",
-          "name": "Postgres account 2"
         }
       }
     }
@@ -494,7 +472,13 @@
     },
     "Simple Memory": {
       "ai_memory": [
-        []
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
       ]
     },
     "listar_terrazas": {
@@ -597,15 +581,6 @@
       ]
     },
     "AI Agent": {
-      "main:0": [
-        [
-          {
-            "node": "Responder al Cliente",
-            "type": "main:0",
-            "index": 0
-          }
-        ]
-      ],
       "main": [
         [
           {
@@ -613,7 +588,8 @@
             "type": "main",
             "index": 0
           }
-        ]
+        ],
+        []
       ]
     },
     "Webhook": {
@@ -628,15 +604,6 @@
       ]
     },
     "confirmar_cancelacion": {
-      "ai_tool:0": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool:0",
-            "index": 0
-          }
-        ]
-      ],
       "ai_tool": [
         [
           {
@@ -648,15 +615,6 @@
       ]
     },
     "confirmar_reservacion": {
-      "ai_tool:0": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool:0",
-            "index": 0
-          }
-        ]
-      ],
       "ai_tool": [
         [
           {
@@ -668,15 +626,6 @@
       ]
     },
     "email_confirmacion_reserva": {
-      "ai_tool:0": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool:0",
-            "index": 0
-          }
-        ]
-      ],
       "ai_tool": [
         [
           {
@@ -688,15 +637,6 @@
       ]
     },
     "email_codigo_cancelacion": {
-      "ai_tool:0": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool:0",
-            "index": 0
-          }
-        ]
-      ],
       "ai_tool": [
         [
           {
@@ -708,15 +648,6 @@
       ]
     },
     "email_cancelada_simple": {
-      "ai_tool:0": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool:0",
-            "index": 0
-          }
-        ]
-      ],
       "ai_tool": [
         [
           {
@@ -728,15 +659,6 @@
       ]
     },
     "email_cancelada_reembolso": {
-      "ai_tool:0": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_tool:0",
-            "index": 0
-          }
-        ]
-      ],
       "ai_tool": [
         [
           {
@@ -757,17 +679,6 @@
           }
         ]
       ]
-    },
-    "Postgres Chat Memory": {
-      "ai_memory": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "active": true,
@@ -778,11 +689,11 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "2b674192-58d2-4c6d-86ff-6e409e517718",
+  "versionId": "60e566f4-a0c8-4c8a-beca-e51cba46267c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "4473fb8311a66e204df5bb26780f8aa75d55a5d99720016f86c09e40c40aab6b"
   },
-  "id": "Os1Y1gDMWa6AiXYY",
+  "id": "W7RWbGq0lqGlHrO5",
   "tags": []
 }

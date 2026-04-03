@@ -1,6 +1,7 @@
 export interface DatePickerAction {
   type: "date_picker";
   min?: string; // YYYY-MM-DD
+  guests?: number; // Total guests — used to filter dates by terrace capacity
 }
 
 export interface GuestCounterField {
