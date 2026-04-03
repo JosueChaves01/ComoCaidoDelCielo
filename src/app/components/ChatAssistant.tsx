@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { MessageCircle, X, Send, ImagePlus, Loader2, Ban, Paperclip } from "lucide-react";
+import { MessageCircle, X, Send, ImagePlus, Loader2, Ban, Paperclip, Lock } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../lib/useAuth";
 
 const N8N_CHAT_URL =
   (import.meta.env.VITE_N8N_CHAT_URL as string) ||
@@ -15,6 +16,8 @@ interface Message {
 }
 
 export function ChatAssistant() {
+  const { user, loading } = useAuth();
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { text: "¡Hola! Soy el asistente de reservas de Como Caído del Cielo. ¿En qué puedo ayudarte?", isUser: false },
@@ -23,11 +26,34 @@ export function ChatAssistant() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
   const [pendingReservationId, setPendingReservationId] = useState<string | null>(null);
+  const [userContext, setUserContext] = useState<{ name: string; phone: string } | null>(null);
 
   const isProcessingRef = useRef(false);
-  const sessionId = useRef(`session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`);
+  const anonymousSessionId = useRef(`session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const sessionId = user?.id ?? anonymousSessionId.current;
+
+  // Fetch last reservation data when user logs in, to pre-fill context for the agent
+  useEffect(() => {
+    if (!user?.email) {
+      setUserContext(null);
+      return;
+    }
+    supabase
+      .from("terrace_reservations")
+      .select("customer_name, customer_phone")
+      .eq("customer_email", user.email)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.customer_name) {
+          setUserContext({ name: data.customer_name, phone: data.customer_phone ?? "" });
+        }
+      });
+  }, [user?.email]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -37,15 +63,21 @@ export function ChatAssistant() {
     const res = await fetch(N8N_CHAT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chatInput: message, sessionId: sessionId.current }),
+      body: JSON.stringify({
+        chatInput: message,
+        sessionId,
+        userId: user?.id ?? null,
+        userContext: user
+          ? { email: user.email, name: userContext?.name ?? null, phone: userContext?.phone ?? null }
+          : null,
+      }),
     });
     if (!res.ok) throw new Error(`Error ${res.status}`);
     const data = await res.json();
     return (data.output as string) ?? "";
-  }, []);
+  }, [sessionId, user, userContext]);
 
   const handleBotResponse = useCallback((raw: string) => {
-    // Parse [AWAIT_PROOF:{uuid}] to extract reservation ID
     const awaitMatch = raw.match(/\[AWAIT_PROOF(?::([a-f0-9-]{36}))?\]/);
     if (awaitMatch) {
       setShowImageUpload(true);
@@ -62,7 +94,7 @@ export function ChatAssistant() {
   }, []);
 
   const handleUserInput = useCallback(async (text: string) => {
-    if (isProcessingRef.current) return;
+    if (!user || isProcessingRef.current) return;
     isProcessingRef.current = true;
     setIsProcessing(true);
     setMessages((prev) => [...prev, { text, isUser: true }]);
@@ -82,7 +114,7 @@ export function ChatAssistant() {
 
     isProcessingRef.current = false;
     setIsProcessing(false);
-  }, [sendToN8N, handleBotResponse]);
+  }, [user, sendToN8N, handleBotResponse]);
 
   // External event from landing page buttons
   useEffect(() => {
@@ -133,7 +165,7 @@ export function ChatAssistant() {
   }, [pendingReservationId]);
 
   const handleFileSelect = async (file: File) => {
-    if (isProcessingRef.current) return;
+    if (!user || isProcessingRef.current) return;
     isProcessingRef.current = true;
     setIsProcessing(true);
 
@@ -201,45 +233,75 @@ export function ChatAssistant() {
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-white/50 backdrop-blur-sm">
-              {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}>
-                  {msg.isImage ? (
-                    <div className="max-w-[75%] rounded-2xl rounded-tr-none overflow-hidden shadow-sm border border-[#E8DED0]">
-                      <img src={msg.imageUrl} alt="Comprobante" className="w-full object-cover" />
-                    </div>
-                  ) : (
-                    <div
-                      className={`max-w-[85%] p-3.5 rounded-2xl shadow-sm text-sm ${
-                        msg.isUser
+            {/* Messages or locked state */}
+            {loading ? (
+              <div className="flex-1 flex items-center justify-center bg-white/50">
+                <Loader2 size={20} className="animate-spin text-[#C89F6A]" />
+              </div>
+            ) : !user ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center bg-white/50">
+                <div className="w-14 h-14 rounded-full bg-[#F5EFE6] flex items-center justify-center mb-4">
+                  <Lock size={22} className="text-[#9B8677]" />
+                </div>
+                <p className="text-[#3B2A22] font-medium text-sm">Inicia sesión para chatear</p>
+                <p className="text-[#9B8677] text-xs mt-1.5 leading-relaxed">
+                  Usa el botón <span className="font-medium">Iniciar sesión</span> en el menú superior para continuar.
+                </p>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-5 space-y-3 bg-white/50 backdrop-blur-sm">
+                {messages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}>
+                    {msg.isImage ? (
+                      <div className="max-w-[75%] rounded-2xl rounded-tr-none overflow-hidden shadow-sm border border-[#E8DED0]">
+                        <img src={msg.imageUrl} alt="Comprobante" className="w-full object-cover" />
+                      </div>
+                    ) : (
+                      <div
+                        className={`max-w-[85%] p-3.5 rounded-2xl shadow-sm text-sm ${msg.isUser
                           ? "bg-[#3B2A22] text-white rounded-tr-none"
                           : "bg-white text-[#2A2419] border border-[#E8DED0] rounded-tl-none"
-                      }`}
-                    >
-                      <p className="leading-relaxed whitespace-pre-line">{msg.text}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+                          }`}
+                      >
+                        <p
+                          className="leading-relaxed whitespace-pre-line"
+                          dangerouslySetInnerHTML={{
+                            __html: msg.text
+                              .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                              .replace(/\*(.+?)\*/g, "<em>$1</em>")
+                              .replace(/`(.+?)`/g, "<code>$1</code>"),
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
 
-              {/* Typing indicator */}
-              {isProcessing && (
-                <div className="flex justify-start">
-                  <div className="bg-white border border-[#E8DED0] rounded-2xl rounded-tl-none p-3.5 shadow-sm">
-                    <div className="flex gap-1 items-center">
-                      <span className="w-1.5 h-1.5 bg-[#C89F6A] rounded-full animate-bounce [animation-delay:0ms]" />
-                      <span className="w-1.5 h-1.5 bg-[#C89F6A] rounded-full animate-bounce [animation-delay:150ms]" />
-                      <span className="w-1.5 h-1.5 bg-[#C89F6A] rounded-full animate-bounce [animation-delay:300ms]" />
+                {isProcessing && (
+                  <div className="flex justify-start">
+                    <div className="bg-white border border-[#E8DED0] rounded-2xl rounded-tl-none p-3.5 shadow-sm">
+                      <div className="flex gap-1 items-center">
+                        <span className="w-1.5 h-1.5 bg-[#C89F6A] rounded-full animate-bounce [animation-delay:0ms]" />
+                        <span className="w-1.5 h-1.5 bg-[#C89F6A] rounded-full animate-bounce [animation-delay:150ms]" />
+                        <span className="w-1.5 h-1.5 bg-[#C89F6A] rounded-full animate-bounce [animation-delay:300ms]" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
 
             {/* Input */}
-            <div className="p-4 bg-white border-t border-[#F5EFE6] flex-shrink-0 rounded-b-2xl">
+            <div className={`p-4 bg-white border-t border-[#F5EFE6] flex-shrink-0 rounded-b-2xl ${!user || loading ? "opacity-40 pointer-events-none" : ""}`}>
+              {/* File input siempre en el DOM para que fileInputRef funcione en ambas ramas */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+              />
               {showImageUpload ? (
                 <div className="flex gap-2">
                   <button
@@ -264,24 +326,17 @@ export function ChatAssistant() {
               ) : (
                 <div className="flex gap-2">
                   <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
-                  />
-                  <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                    placeholder="Escribe tu mensaje..."
-                    disabled={isProcessing}
+                    placeholder={user ? "Escribe tu mensaje..." : "Inicia sesión para chatear..."}
+                    disabled={isProcessing || !user}
                     className="flex-1 px-5 py-3 bg-[#F5EFE6] rounded-full focus:outline-none focus:ring-2 focus:ring-[#3B2A22]/20 text-sm disabled:opacity-50"
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={isProcessing}
+                    disabled={isProcessing || !user}
                     title="Adjuntar comprobante de pago"
                     className="text-[#9B8677] p-3 rounded-full hover:bg-[#F5EFE6] transition-all active:scale-95 disabled:opacity-40"
                   >
@@ -289,7 +344,7 @@ export function ChatAssistant() {
                   </button>
                   <button
                     onClick={handleSend}
-                    disabled={isProcessing || !input.trim()}
+                    disabled={isProcessing || !input.trim() || !user}
                     className="bg-[#3B2A22] text-white p-3 rounded-full hover:bg-[#2A1F19] transition-all shadow-md active:scale-95 disabled:opacity-40"
                   >
                     {isProcessing ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
