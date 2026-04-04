@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { MessageCircle, X, Send, ImagePlus, Loader2, Ban, Paperclip, Lock } from "lucide-react";
+import { MessageCircle, X, Send, ImagePlus, Loader2, Paperclip, Lock } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../lib/useAuth";
 
@@ -131,36 +131,7 @@ export function ChatAssistant() {
     handleUserInput(text);
   };
 
-  const handleCancelReservation = useCallback(async () => {
-    if (!pendingReservationId || isProcessingRef.current) return;
-    isProcessingRef.current = true;
-    setIsProcessing(true);
 
-    try {
-      const { error } = await supabase
-        .from("terrace_reservations")
-        .update({ status: "cancelled" })
-        .eq("id", pendingReservationId)
-        .eq("status", "pendiente_pago");
-
-      if (error) throw error;
-
-      setShowImageUpload(false);
-      setPendingReservationId(null);
-      setMessages((prev) => [
-        ...prev,
-        { text: "Tu reservación ha sido cancelada. No se realizó ningún cargo.", isUser: false },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { text: "No se pudo cancelar. Escribe 'cancelar reserva' para intentarlo por el chat.", isUser: false },
-      ]);
-    }
-
-    isProcessingRef.current = false;
-    setIsProcessing(false);
-  }, [pendingReservationId]);
 
   const handleFileSelect = async (file: File) => {
     if (!user || isProcessingRef.current) return;
@@ -310,16 +281,6 @@ export function ChatAssistant() {
                     {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
                     Subir comprobante
                   </button>
-                  {pendingReservationId && (
-                    <button
-                      onClick={handleCancelReservation}
-                      disabled={isProcessing}
-                      title="Cancelar reserva"
-                      className="flex items-center justify-center p-3 bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-500 rounded-full transition-colors disabled:opacity-50 border border-red-200"
-                    >
-                      <Ban size={16} />
-                    </button>
-                  )}
                 </div>
               ) : (
                 <div className="flex gap-2">
