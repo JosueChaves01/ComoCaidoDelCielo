@@ -4,10 +4,7 @@ import { MessageCircle, X, Send, ImagePlus, Loader2, Ban, Paperclip, Lock } from
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../lib/useAuth";
 
-const N8N_CHAT_URL =
-  (import.meta.env.VITE_N8N_CHAT_URL as string) ||
-  "/webhook/reservas";
-const N8N_HOST_URL = import.meta.env.VITE_N8N_HOST_URL as string;
+const VITE_N8N_WEBHOOK = (import.meta.env.VITE_N8N_WEBHOOK as string);
 
 interface Message {
   text: string;
@@ -61,7 +58,7 @@ export function ChatAssistant() {
   }, [messages, isProcessing]);
 
   const sendToN8N = useCallback(async (message: string): Promise<string> => {
-    const res = await fetch(N8N_HOST_URL + N8N_CHAT_URL, {
+    const res = await fetch(VITE_N8N_WEBHOOK, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

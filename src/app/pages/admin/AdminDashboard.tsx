@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat, LayoutTemplate, Sparkles, CalendarCheck, Check, Store, ChevronDown, Eye } from "lucide-react";
+import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat, LayoutTemplate, Sparkles, CalendarCheck, Check, Store, ChevronDown, Eye, RefreshCcw } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { supabase } from "../../../lib/supabase";
@@ -1743,6 +1743,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
   cancelled:           { label: 'Cancelada',            className: 'bg-red-500/10 text-red-400 border-red-500/20' },
   pendiente_reembolso:    { label: 'Pendiente Reembolso',    className: 'bg-purple-500/10 text-purple-400 border-purple-500/20' },
   pendiente_cancelacion:  { label: 'Pendiente Cancelación',  className: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' },
+  reembolsada:            { label: 'Reembolsada',            className: 'bg-teal-500/10 text-teal-400 border-teal-500/20' },
 };
 
 function TerraceReservationsManager({ subTab }: any) {
@@ -1765,12 +1766,14 @@ function TerraceReservationsManager({ subTab }: any) {
     if (subTab === "list") fetchReservations();
   }, [subTab]);
 
-  const updateStatus = async (id: string, newStatus: string) => {
+  const updateStatus = async (id: string, newStatus: string, clearPreviousStatus = false) => {
     const toastId = toast.loading("Actualizando estado...");
     try {
-      const { error } = await supabase.from('terrace_reservations').update({ status: newStatus }).eq('id', id);
+      const payload: Record<string, any> = { status: newStatus };
+      if (clearPreviousStatus) payload.previous_status = null;
+      const { error } = await supabase.from('terrace_reservations').update(payload).eq('id', id);
       if (error) throw error;
-      setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, status: newStatus, ...(clearPreviousStatus ? { previous_status: null } : {}) } : r));
       toast.success("Estado actualizado", { id: toastId });
     } catch (e: any) {
       toast.error(e.message, { id: toastId });
@@ -1858,8 +1861,10 @@ function TerraceReservationsManager({ subTab }: any) {
               filtered.map((res: any) => {
                 const cfg = STATUS_CONFIG[res.status] ?? { label: res.status, className: 'bg-white/5 text-white/50 border-white/10' };
                 const isPendingReview = res.status === 'pendiente_revision';
+                const isPendingRefund = res.status === 'pendiente_reembolso';
+                const prevCfg = res.previous_status ? (STATUS_CONFIG[res.previous_status] ?? { label: res.previous_status, className: 'bg-white/5 text-white/50 border-white/10' }) : null;
                 return (
-                  <tr key={res.id} className={`hover:bg-white/5 transition-colors group ${isPendingReview ? 'bg-blue-500/5' : ''}`}>
+                  <tr key={res.id} className={`hover:bg-white/5 transition-colors group ${isPendingReview ? 'bg-blue-500/5' : ''} ${isPendingRefund ? 'bg-purple-500/5' : ''}`}>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="text-white font-medium">{res.customer_name}</span>
@@ -1883,9 +1888,19 @@ function TerraceReservationsManager({ subTab }: any) {
                       ₡{(res.total_amount || res.adults_count * 3500).toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${cfg.className}`}>
-                        {cfg.label}
-                      </span>
+                      <div className="flex flex-col gap-1.5">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${cfg.className}`}>
+                          {cfg.label}
+                        </span>
+                        {isPendingRefund && prevCfg && (
+                          <span className="text-xs text-white/40 flex items-center gap-1">
+                            <span className="text-white/20">antes:</span>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs border ${prevCfg.className}`}>
+                              {prevCfg.label}
+                            </span>
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
@@ -1904,7 +1919,12 @@ function TerraceReservationsManager({ subTab }: any) {
                             </button>
                           </>
                         )}
-                        {!isPendingReview && res.status !== 'aprobada' && res.status !== 'rechazada' && (
+                        {isPendingRefund && (
+                          <button onClick={() => updateStatus(res.id, 'reembolsada', true)} className="p-2 bg-teal-500/10 text-teal-400 hover:bg-teal-500 hover:text-white rounded-lg transition-colors border border-teal-500/20" title="Marcar como reembolsada">
+                            <RefreshCcw className="w-4 h-4" />
+                          </button>
+                        )}
+                        {!isPendingReview && !isPendingRefund && res.status !== 'aprobada' && res.status !== 'rechazada' && (
                           <>
                             {res.status !== 'confirmed' && (
                               <button onClick={() => updateStatus(res.id, 'confirmed')} className="p-2 bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white rounded-lg transition-colors border border-green-500/20" title="Confirmar">
