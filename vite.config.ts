@@ -1,31 +1,50 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig({
-  plugins: [
-    // The React and Tailwind plugins are both required for Make, even if
-    // Tailwind is not being actively used – do not remove them
-    react(),
-    tailwindcss(),
-  ],
-  resolve: {
-    alias: {
-      // Alias @ to the src directory
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
+export default defineConfig(({ mode }) => {
+  // Cargar variables de entorno (incluidas las que no tienen el prefijo VITE_)
+  const env = loadEnv(mode, process.cwd(), '')
+  const n8nTarget = env.N8N_HOST_URL || 'http://localhost:5678'
+  
+  // Imprimir en terminal para asegurarnos a dónde está apuntando
+  console.log('🔄 N8N Proxy Target:', n8nTarget)
 
-  // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
-  assetsInclude: ['**/*.svg', '**/*.csv'],
-
-  server: {
-    proxy: {
-      '/webhook': {
-        target: 'http://localhost:5678',
-        changeOrigin: true,
+  return {
+    plugins: [
+      react(),
+      tailwindcss(),
+    ],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
       },
     },
-  },
+
+    assetsInclude: ['**/*.svg', '**/*.csv'],
+
+    server: {
+      cors: true, // Permite CORS globalmente para cualquier petición
+      proxy: {
+        // Enrutamiento local de los webhooks normales
+        '/webhook': {
+          target: n8nTarget,
+          changeOrigin: true,
+          secure: false,
+        },
+        // Enrutamiento exclusivo para el webhook remoto (evita bloqueos de navegador)
+        '/jotech-webhook': {
+          target: 'https://jotech.mytry.dev',
+          changeOrigin: true,
+          secure: true,
+          headers: {
+            'Host': 'jotech.mytry.dev',
+            'Origin': 'https://jotech.mytry.dev',
+          },
+          rewrite: (path) => path.replace(/^\/jotech-webhook/, '/webhook')
+        }
+      },
+    },
+  }
 })

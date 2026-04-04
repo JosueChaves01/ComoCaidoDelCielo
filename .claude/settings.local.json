@@ -1,7 +1,27 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "mcp__claude_ai_Supabase__list_projects",
+      "mcp__claude_ai_Supabase__execute_sql",
+      "Bash(npx n8n-mcp:*)",
+      "Bash(claude mcp:*)",
+      "Bash(npx -y n8n-mcp --version)",
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(f'[{w[\\\\\"id\\\\\"]}] {w[\\\\\"name\\\\\"]} — active: {w[\\\\\"active\\\\\"]}'\\) for w in data.get\\('data', []\\)]\")",
+      "Bash(curl -s https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY')",
+      "Bash(python -c ':*)",
+      "Bash(python)",
+      "Bash(curl -s https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY' -o C:/Users/Salaz/AppData/Local/Temp/workflow_backup2.json)",
+      "Bash(curl -s -X PUT https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY' -H 'Content-Type: application/json' --data-binary @C:/Users/Salaz/AppData/Local/Temp/workflow_put2.json)",
+      "mcp__claude_ai_Supabase__list_extensions",
+      "mcp__claude_ai_Supabase__apply_migration",
+      "Bash(curl -s https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY' -o C:/Users/Salaz/AppData/Local/Temp/workflow_img.json)",
+      "Bash(curl -s -X PUT https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY' -H 'Content-Type: application/json' --data-binary @C:/Users/Salaz/AppData/Local/Temp/workflow_img_put.json)",
+      "Bash(curl -s https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY' -o C:/Users/Salaz/AppData/Local/Temp/workflow_loop.json)",
+      "Bash(curl -s -X PUT https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY' -H 'Content-Type: application/json' --data-binary @C:/Users/Salaz/AppData/Local/Temp/workflow_loop_put.json)",
+      "Bash(curl -s https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY' -o C:/Users/Salaz/AppData/Local/Temp/workflow_ephemeral.json)",
+      "Bash(curl -s -X PUT https://jotech.mytry.dev/api/v1/workflows/sNNzmEamKtPVMXDJ -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmZjI2NWU5Yi00MjRmLTRlODQtYTY2Ni02MTFkZGM2YzQxYzkiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYmJmMDRmMGYtNDZiNS00YjY2LTg2ZDEtY2JkNDY1ZTBmMDdiIiwiaWF0IjoxNzc1MjcwNjE3fQ.WLYY-PkBQ1xE8QZTZ8LzMrJmjAntmhV2kThdrL2ieJY' -H 'Content-Type: application/json' --data-binary @C:/Users/Salaz/AppData/Local/Temp/workflow_ephemeral_put.json)",
+      "Bash(npm run:*)"
     ]
   }
 }
