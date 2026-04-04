@@ -1924,7 +1924,7 @@ function TerraceReservationsManager({ subTab }: any) {
                             <RefreshCcw className="w-4 h-4" />
                           </button>
                         )}
-                        {!isPendingReview && !isPendingRefund && res.status !== 'aprobada' && res.status !== 'rechazada' && (
+                        {!isPendingReview && !isPendingRefund && res.status !== 'aprobada' && res.status !== 'rechazada' && res.status !== 'reembolsada' && res.status !== 'cancelled' && (
                           <>
                             {res.status !== 'confirmed' && (
                               <button onClick={() => updateStatus(res.id, 'confirmed')} className="p-2 bg-green-500/10 text-green-400 hover:bg-green-500 hover:text-white rounded-lg transition-colors border border-green-500/20" title="Confirmar">

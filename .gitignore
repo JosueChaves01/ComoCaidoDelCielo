@@ -30,3 +30,6 @@ node_modules/
 .github/
 guidelines/
 .playwright-mcp/
+
+#AI
+.claude/
