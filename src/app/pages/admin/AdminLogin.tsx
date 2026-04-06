@@ -1,38 +1,133 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router";
-import { Lock, User, ArrowRight, ArrowLeft } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router";
+import { Lock, Mail, ArrowRight, ArrowLeft } from "lucide-react";
 import { motion } from "motion/react";
-import { toast } from "sonner"; // They have 'sonner' installed
+import { toast } from "sonner";
+import { supabase } from "../../../lib/supabase";
+import { loginSchema } from "../../../lib/adminSchemas";
+
+const BRUTE_FORCE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-brute-force`;
 
 export default function AdminLogin() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const location = useLocation();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const heroImage = "/assets/Hero/Atardecer.png";
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Mostrar mensaje si fue redirigido por falta de permisos
+  useEffect(() => {
+    const state = location.state as { reason?: string } | null;
+    if (state?.reason === "unauthorized") {
+      toast.error("No tienes permisos de administrador.");
+      // Limpiar el state para que no aparezca al recargar
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Mock authentication
-    setTimeout(() => {
-      if (username === "admin" && password === "cielo2026") {
-        toast.success("¡Bienvenido al Panel de Administración!");
-        localStorage.setItem("adminAuth", "true");
-        navigate("/admin/dashboard");
-      } else {
-        toast.error("Credenciales incorrectas. Intenta de nuevo.");
-      }
+    // 1. Validar inputs con Zod
+    const parsed = loginSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
       setIsLoading(false);
-    }, 1000);
+      return;
+    }
+
+    try {
+      // 2. Verificar brute force ANTES de intentar login
+      const bruteRes = await fetch(BRUTE_FORCE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ action: "check" }),
+      });
+
+      if (bruteRes.ok) {
+        const bruteData = await bruteRes.json();
+        if (bruteData.blocked) {
+          toast.error(bruteData.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // 3. Intentar autenticación con Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: parsed.data.email,
+        password: parsed.data.password,
+      });
+
+      if (error || !data.user) {
+        // Registrar el intento fallido
+        await fetch(BRUTE_FORCE_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ action: "record_failure" }),
+        }).catch(() => { /* No bloquear el flujo si falla el registro */ });
+
+        toast.error("Credenciales incorrectas. Intenta de nuevo.");
+        setIsLoading(false);
+        return;
+      }
+
+      // 4. Verificar que el usuario tiene rol de administrador
+      const { data: adminRow } = await supabase
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+
+      if (!adminRow) {
+        // Autenticado en Supabase pero NO es admin: cerrar sesión
+        await supabase.auth.signOut();
+        await fetch(BRUTE_FORCE_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ action: "record_failure" }),
+        }).catch(() => {});
+
+        toast.error("No tienes permisos de administrador.");
+        setIsLoading(false);
+        return;
+      }
+
+      // 5. Login exitoso: registrar y redirigir
+      await fetch(BRUTE_FORCE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ action: "record_success" }),
+      }).catch(() => {});
+
+      toast.success("¡Bienvenido al Panel de Administración!");
+      navigate("/admin/dashboard");
+    } catch (err: any) {
+      toast.error("Error inesperado. Intenta de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex bg-[#090B10] text-[#EFEAE2] font-sans">
       {/* Botón para volver al inicio */}
-      <button 
+      <button
         onClick={() => navigate("/")}
         className="absolute top-6 left-6 z-10 flex items-center gap-2 text-[#C89F6A] hover:text-white transition-colors uppercase tracking-widest text-sm font-semibold group bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm"
       >
@@ -68,11 +163,11 @@ export default function AdminLogin() {
 
       {/* Right Column: Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-24 relative overflow-hidden">
-        {/* Subtle background glow effect matching brand colors */}
+        {/* Subtle background glow */}
         <div className="absolute top-1/4 -right-20 w-96 h-96 bg-[#C89F6A]/10 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-purple-900/10 rounded-full blur-[100px] pointer-events-none"></div>
 
-        <motion.div 
+        <motion.div
           className="w-full max-w-md relative z-10"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -87,14 +182,15 @@ export default function AdminLogin() {
             <div className="space-y-4">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-white/40">
-                  <User className="h-5 w-5" />
+                  <Mail className="h-5 w-5" />
                 </div>
                 <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#C89F6A]/50 focus:border-[#C89F6A] transition-all backdrop-blur-sm"
-                  placeholder="Usuario"
+                  placeholder="Correo electrónico"
+                  autoComplete="email"
                   required
                 />
               </div>
@@ -109,6 +205,7 @@ export default function AdminLogin() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-4 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#C89F6A]/50 focus:border-[#C89F6A] transition-all backdrop-blur-sm"
                   placeholder="Contraseña"
+                  autoComplete="current-password"
                   required
                 />
               </div>
@@ -118,10 +215,10 @@ export default function AdminLogin() {
               type="submit"
               disabled={isLoading}
               className={`w-full group relative flex items-center justify-center p-4 bg-gradient-to-r from-[#C89F6A] to-[#D5B285] text-black rounded-xl font-bold tracking-wider hover:opacity-90 overflow-hidden transition-all ${
-                isLoading ? 'opacity-70 cursor-not-allowed' : ''
+                isLoading ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
-              <span className={`relative z-10 flex items-center transition-transform ${isLoading ? '' : 'group-hover:-translate-x-2'}`}>
+              <span className={`relative z-10 flex items-center transition-transform ${isLoading ? "" : "group-hover:-translate-x-2"}`}>
                 {isLoading ? (
                   <div className="w-6 h-6 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
                 ) : (
@@ -133,9 +230,9 @@ export default function AdminLogin() {
               )}
             </button>
           </form>
-          
+
           <div className="mt-8 text-center">
-             <p className="text-white/30 text-sm">Protegido por seguridad interna.</p>
+            <p className="text-white/30 text-sm">Acceso restringido. Protegido por Supabase Auth.</p>
           </div>
         </motion.div>
       </div>

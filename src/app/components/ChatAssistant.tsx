@@ -8,6 +8,7 @@ import { ChatActionWidget } from "./chat/ChatActionWidget";
 import type { ChatAction } from "./chat/types";
 
 const VITE_N8N_WEBHOOK = (import.meta.env.VITE_N8N_WEBHOOK as string);
+const VITE_N8N_SECRET = (import.meta.env.VITE_N8N_SECRET as string);
 
 interface Message {
   text: string;
@@ -63,21 +64,36 @@ export function ChatAssistant() {
   }, [messages, isProcessing]);
 
   const sendToN8N = useCallback(async (message: string): Promise<string> => {
-    const res = await fetch(VITE_N8N_WEBHOOK, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chatInput: message,
-        sessionId,
-        userId: user?.id ?? null,
-        userContext: user
-          ? { email: user.email, name: userContext?.name ?? null, phone: userContext?.phone ?? null }
-          : null,
-      }),
-    });
-    if (!res.ok) throw new Error(`Error ${res.status}`);
-    const data = await res.json();
-    return (data.output as string) ?? "";
+    try {
+      const res = await fetch(VITE_N8N_WEBHOOK, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-webhook-secret": VITE_N8N_SECRET
+        },
+        body: JSON.stringify({
+          chatInput: message,
+          sessionId,
+          userId: user?.id ?? null,
+          userContext: user
+            ? { email: user.email, name: userContext?.name ?? null, phone: userContext?.phone ?? null }
+            : null,
+        }),
+      });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          console.error("ChatAssistant: Error de autenticación con el webhook (401). Verifica el secreto.");
+        }
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      return (Array.isArray(data) ? data[0]?.output : data.output) ?? "";
+    } catch (err: any) {
+      console.error("ChatAssistant sendToN8N Error:", err.message);
+      throw err;
+    }
   }, [sessionId, user, userContext]);
 
   const handleUserInput = useCallback(async (text: string) => {

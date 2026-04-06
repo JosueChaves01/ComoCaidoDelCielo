@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat, LayoutTemplate, Sparkles, CalendarCheck, Check, Store, ChevronDown, Eye, RefreshCcw } from "lucide-react";
+import { LogOut, Calendar, Images, UploadCloud, CheckCircle2, X, Pencil, Trash2, Plus, List, ChefHat, LayoutTemplate, Sparkles, CalendarCheck, Check, Store, ChevronDown, Eye, RefreshCcw, ShieldCheck } from "lucide-react";
+import { useAdminGuard } from "../../../lib/useAdminGuard";
+import AdminManagement from "./AdminManagement";
 import { motion, AnimatePresence } from "motion/react";
 import { toast } from "sonner";
 import { supabase } from "../../../lib/supabase";
@@ -11,7 +13,7 @@ import {
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"home" | "upcoming" | "carousel" | "menu" | "terraces" | "special_events" | "terrace_reservations" | "business_rules">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "upcoming" | "carousel" | "menu" | "terraces" | "special_events" | "terrace_reservations" | "business_rules" | "admins">("home");
   const [activeSubTab, setActiveSubTab] = useState<"create" | "list" | "reservations" | "settings">("create");
   const [editingItem, setEditingItem] = useState<any>(null);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
@@ -69,19 +71,22 @@ export default function AdminDashboard() {
       items: [
         { label: "Ver Reservas", icon: List, tab: "terrace_reservations", subTab: "list" },
       ]
+    },
+    {
+      id: "admins",
+      title: "Administradores",
+      icon: ShieldCheck,
+      items: [
+        { label: "Gestionar", icon: List, tab: "admins", subTab: "list" },
+      ]
     }
   ], []);
 
-  // Auth Check
-  useEffect(() => {
-    const isAuth = localStorage.getItem("adminAuth");
-    if (!isAuth) {
-      navigate("/admin");
-    }
-  }, [navigate]);
+  // Auth Check: sesión real de Supabase + verificación de rol admin
+  const { loading: authLoading } = useAdminGuard();
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminAuth");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     navigate("/admin");
   };
 
@@ -102,6 +107,15 @@ export default function AdminDashboard() {
   const stars1 = useMemo(() => generateStars(120, false, false), []);
   const stars2 = useMemo(() => generateStars(40, true, false), []);
   const stars3 = useMemo(() => generateStars(15, true, true), []);
+
+  // Mostrar spinner mientras se verifica la sesión y el rol admin
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#090B10] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#C89F6A] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-full bg-[#090B10] flex text-[#EFEAE2] font-sans relative overflow-hidden">
@@ -337,6 +351,8 @@ export default function AdminDashboard() {
             <SpecialEventsManager subTab={activeSubTab} setSubTab={setActiveSubTab} editingItem={editingItem} setEditingItem={setEditingItem} />
           ) : activeTab === "terrace_reservations" ? (
             <TerraceReservationsManager subTab={activeSubTab} setSubTab={setActiveSubTab} />
+          ) : activeTab === "admins" ? (
+            <AdminManagement />
           ) : (
             <BusinessRulesManager />
           )}
