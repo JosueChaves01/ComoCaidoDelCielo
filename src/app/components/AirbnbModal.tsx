@@ -1,17 +1,12 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
-import { X, ChevronLeft, ChevronRight, MapPin, Calendar, Users, Wifi, Car, Shield, Flame, Bath, Bed, ChefHat, Home as HomeIcon, TreePine, Zap, Waves, Utensils, Coffee, Gamepad2, Tv, Phone } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, MapPin, Users, Calendar, Car, Bath, Flame, Wifi, Home as HomeIcon, Shield, TreePine } from "lucide-react";
+import { AIRBNB_DESCRIPTION, AMENITY_CATEGORIES, LOCATION_FEATURES, AmenityCategory } from "../../data/airbnbData";
 
 interface AirbnbModalProps {
   isOpen: boolean;
   onClose: () => void;
   images: string[];
-}
-
-interface AmenityCategory {
-  title: string;
-  icon: React.ReactNode;
-  amenities: string[];
 }
 
 export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
@@ -24,49 +19,6 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
-
-  const amenityCategories: AmenityCategory[] = [
-    {
-      title: "Alojamiento",
-      icon: <HomeIcon className="w-5 h-5" />,
-      amenities: [
-        "2 dormitorios con camas cómodas",
-        "Baño completo con agua caliente",
-        "TV en las habitaciones",
-        "Toallas y amenities incluidos"
-      ]
-    },
-    {
-      title: "Cocina y Comedor",
-      icon: <ChefHat className="w-5 h-5" />,
-      amenities: [
-        "Cocina totalmente equipada",
-        "Refrigerador, microondas y horno",
-        "Utensilios y vajilla completa",
-        "Mesa para compartir"
-      ]
-    },
-    {
-      title: "Exterior y Relax",
-      icon: <TreePine className="w-5 h-5" />,
-      amenities: [
-        "Área de fogatas",
-        "Parrilla y asador",
-        "Patio con vistas",
-        "Jardín privado"
-      ]
-    },
-    {
-      title: "Servicios",
-      icon: <Zap className="w-5 h-5" />,
-      amenities: [
-        "Wifi gratuito",
-        "Estacionamiento privado",
-        "Se permiten mascotas",
-        "Anfitrión disponible"
-      ]
-    }
-  ];
 
   return (
     <AnimatePresence>
@@ -90,15 +42,15 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
             <div className="sticky top-0 z-10 bg-[#8B6F47]/95 backdrop-blur-sm border-b border-[#C19A6B]/30 rounded-t-3xl p-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-3xl font-bold text-white">Cabaña en las Terrazas</h2>
+                  <h2 className="text-3xl font-bold text-white">{AIRBNB_DESCRIPTION.title}</h2>
                   <div className="flex items-center gap-4 mt-2 text-white/80">
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
-                      <span>Nicoya, Guanacaste</span>
+                      <span>{AIRBNB_DESCRIPTION.location}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Users className="w-4 h-4" />
-                      <span>Hasta 6 huéspedes</span>
+                      <span>{AIRBNB_DESCRIPTION.guests}</span>
                     </div>
                   </div>
                 </div>
@@ -136,30 +88,9 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                 <ChevronRight className="w-5 h-5" />
               </button>
 
-              {/* Image Counter */}
+              {/* Counter/Thumbnails */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 text-white px-3 py-1 rounded-full text-sm">
                 {currentImageIndex + 1} / {images.length}
-              </div>
-
-              {/* Thumbnail Strip */}
-              <div className="absolute bottom-4 left-4 right-4 flex gap-2 overflow-x-auto pb-2">
-                {images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                      index === currentImageIndex
-                        ? 'border-[#C19A6B] scale-110'
-                        : 'border-white/50 hover:border-white'
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`Miniatura ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
               </div>
             </div>
 
@@ -174,9 +105,7 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                   <div>
                     <h3 className="text-2xl font-bold text-[#2A2419] mb-2">Acerca de este espacio</h3>
                     <p className="text-[#6B5D4F] leading-relaxed">
-                      Este acogedor refugio familiar ofrece tranquilidad absoluta en medio de la naturaleza. 
-                      Ubicado estratégicamente junto a la vía principal para facilitar el acceso, combina comodidad 
-                      moderna con la serenidad del entorno natural.
+                      {AIRBNB_DESCRIPTION.aboutShort}
                     </p>
                   </div>
                 </div>
@@ -200,14 +129,9 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                     </div>
                   </div>
                   <div className="space-y-2 text-sm leading-relaxed">
-                    <p>
-                      La cabaña cuenta con una habitación principal en el segundo piso equipada con 
-                      dos camas individuales, una matrimonial y televisor para entretenimiento.
-                    </p>
-                    <p>
-                      En la planta baja, una habitación adicional con camarote ofrece flexibilidad 
-                      para diferentes configuraciones de huéspedes.
-                    </p>
+                    {AIRBNB_DESCRIPTION.details.map((detail: string, i: number) => (
+                      <p key={i}>{detail}</p>
+                    ))}
                   </div>
                 </div>
               </section>
@@ -219,9 +143,7 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                   <h3 className="text-xl font-semibold text-[#2A2419]">Acceso de los huéspedes</h3>
                 </div>
                 <p className="text-[#6B5D4F] leading-relaxed">
-                  Disfruta de privacidad total en todas las áreas de la cabaña. Desde el jardín hasta 
-                  las habitaciones, cada espacio está diseñado para ofrecer una experiencia íntima 
-                  y personalizada, permitiendo que te sientas completamente en casa.
+                  {AIRBNB_DESCRIPTION.guestAccess}
                 </p>
               </section>
 
@@ -229,7 +151,7 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
               <section>
                 <h3 className="text-2xl font-bold text-white mb-6">Lo que este lugar ofrece</h3>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {amenityCategories.map((category, index) => (
+                  {AMENITY_CATEGORIES.map((category: AmenityCategory, index: number) => (
                     <motion.div
                       key={category.title}
                       initial={{ opacity: 0, y: 20 }}
@@ -244,7 +166,7 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                         <h4 className="text-lg font-semibold text-[#2A2419]">{category.title}</h4>
                       </div>
                       <ul className="space-y-1">
-                        {category.amenities.map((amenity, amenityIndex) => (
+                        {category.amenities.map((amenity: string, amenityIndex: number) => (
                           <li key={amenityIndex} className="flex items-center gap-2 text-[#6B5D4F]">
                             <div className="w-1.5 h-1.5 rounded-full bg-[#C19A6B]"></div>
                             {amenity}
@@ -260,30 +182,14 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
               <section>
                 <h3 className="text-2xl font-bold text-white mb-4">Características de la ubicación</h3>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
-                    <div className="p-2 bg-[#8B7355]/20 rounded-lg">
-                      <Car className="w-5 h-5 text-[#8B7355]" />
+                  {LOCATION_FEATURES.map((feature: any, i: number) => (
+                    <div key={i} className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
+                      <div className="p-2 bg-[#8B7355]/20 rounded-lg">
+                        {feature.icon}
+                      </div>
+                      <span className="text-[#6B5D4F]">{feature.text}</span>
                     </div>
-                    <span className="text-[#6B5D4F]">Estacionamiento gratuito en las instalaciones</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
-                    <div className="p-2 bg-[#8B7355]/20 rounded-lg">
-                      <HomeIcon className="w-5 h-5 text-[#8B7355]" />
-                    </div>
-                    <span className="text-[#6B5D4F]">Entrada independiente</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
-                    <div className="p-2 bg-[#8B7355]/20 rounded-lg">
-                      <Flame className="w-5 h-5 text-[#8B7355]" />
-                    </div>
-                    <span className="text-[#6B5D4F]">Lugar para hacer fogata</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-4 bg-[#F5F2E8] rounded-xl">
-                    <div className="p-2 bg-[#8B7355]/20 rounded-lg">
-                      <TreePine className="w-5 h-5 text-[#8B7355]" />
-                    </div>
-                    <span className="text-[#6B5D4F]">Jardín privado</span>
-                  </div>
+                  ))}
                 </div>
               </section>
 
@@ -292,17 +198,15 @@ export function AirbnbModal({ isOpen, onClose, images }: AirbnbModalProps) {
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                   <div>
                     <h3 className="text-2xl font-bold mb-2">Reservar tu estadía</h3>
-                    <p className="mb-4 opacity-90">
-                      Desde $85 USD por noche. Precios pueden variar según temporada.
-                    </p>
+                    <p className="mb-4 opacity-90">{AIRBNB_DESCRIPTION.pricing}</p>
                     <div className="flex items-center gap-4 text-sm opacity-90">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        <span>Mínimo 2 noches</span>
+                        <span>Mínimo {AIRBNB_DESCRIPTION.minNights} noches</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" />
-                        <span>Hasta 6 huéspedes</span>
+                        <span>{AIRBNB_DESCRIPTION.guests}</span>
                       </div>
                     </div>
                   </div>

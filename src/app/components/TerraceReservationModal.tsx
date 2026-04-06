@@ -65,15 +65,22 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
 
   const fetchInitialData = async () => {
     setIsLoading(true);
-    // Fetch rules
-    const { data: rulesData } = await supabase.from('business_rules').select('*').eq('id', 1).single();
-    if (rulesData) setRules(rulesData);
+    try {
+      // Fetch rules
+      const { data: rulesData, error: rulesError } = await supabase.from('business_rules').select('*').eq('id', 1).single();
+      if (rulesError) throw rulesError;
+      if (rulesData) setRules(rulesData);
 
-    // Fetch all terraces
-    const { data: terracesData } = await supabase.from('terraces').select('*').order('title', { ascending: true });
-    if (terracesData) setTerraces(terracesData);
-    
-    setIsLoading(false);
+      // Fetch all terraces
+      const { data: terracesData, error: terracesError } = await supabase.from('terraces').select('*').order('title', { ascending: true });
+      if (terracesError) throw terracesError;
+      if (terracesData) setTerraces(terracesData);
+    } catch (err: any) {
+      console.error("Error fetching initial data:", err.message);
+      toast.error("Error al cargar datos iniciales. Por favor intenta de nuevo.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const isWorkingDay = (dateStr: string) => {
@@ -88,34 +95,42 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
     if (!isWorkingDay(selectedDate)) return toast.error("El local está cerrado en esa fecha según el horario.");
     
     setIsLoading(true);
-    // Fetch reservations for that date that are NOT cancelled
-    const { data: reservations } = await supabase
-      .from('terrace_reservations')
-      .select('terrace_id')
-      .eq('reservation_date', selectedDate)
-      .neq('status', 'cancelled');
-    
-    const bookedTerraceIds = reservations?.map(r => r.terrace_id) || [];
-    
-    // Filter terraces:
-    // 1. Not booked
-    // 2. Capacity >= total people
-    const totalPeople = adultsCount + childrenCount;
-    const available = terraces.filter(t => 
-      !bookedTerraceIds.includes(t.id) && 
-      t.max_capacity >= totalPeople
-    );
+    try {
+      // Fetch reservations for that date that are NOT cancelled
+      const { data: reservations, error: resError } = await supabase
+        .from('terrace_reservations')
+        .select('terrace_id')
+        .eq('reservation_date', selectedDate)
+        .neq('status', 'cancelled');
+      
+      if (resError) throw resError;
+      
+      const bookedTerraceIds = reservations?.map(r => r.terrace_id) || [];
+      
+      // Filter terraces:
+      // 1. Not booked
+      // 2. Capacity >= total people
+      const totalPeople = adultsCount + childrenCount;
+      const available = terraces.filter(t => 
+        !bookedTerraceIds.includes(t.id) && 
+        t.max_capacity >= totalPeople
+      );
 
-    setAvailableTerraces(available);
-    setSelectedTerrace(null);
-    setStep(2);
-    setIsLoading(false);
+      setAvailableTerraces(available);
+      setSelectedTerrace(null);
+      setStep(2);
 
-    if (available.length === 0) {
-      toast("No hay terrazas disponibles", {
-        description: "Intenta con otra fecha o reduce la cantidad de personas.",
-        icon: <Users className="w-4 h-4" />
-      });
+      if (available.length === 0) {
+        toast("No hay terrazas disponibles", {
+          description: "Intenta con otra fecha o reduce la cantidad de personas.",
+          icon: <Users className="w-4 h-4" />
+        });
+      }
+    } catch (err: any) {
+      console.error("Error checking availability:", err.message);
+      toast.error("Error al verificar disponibilidad.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -138,6 +153,12 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone) return toast.error("Por favor, complete todos los datos requeridos.");
+    
+    // Basic phone validation (CR format: 8 digits, maybe with dash/space)
+    const phoneRegex = /^(\d{4})[- ]?(\d{4})$|^(\d{8})$/;
+    if (!phoneRegex.test(phone.trim())) {
+      return toast.error("Por favor, ingrese un número de teléfono válido (8 dígitos).");
+    }
     
     setIsLoading(true);
     const toastId = toast.loading("Procesando reservación...");
