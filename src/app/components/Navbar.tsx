@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Menu, X, Home, Sunset, Calendar, Utensils, ChefHat, Bed, Instagram, Facebook, LogIn, LogOut, Mail, ChevronLeft, Loader2, User2 } from "lucide-react";
+import { Menu, X, Home, Sunset, Calendar, Utensils, ChefHat, Bed, Instagram, Facebook, LogIn, LogOut, Mail, ChevronLeft, Loader2, User2, ChevronDown, BookOpen } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../lib/useAuth";
+import { MyReservationsModal } from "./MyReservationsModal";
 
 type AuthView = "hidden" | "options" | "email" | "sent";
 
@@ -12,6 +13,8 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authView, setAuthView] = useState<AuthView>("hidden");
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showMyReservations, setShowMyReservations] = useState(false);
   const [authEmail, setAuthEmail] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
 
@@ -33,13 +36,14 @@ export function Navbar() {
     const handleClickOutside = (e: MouseEvent) => {
       if (authPanelRef.current && !authPanelRef.current.contains(e.target as Node)) {
         setAuthView("hidden");
+        setIsUserMenuOpen(false);
       }
     };
-    if (authView !== "hidden") {
+    if (authView !== "hidden" || isUserMenuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [authView]);
+  }, [authView, isUserMenuOpen]);
 
   // Close panel when user logs in
   useEffect(() => {
@@ -149,12 +153,12 @@ export function Navbar() {
                   <Loader2 size={15} className="animate-spin text-white/40" />
                 ) : user ? (
                   <button
-                    onClick={handleSignOut}
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-[11px] uppercase tracking-[0.15em] font-medium"
                   >
                     <User2 size={15} />
                     <span className="max-w-[90px] truncate">{displayName}</span>
-                    <LogOut size={13} className="opacity-60" />
+                    <ChevronDown size={13} className={`opacity-60 transition-transform ${isUserMenuOpen ? "rotate-180" : ""}`} />
                   </button>
                 ) : (
                   <button
@@ -168,6 +172,40 @@ export function Navbar() {
 
                 {/* Dropdown panel */}
                 <AnimatePresence>
+                  {isUserMenuOpen && user && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-[#E8DED0] overflow-hidden z-50"
+                    >
+                      <div className="p-2">
+                        <button
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            setShowMyReservations(true);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-[#F5EFE6] text-[#3B2A22] text-sm transition-colors text-left"
+                        >
+                          <BookOpen size={16} className="text-[#9B8677]" />
+                          <span className="font-medium">Mis Reservas</span>
+                        </button>
+                        <div className="h-[1px] bg-[#E8DED0] my-1 mx-2" />
+                        <button
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            handleSignOut();
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-50 text-red-600 text-sm transition-colors text-left"
+                        >
+                          <LogOut size={16} className="opacity-70" />
+                          <span className="font-medium">Cerrar sesión</span>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
                   {authView !== "hidden" && !user && (
                     <motion.div
                       initial={{ opacity: 0, y: 8, scale: 0.97 }}
@@ -334,13 +372,25 @@ export function Navbar() {
 
                 {/* Mobile auth */}
                 {loading ? null : user ? (
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center gap-2 text-white/50 hover:text-white/80 transition-colors text-sm"
-                  >
-                    <LogOut size={15} />
-                    Cerrar sesión ({displayName})
-                  </button>
+                  <div className="flex flex-col items-center gap-4">
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setShowMyReservations(true);
+                      }}
+                      className="flex items-center gap-2 text-[#C89F6A] font-medium tracking-wide border border-[#C89F6A]/30 bg-[#C89F6A]/10 px-6 py-2.5 rounded-full hover:bg-[#C89F6A]/20 transition-all text-sm"
+                    >
+                      <BookOpen size={16} />
+                      Mis Reservas
+                    </button>
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-2 text-white/50 hover:text-white/80 transition-colors text-sm"
+                    >
+                      <LogOut size={15} />
+                      Cerrar sesión ({displayName})
+                    </button>
+                  </div>
                 ) : (
                   <div className="w-full max-w-[280px] space-y-2">
                     <button
@@ -400,6 +450,11 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <MyReservationsModal 
+        isOpen={showMyReservations} 
+        onClose={() => setShowMyReservations(false)} 
+      />
     </>
   );
 }
