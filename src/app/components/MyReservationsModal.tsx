@@ -55,36 +55,26 @@ export function MyReservationsModal({ isOpen, onClose }: MyReservationsModalProp
     }
   };
 
+  const STATUS_MAP: Record<string, { label: string; classes: string }> = {
+    sin_confirmar:         { label: "Sin Confirmar",         classes: "bg-gray-500/20 text-gray-400 border-gray-500/30" },
+    pendiente_revision:    { label: "Revisando Comprobante", classes: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
+    pendiente_pago:        { label: "Pendiente de Pago",     classes: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
+    pendiente_cancelacion: { label: "Cancelación Pendiente", classes: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
+    pendiente_reembolso:   { label: "Reembolso Pendiente",   classes: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
+    aprobada:              { label: "Aprobada",              classes: "bg-green-500/20 text-green-400 border-green-500/30" },
+    confirmed:             { label: "Confirmada",            classes: "bg-green-500/20 text-green-400 border-green-500/30" },
+    rechazada:             { label: "Rechazada",             classes: "bg-red-500/20 text-red-400 border-red-500/30" },
+    cancelled:             { label: "Cancelada",             classes: "bg-red-500/20 text-red-400 border-red-500/30" },
+    reembolsada:           { label: "Reembolsada",           classes: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
+  };
+
   const getStatusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "confirmed":
-      case "confirmada":
-        return (
-          <span className="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-[10px] uppercase tracking-wider font-semibold">
-            Confirmada
-          </span>
-        );
-      case "pending":
-      case "pendiente":
-        return (
-          <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 rounded-full text-[10px] uppercase tracking-wider font-semibold">
-            Pendiente
-          </span>
-        );
-      case "cancelled":
-      case "cancelada":
-        return (
-          <span className="px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-full text-[10px] uppercase tracking-wider font-semibold">
-            Cancelada
-          </span>
-        );
-      default:
-        return (
-          <span className="px-3 py-1 bg-gray-500/20 text-gray-400 border border-gray-500/30 rounded-full text-[10px] uppercase tracking-wider font-semibold">
-            {status}
-          </span>
-        );
-    }
+    const cfg = STATUS_MAP[status] ?? { label: status, classes: "bg-gray-500/20 text-gray-400 border-gray-500/30" };
+    return (
+      <span className={`px-3 py-1 border rounded-full text-[10px] uppercase tracking-wider font-semibold ${cfg.classes}`}>
+        {cfg.label}
+      </span>
+    );
   };
 
   const formatDate = (dateStr: string) => {
