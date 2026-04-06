@@ -2257,7 +2257,9 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
       title: "Ingresos del Mes",
       value: `₡${isLoading ? "..." : stats.incomeMonth.toLocaleString()}`,
       label: "Mes Actual",
-      variation: "65%",
+      variation: stats.customerVariation !== 0
+        ? `${stats.customerVariation >= 0 ? '+' : ''}${stats.customerVariation.toFixed(0)}% vs mes ant.`
+        : undefined,
       color: "from-[#C89F6A]/20 to-orange-500/10",
       borderColor: "hover:border-[#C89F6A]/30",
       icon: <Store className="w-5 h-5 text-[#C89F6A]" />,
@@ -2354,10 +2356,14 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
               )}
             </div>
 
-            {metric.type === 'income' && (
+            {metric.type === 'income' && !isLoading && (
               <div className="mt-4 flex items-center gap-2">
                 <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                  <motion.div initial={{ width: 0 }} animate={{ width: metric.variation }} className="h-full bg-gradient-to-r from-[#C89F6A] to-orange-400" />
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: stats.incomeMonth > 0 ? '100%' : '0%' }}
+                    className="h-full bg-gradient-to-r from-[#C89F6A] to-orange-400"
+                  />
                 </div>
               </div>
             )}
@@ -2544,24 +2550,24 @@ function HomeManager({ setActiveTab, setActiveSubTab }: any) {
                       <td colSpan={4} className="px-6 py-12 text-center text-white/30 italic">No hay reservas recientes.</td>
                     </tr>
                   ) : (
-                    recentReservations.map((res: any) => (
-                      <tr key={res.id} className="hover:bg-white/5 transition-colors group">
-                        <td className="px-6 py-4">
-                          <p className="text-white font-medium text-sm">{res.customer_name}</p>
-                          <p className="text-white/30 text-xs mt-0.5">{res.customer_phone}</p>
-                        </td>
-                        <td className="px-6 py-4 text-white/70 text-sm">{res.terraces?.title || 'Terraza'}</td>
-                        <td className="px-6 py-4 text-[#C89F6A] font-bold text-xs">{res.reservation_date}</td>
-                        <td className="px-6 py-4">
-                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${res.status === 'confirmed' ? 'bg-green-500/10 text-green-400' :
-                            res.status === 'cancelled' ? 'bg-red-500/10 text-red-400' :
-                              'bg-yellow-500/10 text-yellow-500'
-                            }`}>
-                            {res.status === 'pending' ? 'Pendiente' : res.status === 'confirmed' ? 'Confirmado' : 'Cancelado'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
+                    recentReservations.map((res: any) => {
+                      const cfg = STATUS_CONFIG[res.status] ?? { label: res.status, className: 'bg-white/5 text-white/50 border-white/10' };
+                      return (
+                        <tr key={res.id} className="hover:bg-white/5 transition-colors group">
+                          <td className="px-6 py-4">
+                            <p className="text-white font-medium text-sm">{res.customer_name}</p>
+                            <p className="text-white/30 text-xs mt-0.5">{res.customer_phone}</p>
+                          </td>
+                          <td className="px-6 py-4 text-white/70 text-sm">{res.terraces?.title || 'Terraza'}</td>
+                          <td className="px-6 py-4 text-[#C89F6A] font-bold text-xs">{res.reservation_date}</td>
+                          <td className="px-6 py-4">
+                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${cfg.className}`}>
+                              {cfg.label}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
