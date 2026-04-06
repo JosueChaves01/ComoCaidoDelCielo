@@ -1,9 +1,11 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Suspense, lazy } from "react";
 import BackgroundEffectLocal from "./BackgroundEffectLocal";
 import { supabase } from "../../lib/supabase";
-import { TerraceReservationModal } from "./TerraceReservationModal";
+
+// Lazy loading the heavy reservation modal
+const TerraceReservationModal = lazy(() => import("./TerraceReservationModal").then(m => ({ default: m.TerraceReservationModal })));
 
 interface TerraceSectionProps {
   images: { description: string; url: string }[];
@@ -493,10 +495,12 @@ export function TerraceSection({
         </motion.div>
       </div>
 
-      <TerraceReservationModal
-        isOpen={isReservationModalOpen}
-        onClose={() => setIsReservationModalOpen(false)}
-      />
+      <Suspense fallback={null}>
+        <TerraceReservationModal
+          isOpen={isReservationModalOpen}
+          onClose={() => setIsReservationModalOpen(false)}
+        />
+      </Suspense>
     </section>
   );
 }

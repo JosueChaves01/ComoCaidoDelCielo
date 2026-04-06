@@ -6,10 +6,11 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => {
   // Cargar variables de entorno (incluidas las que no tienen el prefijo VITE_)
   const env = loadEnv(mode, process.cwd(), '')
-  const n8nTarget = env.N8N_HOST_URL || 'http://localhost:5678'
+  const n8nTarget = env.N8N_HOST_URL || 'https://jotech.mytry.dev/'
   
-  // Imprimir en terminal para asegurarnos a dónde está apuntando
-  console.log('🔄 N8N Proxy Target:', n8nTarget)
+  if (mode !== 'test') {
+    console.log('🔄 N8N Proxy Target:', n8nTarget)
+  }
 
   return {
     plugins: [
@@ -45,6 +46,11 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/jotech-webhook/, '/webhook')
         }
       },
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: './src/test/setup.ts',
     },
   }
 })

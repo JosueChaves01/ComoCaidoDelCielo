@@ -1,8 +1,10 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef, useState, Suspense, lazy } from "react";
 import { Moon, Trees, Home } from "lucide-react";
-import { AirbnbModal } from "./AirbnbModal";
+
+// Lazy loading the heavy modal
+const AirbnbModal = lazy(() => import("./AirbnbModal").then(m => ({ default: m.AirbnbModal })));
 
 interface AirbnbSectionProps {
   images: string[];
@@ -12,7 +14,6 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [isModalOpen, setIsModalOpen] = useState(false);
-
 
   return (
     <section id="hospedaje" ref={ref} className="py-24 px-6 md:px-12 bg-[#D6BFA6] text-[#3B2A22]">
@@ -122,11 +123,15 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
         </motion.div>
       </div>
 
-      <AirbnbModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        images={images}
-      />
+      <Suspense fallback={null}>
+        <AirbnbModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          images={images}
+        />
+      </Suspense>
     </section>
   );
+}
+ );
 }

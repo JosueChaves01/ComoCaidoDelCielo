@@ -3,30 +3,19 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, Calendar as CalendarIcon, Users, CheckCircle, Info, ChevronRight, ChevronLeft, CalendarClock } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
-
-interface Terrace {
-  id: string;
-  title: string;
-  description: string;
-  highlight: string;
-  image_url: string;
-  max_capacity: number;
-}
-
-interface BusinessRules {
-  adult_price: number;
-  child_price: number;
-  opening_time: string;
-  closing_time: string;
-  working_days: string[];
-}
+import { 
+  validatePhone, 
+  calculateTotalAmount, 
+  isWorkingDay, 
+  filterAvailableTerraces,
+  BusinessRules,
+  Terrace 
+} from "../../utils/reservation-logic";
 
 interface TerraceReservationModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-const DAYS_OF_WEEK = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
 export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationModalProps) {
   const [step, setStep] = useState(1);
@@ -83,16 +72,9 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
     }
   };
 
-  const isWorkingDay = (dateStr: string) => {
-    if (!rules) return true;
-    const date = new Date(dateStr + 'T12:00:00'); // Force local midday to avoid timezone shifts
-    const dayName = DAYS_OF_WEEK[date.getDay()];
-    return rules.working_days.includes(dayName);
-  };
-
   const checkAvailability = async () => {
     if (!selectedDate) return toast.error("Selecciona una fecha");
-    if (!isWorkingDay(selectedDate)) return toast.error("El local está cerrado en esa fecha según el horario.");
+    if (!isWorkingDay(selectedDate, rules)) return toast.error("El local está cerrado en esa fecha según el horario.");
     
     setIsLoading(true);
     try {
@@ -106,15 +88,9 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
       if (resError) throw resError;
       
       const bookedTerraceIds = reservations?.map(r => r.terrace_id) || [];
-      
-      // Filter terraces:
-      // 1. Not booked
-      // 2. Capacity >= total people
       const totalPeople = adultsCount + childrenCount;
-      const available = terraces.filter(t => 
-        !bookedTerraceIds.includes(t.id) && 
-        t.max_capacity >= totalPeople
-      );
+      
+      const available = filterAvailableTerraces(terraces, bookedTerraceIds, totalPeople);
 
       setAvailableTerraces(available);
       setSelectedTerrace(null);
@@ -148,15 +124,13 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
     setStep(step - 1);
   };
 
-  const totalAmount = rules ? (adultsCount * rules.adult_price) + (childrenCount * rules.child_price) : 0;
+  const totalAmount = calculateTotalAmount(adultsCount, childrenCount, rules);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone) return toast.error("Por favor, complete todos los datos requeridos.");
     
-    // Basic phone validation (CR format: 8 digits, maybe with dash/space)
-    const phoneRegex = /^(\d{4})[- ]?(\d{4})$|^(\d{8})$/;
-    if (!phoneRegex.test(phone.trim())) {
+    if (!validatePhone(phone)) {
       return toast.error("Por favor, ingrese un número de teléfono válido (8 dígitos).");
     }
     

@@ -14,11 +14,12 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-18.3.1-61DAFB?logo=react&logoColor=white" alt="React" />
-  <img src="https://img.shields.io/badge/Vite-6.3.5-646CFF?logo=vite&logoColor=white" alt="Vite" />
-  <img src="https://img.shields.io/badge/TailwindCSS-4.1.12-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind" />
-  <img src="https://img.shields.io/badge/Motion-12.23-FF4154?logo=framer&logoColor=white" alt="Motion" />
+  <img src="https://img.shields.io/badge/Vite-6.4.1-646CFF?logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/Vitest-Testing-6E9F18?logo=vitest&logoColor=white" alt="Vitest" />
+  <img src="https://img.shields.io/badge/Supabase-DB-3FCF8E?logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/n8n-Automation-FF6D5A?logo=n8n&logoColor=white" alt="n8n" />
+  <img src="https://img.shields.io/badge/TailwindCSS-4.x-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind" />
   <img src="https://img.shields.io/badge/TypeScript-TSX-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Deployed-Vercel-000000?logo=vercel&logoColor=white" alt="Vercel" />
 </p>
 
 ---
@@ -144,8 +145,11 @@ Hero (Impacto emocional)
 | **clsx** | 2.1.1 | Composición condicional de clases |
 | **tailwind-merge** | 3.2.0 | Merge inteligente de clases Tailwind |
 | **date-fns** | 3.6.0 | Manipulación de fechas |
-| **canvas-confetti** | 1.9.4 | Efectos de confetti para celebraciones |
+| **zod** | 4.3.6 | Validación de esquemas y tipos |
 | **sonner** | 2.0.3 | Sistema de notificaciones toast |
+| **canvas-confetti** | 1.9.4 | Efectos de confetti para celebraciones |
+| **vitest** | 4.1.2 | Framework de testing (Unit/Integration) |
+| **jsdom** | — | Entorno de simulación de DOM para tests |
 | **react-hook-form** | 7.55.0 | Manejo de formularios |
 | **react-router** | 7.13.0 | Enrutamiento (preparado para expansión) |
 
@@ -165,23 +169,27 @@ ComoCaidoDelCielo/
 ├── 📁 src/
 │   ├── 📄 main.tsx               # Punto de entrada de React
 │   ├── 📁 app/
-│   │   ├── 📄 App.tsx            # Componente raíz (orquesta todas las secciones)
+│   │   ├── 📄 App.tsx            # Componente raíz
 │   │   └── 📁 components/
-│   │       ├── 📄 Navbar.tsx             # Barra de navegación adaptativa
-│   │       ├── 📄 Hero.tsx               # Sección héroe con CTA
-│   │       ├── 📄 TerraceSection.tsx     # Experiencia de terrazas (4 sub-experiencias)
-│   │       ├── 📄 FoodTruckSection.tsx   # Sección gastronómica
-│   │       ├── 📄 EventsSection.tsx      # Galería de eventos
-│   │       ├── 📄 EventHallSection.tsx   # Salón de eventos privado
-│   │       ├── 📄 AirbnbSection.tsx      # Hospedaje
-│   │       ├── 📄 AirbnbModal.tsx        # Modal detallado del hospedaje
-│   │       ├── 📄 MomentsGallery.tsx     # Galería tipo masonry
-│   │       ├── 📄 InfoSection.tsx        # Información práctica
-│   │       ├── 📄 ChatAssistant.tsx      # Chatbot asistente
-│   │       ├── 📄 Footer.tsx             # Pie de página
-│   │       ├── 📁 figma/                 # Componentes generados/Figma
-│   │       │   └── ImageWithFallback.tsx  # Imagen con fallback graceful
-│   │       └── 📁 ui/                    # 48 componentes UI (shadcn/ui)
+│   │       ├── 📁 navbar/                # Nueva estructura modular
+│   │       │   ├── Navbar.tsx            # Orquestador
+│   │       │   ├── NavbarAuthPanel.tsx   # Lógica Supabase Auth
+│   │       │   └── NavbarMobileMenu.tsx  # Menú móvil animado
+│   │       ├── 📄 Hero.tsx
+│   │       ├── 📄 TerraceSection.tsx
+│   │       ├── 📄 AirbnbSection.tsx
+│   │       ├── 📄 AirbnbModal.tsx
+│   │       └── ...
+│   ├── 📁 lib/                   # Servicios Core
+│   │   ├── 📄 supabase.ts        # Cliente Supabase
+│   │   ├── 📄 errorHandler.ts    # Manejo de errores centralizado
+│   │   └── 📄 adminSchemas.ts    # Esquemas Zod
+│   ├── 📁 utils/                 # Lógica Pura (Testeable)
+│   │   ├── 📄 reservation-logic.ts
+│   │   └── 📄 reservation-logic.test.ts
+│   ├── 📁 data/                  # Single Source of Truth
+│   │   ├── 📄 airbnbData.ts
+│   │   └── 📄 terraceNarratives.ts
 │   │           ├── accordion.tsx
 │   │           ├── button.tsx
 │   │           ├── card.tsx
@@ -446,11 +454,17 @@ window.addEventListener("open-chat", handleOpenChat);
 - Gradientes de overlay para legibilidad de texto sobre imágenes
 - Backdrop blur en navbar y cards para efecto glassmorphism
 
-### Optimización de Imágenes
+### ⚙️ Automatización e Integración (n8n + Supabase)
+El proyecto utiliza un flujo de trabajo moderno para la gestión de clientes:
+- **Supabase Auth**: Autenticación Google One-Tap y OTP.
+- **n8n Webhooks**: Notificaciones automáticas de reservas y sincronización con bases de datos internas.
+- **Security hardening**: Implementación de remediaciones CAPEC para asegurar que solo webhooks autorizados interactúen con el servidor.
 
-- Imágenes del salón de eventos servidas localmente desde `/assets/SalonEventos/`
-- Imágenes externas vía CDN de Facebook (Instagram/Facebook del negocio)
-- `ImageWithFallback` component para manejo graceful de errores de carga
+### 🧪 Calidad de Código y Testing
+Alineado con los estándares de **SonarQube (Grado A)**:
+- **Pruebas Unitarias**: Suite de tests con Vitest para validaciones críticas.
+- **Desacoplamiento**: Separación estricta entre lógica de negocio (`utils/`) y presentación (`components/`).
+- **Manejo de Errores**: Servicio centralizado (`errorHandler.ts`) para una mejor observabilidad.
 
 ---
 

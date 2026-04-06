@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Calendar, Clock, Users, MapPin, Loader2, Receipt } from "lucide-react";
+import { X, Calendar, Users, MapPin, Loader2, Receipt } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../lib/useAuth";
 
@@ -61,8 +61,8 @@ export function MyReservationsModal({ isOpen, onClose }: MyReservationsModalProp
     pendiente_pago:        { label: "Pendiente de Pago",     classes: "bg-orange-500/20 text-orange-400 border-orange-500/30" },
     pendiente_cancelacion: { label: "Cancelación Pendiente", classes: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
     pendiente_reembolso:   { label: "Reembolso Pendiente",   classes: "bg-purple-500/20 text-purple-400 border-purple-500/30" },
-    aprobada:              { label: "Aprobada",              classes: "bg-green-500/20 text-green-400 border-green-500/30" },
-    confirmed:             { label: "Confirmada",            classes: "bg-green-500/20 text-green-400 border-green-500/30" },
+    aprobada:              { label: "Pago Aprobado",          classes: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
+    confirmed:             { label: "Confirmada",            classes: "bg-lime-500/20 text-lime-400 border-lime-500/30" },
     rechazada:             { label: "Rechazada",             classes: "bg-red-500/20 text-red-400 border-red-500/30" },
     cancelled:             { label: "Cancelada",             classes: "bg-red-500/20 text-red-400 border-red-500/30" },
     reembolsada:           { label: "Reembolsada",           classes: "bg-teal-500/20 text-teal-400 border-teal-500/30" },
