@@ -14,7 +14,7 @@ interface Reservation {
   status: string;
   created_at: string;
   terraces: {
-    name: string;
+    title: string;
   } | null;
 }
 
@@ -41,7 +41,7 @@ export function MyReservationsModal({ isOpen, onClose }: MyReservationsModalProp
         .from("terrace_reservations")
         .select(`
           *,
-          terraces(name)
+          terraces(title)
         `)
         .eq("customer_email", user?.email)
         .order("reservation_date", { ascending: false });
@@ -165,7 +165,7 @@ export function MyReservationsModal({ isOpen, onClose }: MyReservationsModalProp
                           <div className="flex items-center gap-2 mb-1">
                             <MapPin size={16} className="text-[#C89F6A]" />
                             <h4 className="text-lg font-serif text-white">
-                              {reservation.terraces?.name ?? "Terraza"}
+                              {reservation.terraces?.title ?? "Terraza"}
                             </h4>
                           </div>
                           <div className="flex items-center gap-2 text-sm text-[#9B8677] capitalize">
