@@ -32,13 +32,12 @@ export default function AdminLogin() {
 
   // Mostrar mensaje si fue redirigido por falta de permisos
   useEffect(() => {
-    const state = location.state as { reason?: string } | null;
-    if (state?.reason === "unauthorized") {
-      toast.error("No tienes permisos de administrador.");
-      // Limpiar el state para que no aparezca al recargar
-      window.history.replaceState({}, document.title);
+    const reason = sessionStorage.getItem("adminRedirectReason");
+    if (reason === "unauthorized") {
+      sessionStorage.removeItem("adminRedirectReason");
+      toast.error("Esta cuenta no tiene permisos de administrador.");
     }
-  }, [location.state]);
+  }, []);
 
   const handleGoogleLogin = async () => {
     setIsGoogleLoading(true);

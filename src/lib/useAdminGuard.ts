@@ -39,11 +39,14 @@ export function useAdminGuard(): AdminGuardState {
 
       if (!adminRow) {
         // Sesión válida pero no es admin: cerrar sesión y redirigir
+        // Usamos sessionStorage porque signOut() dispara onAuthStateChange(SIGNED_OUT)
+        // que sobreescribiría el navigation state antes de que AdminLogin lo lea.
+        sessionStorage.setItem("adminRedirectReason", "unauthorized");
         await supabase.auth.signOut();
         setUser(null);
         setIsAdmin(false);
         setLoading(false);
-        navigate("/admin", { replace: true, state: { reason: "unauthorized" } });
+        navigate("/admin", { replace: true });
         return;
       }
 
