@@ -15,6 +15,8 @@ export interface Terrace {
   id: string;
   title: string;
   max_capacity: number;
+  image_url?: string;
+  highlight?: string;
 }
 
 const DAYS_OF_WEEK = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];

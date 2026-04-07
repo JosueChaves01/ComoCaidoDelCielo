@@ -11,6 +11,8 @@ import {
   BusinessRules,
   Terrace 
 } from "../../utils/reservation-logic";
+import { Calendar as CalendarUI } from "./ui/calendar";
+import { es } from "date-fns/locale";
 
 interface TerraceReservationModalProps {
   isOpen: boolean;
@@ -185,10 +187,10 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="relative w-full max-w-4xl bg-[#090B10] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row z-10 max-h-[90vh]"
+        className="relative w-full max-w-6xl xl:max-w-7xl bg-[#090B10] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row z-10 max-h-[95vh] lg:h-[85vh]"
       >
         {/* Left Side / Sidebar Informational */}
-        <div className="md:w-1/3 bg-[#11141D] p-8 hidden md:flex flex-col border-r border-white/5 relative">
+        <div className="md:w-80 flex-shrink-0 bg-[#11141D] p-8 hidden md:flex flex-col border-r border-white/5 relative">
           <div className="absolute top-0 right-0 w-32 h-32 bg-[#C89F6A]/5 blur-[60px] rounded-full"></div>
           
           <h2 className="text-2xl font-light text-white mb-6">Reservar <br/><span className="text-[#C89F6A] font-medium">Terraza VIP</span></h2>
@@ -217,7 +219,7 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
         </div>
 
         {/* Right Side / Content */}
-        <div className="w-full md:w-2/3 flex flex-col h-[80vh] md:h-auto">
+        <div className="w-full flex-1 flex flex-col h-[80vh] md:h-auto overflow-hidden">
           {/* Header Mobile & Close */}
           <div className="flex justify-between items-center p-6 border-b border-white/5 relative z-20 bg-[#090B10]">
             <h3 className="text-xl text-white font-medium md:hidden">Reservación de Terraza</h3>
@@ -230,57 +232,97 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
           </div>
 
           {/* Form Area */}
-          <div className="flex-1 overflow-y-auto p-6 md:p-8 relative">
+          <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:px-10 relative">
             <AnimatePresence mode="wait">
               
               {/* ------------ STEP 1: DATE AND PEOPLE ------------ */}
               {step === 1 && (
-                <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                  <h3 className="text-2xl text-white mb-2">Cuéntanos de tu visita</h3>
-                  <p className="text-white/50 mb-8">Elige el día y cuántas personas te acompañarán.</p>
+                <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="max-w-4xl lg:max-w-5xl mx-auto mt-4 lg:mt-6">
+                  <h3 className="text-3xl lg:text-4xl font-light text-white mb-3">Cuéntanos de tu visita</h3>
+                  <p className="text-white/50 text-lg mb-10">Elige el día y cuántas personas te acompañarán.</p>
                   
-                  <div className="space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14 items-stretch">
                     {/* Fecha */}
-                    <div>
-                      <label className="block text-sm font-medium tracking-wide text-white/80 mb-3">Fecha de Reservación</label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <CalendarIcon className="h-5 w-5 text-white/40" />
-                        </div>
-                        <input
-                          type="date"
-                          min={new Date().toISOString().split('T')[0]}
-                          value={selectedDate}
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                          className="w-full bg-[#090B10] border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white focus:outline-none focus:border-[#C89F6A] transition-colors [color-scheme:dark]"
+                    <div className="flex flex-col">
+                      <label className="block text-base font-medium tracking-wide text-white/80 mb-4">Fecha de Reservación</label>
+                      <div className="bg-[#11141D] flex-1 border border-white/10 rounded-3xl p-6 md:p-8 shadow-inner relative flex flex-col items-center justify-center">
+                        <CalendarUI
+                          mode="single"
+                          locale={es}
+                          selected={selectedDate ? new Date(selectedDate + "T12:00:00") : undefined}
+                          onSelect={(date) => {
+                            if (date) {
+                              const d = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                              setSelectedDate(d.toISOString().split("T")[0]);
+                            } else {
+                              setSelectedDate("");
+                            }
+                          }}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0,0,0,0);
+                            return date < today;
+                          }}
+                          className="w-full flex justify-center text-white"
+                          classNames={{
+                            months: "w-full",
+                            month: "w-full space-y-6",
+                            caption: "flex justify-center pt-2 relative items-center w-full mb-6",
+                            caption_label: "text-xl md:text-2xl font-medium tracking-wide text-white capitalize",
+                            nav: "flex items-center gap-2",
+                            nav_button: "h-10 w-10 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center transition-colors text-white/80 hover:text-white border border-white/10",
+                            nav_button_previous: "absolute left-1",
+                            nav_button_next: "absolute right-1",
+                            table: "w-full border-collapse",
+                            head_row: "w-full grid grid-cols-7 mb-4",
+                            head_cell: "text-white/40 font-medium text-[0.8rem] md:text-sm uppercase tracking-wider text-center flex items-center justify-center",
+                            row: "w-full grid grid-cols-7 mt-2 md:mt-3",
+                            cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 w-full flex justify-center items-center",
+                            day: "h-11 w-11 md:h-12 md:w-12 lg:h-14 lg:w-14 p-0 md:text-lg font-normal hover:bg-white/10 rounded-full transition-colors flex items-center justify-center mx-auto",
+                            day_selected: "bg-[#C89F6A] text-black hover:bg-[#D5B285] hover:text-black font-semibold shadow-[0_2px_15px_rgba(200,159,106,0.35)] scale-110",
+                            day_today: "bg-[#C89F6A]/20 text-[#C89F6A]",
+                            day_outside: "text-white/20 opacity-30",
+                            day_disabled: "text-white/10 cursor-not-allowed",
+                          }}
                         />
                       </div>
-                      {selectedDate && !isWorkingDay(selectedDate) && (
-                        <p className="text-red-400 text-sm mt-2 flex items-center gap-1">
-                          <X className="w-4 h-4" /> Cerramos este día. Por favor elige otro.
-                        </p>
+                      {selectedDate && !isWorkingDay(selectedDate, rules) && (
+                        <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-red-400 text-sm md:text-base mt-4 flex items-center gap-2 bg-red-400/10 border border-red-400/20 p-4 rounded-xl">
+                          <X className="w-5 h-5 flex-shrink-0" /> Local cerrado en esta fecha.
+                        </motion.p>
                       )}
                     </div>
 
                     {/* Personas */}
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Adultos</label>
-                        <div className="flex bg-[#11141D] border border-white/10 rounded-xl overflow-hidden">
-                          <button type="button" onClick={() => setAdultsCount(Math.max(1, adultsCount - 1))} className="w-12 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 text-xl">-</button>
-                          <div className="flex-1 text-center py-3.5 text-white">{adultsCount}</div>
-                          <button type="button" onClick={() => setAdultsCount(adultsCount + 1)} className="w-12 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 text-xl">+</button>
+                    <div className="flex flex-col">
+                      <label className="block text-base font-medium tracking-wide text-white/80 mb-4">Acompañantes</label>
+                      <div className="bg-[#11141D] flex-1 border border-white/10 rounded-3xl p-8 lg:p-10 flex flex-col justify-center">
+                        
+                        <div className="space-y-10 flex-1 flex flex-col justify-center">
+                          <div>
+                            <div className="flex justify-between items-center mb-4">
+                              <span className="text-white font-medium text-lg lg:text-xl">Adultos</span>
+                              {rules && <span className="text-sm font-semibold text-[#C89F6A]">₡{rules.adult_price.toLocaleString()} c/u</span>}
+                            </div>
+                            <div className="flex items-center bg-[#090B10] border border-white/10 rounded-2xl overflow-hidden p-1.5 shadow-inner h-16 md:h-20">
+                              <button type="button" onClick={() => setAdultsCount(Math.max(1, adultsCount - 1))} className="h-full w-16 md:w-20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded-xl text-3xl font-light transition-colors">-</button>
+                              <div className="flex-1 text-center font-medium text-2xl md:text-3xl text-white">{adultsCount}</div>
+                              <button type="button" onClick={() => setAdultsCount(adultsCount + 1)} className="h-full w-16 md:w-20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded-xl text-3xl font-light transition-colors">+</button>
+                            </div>
+                          </div>
+                          
+                          <div className="pt-8 border-t border-white/5">
+                            <div className="flex justify-between items-center mb-4">
+                              <span className="text-white font-medium text-lg lg:text-xl">Niños</span>
+                              {rules && <span className="text-sm font-semibold text-[#C89F6A]">₡{rules.child_price.toLocaleString()} c/u</span>}
+                            </div>
+                            <div className="flex items-center bg-[#090B10] border border-white/10 rounded-2xl overflow-hidden p-1.5 shadow-inner h-16 md:h-20">
+                              <button type="button" onClick={() => setChildrenCount(Math.max(0, childrenCount - 1))} className="h-full w-16 md:w-20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded-xl text-3xl font-light transition-colors">-</button>
+                              <div className="flex-1 text-center font-medium text-2xl md:text-3xl text-white">{childrenCount}</div>
+                              <button type="button" onClick={() => setChildrenCount(childrenCount + 1)} className="h-full w-16 md:w-20 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 rounded-xl text-3xl font-light transition-colors">+</button>
+                            </div>
+                          </div>
                         </div>
-                        {rules && <p className="text-xs text-white/30 text-center mt-2">₡{rules.adult_price.toLocaleString()} c/u</p>}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium tracking-wide text-white/80 mb-2">Niños</label>
-                        <div className="flex bg-[#11141D] border border-white/10 rounded-xl overflow-hidden">
-                          <button type="button" onClick={() => setChildrenCount(Math.max(0, childrenCount - 1))} className="w-12 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 text-xl">-</button>
-                          <div className="flex-1 text-center py-3.5 text-white">{childrenCount}</div>
-                          <button type="button" onClick={() => setChildrenCount(childrenCount + 1)} className="w-12 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/5 text-xl">+</button>
-                        </div>
-                        {rules && <p className="text-xs text-white/30 text-center mt-2">₡{rules.child_price.toLocaleString()} c/u</p>}
                       </div>
                     </div>
                   </div>
@@ -291,37 +333,67 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
               {step === 2 && (
                 <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                   <h3 className="text-2xl text-white mb-2">Terrazas Disponibles</h3>
-                  <p className="text-white/50 mb-6">Encontramos {availableTerraces.length} opcion(es) con capacidad para {adultsCount + childrenCount} personas el {selectedDate}.</p>
+                  <p className="text-white/50 mb-6">Encontramos {availableTerraces.length} opcion(es) con capacidad apta el {selectedDate}.</p>
                   
                   {availableTerraces.length === 0 ? (
-                    <div className="p-8 border border-white/10 rounded-2xl bg-white/5 text-center flex flex-col items-center">
+                    <div className="p-8 border border-white/10 rounded-2xl bg-white/5 text-center flex flex-col items-center max-w-2xl mx-auto">
                       <CalendarClock className="w-12 h-12 text-white/20 mb-4" />
                       <p className="text-white font-medium mb-1">Todas ocupadas o capacidad insuficiente</p>
                       <p className="text-white/50 text-sm">Por favor, regresa e intenta con otra fecha o menos personas.</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                       {availableTerraces.map((terrace) => (
                         <div
                           key={terrace.id}
-                          className={`relative rounded-xl overflow-hidden cursor-pointer border-2 transition-all ${selectedTerrace?.id === terrace.id ? 'border-[#C89F6A] shadow-[0_0_15px_rgba(200,159,106,0.3)]' : 'border-white/5 hover:border-white/20'}`}
+                          className={`relative flex flex-col bg-[#11141D] p-5 rounded-2xl cursor-pointer border-2 transition-all ${selectedTerrace?.id === terrace.id ? 'border-[#C89F6A] shadow-[0_4px_25px_rgba(200,159,106,0.2)] bg-[#C89F6A]/5' : 'border-white/5 hover:border-white/20 hover:bg-white/5'}`}
                           onClick={() => setSelectedTerrace(terrace)}
                         >
-                          <div className="h-32 relative">
-                            <img src={terrace.image_url} alt={terrace.title} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                            {selectedTerrace?.id === terrace.id && (
-                              <div className="absolute top-2 right-2 bg-[#C89F6A] text-black w-6 h-6 rounded-full flex items-center justify-center">
-                                <CheckCircle size={14} />
-                              </div>
-                            )}
-                            <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/60 px-2 py-1 rounded text-xs text-white/80">
-                              <Users size={12} /> Máx {terrace.max_capacity}
+                          {/* Top: Nombre and Capacidad boxes */}
+                          <div className="flex justify-between items-center mb-4 truncate gap-2">
+                            <div className="border border-white/20 bg-[#090B10] px-4 py-2 rounded-lg text-white font-medium text-sm truncate max-w-[65%] shadow-sm">
+                              {terrace.title}
+                            </div>
+                            <div className="flex-shrink-0 border border-white/20 bg-[#090B10] px-3 py-2 rounded-lg text-white/80 text-xs font-medium flex items-center gap-1.5 shadow-sm">
+                              <Users size={14} className="text-[#C89F6A]" /> {terrace.highlight ? terrace.highlight : `Capacidad ${terrace.max_capacity}`}
                             </div>
                           </div>
-                          <div className="p-4 bg-[#11141D]">
-                            <p className="text-[#C89F6A] text-xs font-bold uppercase tracking-wider mb-1 truncate">{terrace.highlight}</p>
-                            <h4 className="text-white font-medium truncate">{terrace.title}</h4>
+
+                          {/* Middle: IMG */}
+                          <div className="h-40 relative rounded-xl border border-white/10 overflow-hidden mb-5">
+                            <img src={terrace.image_url} alt={terrace.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#11141D]/80 via-transparent to-transparent" />
+                            {selectedTerrace?.id === terrace.id && (
+                              <div className="absolute top-3 right-3 bg-[#C89F6A] text-black w-7 h-7 rounded-full flex items-center justify-center shadow-lg">
+                                <CheckCircle size={16} />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Bottom: Week days styled like the mockup */}
+                          <div className="flex flex-col gap-2 mt-auto">
+                            <div className="flex justify-center gap-2 w-full">
+                              {['Lunes', 'Martes', 'Miercoles', 'Jueves'].map(day => {
+                                const checkDay = day === 'Miercoles' ? 'Miércoles' : day;
+                                const isWorking = rules?.working_days?.includes(checkDay);
+                                return (
+                                  <span key={day} className={`flex-1 text-center text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold px-0 py-1.5 rounded-md border transition-colors ${isWorking ? 'bg-[#2E7D32]/20 text-green-400 border-green-500/30' : 'bg-[#D32F2F]/20 text-red-400 border-red-500/30'}`}>
+                                    {day}
+                                  </span>
+                                )
+                              })}
+                            </div>
+                            <div className="flex justify-center gap-2 w-full px-6">
+                              {['Viernes', 'Sabado', 'Domingo'].map(day => {
+                                const checkDay = day === 'Sabado' ? 'Sábado' : day;
+                                const isWorking = rules?.working_days?.includes(checkDay);
+                                return (
+                                  <span key={day} className={`flex-1 text-center text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold px-0 py-1.5 rounded-md border transition-colors ${isWorking ? 'bg-[#2E7D32]/20 text-green-400 border-green-500/30' : 'bg-[#D32F2F]/20 text-red-400 border-red-500/30'}`}>
+                                    {day}
+                                  </span>
+                                )
+                              })}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -402,7 +474,7 @@ export function TerraceReservationModal({ isOpen, onClose }: TerraceReservationM
                   onClick={handleNextStep}
                   disabled={
                     isLoading || 
-                    (step === 1 && (!selectedDate || !isWorkingDay(selectedDate))) || 
+                    (step === 1 && (!selectedDate || !isWorkingDay(selectedDate, rules))) || 
                     (step === 2 && !selectedTerrace)
                   }
                   className="flex-1 px-8 py-4 bg-[#C89F6A] text-black font-semibold rounded-xl hover:bg-[#D5B285] transition-colors flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(200,159,106,0.3)] disabled:opacity-50"
