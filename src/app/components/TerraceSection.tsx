@@ -1,14 +1,12 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef, useState, useEffect, Suspense, lazy } from "react";
+import { useRef, useState, useEffect } from "react";
 import BackgroundEffectLocal from "./BackgroundEffectLocal";
 import { supabase } from "../../lib/supabase";
 
-// Lazy loading the heavy reservation modal
-const TerraceReservationModal = lazy(() => import("./TerraceReservationModal").then(m => ({ default: m.TerraceReservationModal })));
-
 interface TerraceSectionProps {
   images: { description: string; url: string }[];
+  onOpenReservation?: () => void;
 }
 
 import {
@@ -25,11 +23,11 @@ import {
 
 export function TerraceSection({
   images,
+  onOpenReservation,
 }: TerraceSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [dbTerraces, setDbTerraces] = useState<any[]>([]);
-  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -96,7 +94,7 @@ export function TerraceSection({
             lugar perfecto, en el momento perfecto.
           </p>
           <button
-            onClick={() => setIsReservationModalOpen(true)}
+            onClick={onOpenReservation}
             className="px-8 py-4 bg-gradient-to-r from-[#B1630A] to-[#C89F6A] text-white font-bold rounded-xl hover:shadow-[0_4px_20px_rgba(200,159,106,0.4)] transition-all hover:-translate-y-1 transform uppercase tracking-widest text-sm"
           >
             Ver Disponibilidad y Reservar
@@ -494,13 +492,6 @@ export function TerraceSection({
           </div>
         </motion.div>
       </div>
-
-      <Suspense fallback={null}>
-        <TerraceReservationModal
-          isOpen={isReservationModalOpen}
-          onClose={() => setIsReservationModalOpen(false)}
-        />
-      </Suspense>
     </section>
   );
 }

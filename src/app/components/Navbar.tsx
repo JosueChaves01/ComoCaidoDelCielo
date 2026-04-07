@@ -7,7 +7,7 @@ import { MyReservationsModal } from "./MyReservationsModal";
 import { NavbarAuthPanel } from "./navbar/NavbarAuthPanel";
 import { NavbarMobileMenu } from "./navbar/NavbarMobileMenu";
 
-export function Navbar() {
+export function Navbar({ onOpenReservation }: { onOpenReservation?: () => void }) {
   const { user, loading } = useAuth();
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -109,6 +109,7 @@ export function Navbar() {
               <NavbarAuthPanel onShowReservations={() => setShowMyReservations(true)} />
 
               <button
+                onClick={onOpenReservation}
                 className="px-8 py-2.5 rounded-full bg-[#C89F6A] text-black text-sm font-bold tracking-widest uppercase hover:scale-105 hover:bg-[#D4A574] transition-all shadow-[0_0_20px_rgba(200,159,106,0.2)]"
               >
                 Reservar
@@ -137,6 +138,7 @@ export function Navbar() {
         onGoogleSignIn={handleGoogleSignIn}
         onSignOut={handleSignOut}
         authLoading={authLoading}
+        onOpenReservation={onOpenReservation}
       />
 
       <MyReservationsModal 

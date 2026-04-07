@@ -27,6 +27,7 @@ interface NavbarMobileMenuProps {
   onGoogleSignIn: () => void;
   onSignOut: () => void;
   authLoading: boolean;
+  onOpenReservation?: () => void;
 }
 
 export function NavbarMobileMenu({
@@ -38,6 +39,7 @@ export function NavbarMobileMenu({
   onGoogleSignIn,
   onSignOut,
   authLoading,
+  onOpenReservation,
 }: NavbarMobileMenuProps) {
   const { user, loading } = useAuth();
   const displayName = user?.user_metadata?.name ?? user?.email?.split("@")[0] ?? "";
@@ -87,7 +89,13 @@ export function NavbarMobileMenu({
               transition={{ delay: 0.5, duration: 0.5 }}
               className="pt-10 w-full flex flex-col items-center gap-4"
             >
-              <button className="w-full max-w-[280px] px-10 py-4 bg-[#C89F6A] text-black font-bold tracking-widest uppercase rounded-full shadow-[0_15px_30px_rgba(200,159,106,0.2)]">
+              <button 
+                onClick={() => {
+                  onClose();
+                  onOpenReservation?.();
+                }}
+                className="w-full max-w-[280px] px-10 py-4 bg-[#C89F6A] text-black font-bold tracking-widest uppercase rounded-full shadow-[0_15px_30px_rgba(200,159,106,0.2)]"
+              >
                 Reservar Ahora
               </button>
 

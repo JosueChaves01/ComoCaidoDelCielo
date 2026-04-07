@@ -3,9 +3,10 @@ import { ArrowDown } from "lucide-react";
 
 interface HeroProps {
   imageUrl: string;
+  onOpenReservation?: () => void;
 }
 
-export function Hero({ imageUrl }: HeroProps) {
+export function Hero({ imageUrl, onOpenReservation }: HeroProps) {
   return (
     <section className="relative h-screen w-full overflow-hidden">
       {/* Background Image */}
@@ -50,10 +51,16 @@ export function Hero({ imageUrl }: HeroProps) {
             transition={{ duration: 0.8, delay: 0.9 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <button className="px-8 py-4 bg-[#8B6F47] text-white rounded-full hover:bg-[#6B5337] transition-all hover:shadow-2xl transform hover:scale-105">
+            <button 
+              onClick={() => document.getElementById('terrazas')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-8 py-4 bg-[#8B6F47] text-white rounded-full hover:bg-[#6B5337] transition-all hover:shadow-2xl transform hover:scale-105"
+            >
               Explorar la experiencia
             </button>
-            <button className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-full border-2 border-white/40 hover:bg-white/20 transition-all">
+            <button 
+              onClick={onOpenReservation}
+              className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-full border-2 border-white/40 hover:bg-white/20 transition-all"
+            >
               Consultar disponibilidad
             </button>
           </motion.div>

@@ -9,8 +9,10 @@ import { InfoSection } from "../components/InfoSection";
 import { Footer } from "../components/Footer";
 import { ChatAssistant } from "../components/ChatAssistant";
 import { Navbar } from "../components/Navbar";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { supabase } from "../../lib/supabase";
+
+const TerraceReservationModal = lazy(() => import("../components/TerraceReservationModal").then(m => ({ default: m.TerraceReservationModal })));
 
 const fallbackMainEvents: MainEvent[] = [
   {
@@ -57,6 +59,7 @@ const fallbackUpcomingPosters: UpcomingEvent[] = [
 export function Landing() {
   const [mainEvents, setMainEvents] = useState<MainEvent[]>(fallbackMainEvents);
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>(fallbackUpcomingPosters);
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -179,9 +182,15 @@ export function Landing() {
 
   return (
     <div className="overflow-x-hidden">
-      <Navbar />
-      <Hero imageUrl={heroImage} />
-      <TerraceSection images={terraceImages} />
+      <Navbar onOpenReservation={() => setIsReservationModalOpen(true)} />
+      <Hero 
+        imageUrl={heroImage} 
+        onOpenReservation={() => setIsReservationModalOpen(true)} 
+      />
+      <TerraceSection 
+        images={terraceImages} 
+        onOpenReservation={() => setIsReservationModalOpen(true)} 
+      />
       <EventsSection mainEvents={mainEvents} upcomingPosters={upcomingEvents} />
       <EventHallSection images={eventHallImages} />
       <FoodTruckSection images={foodTruckImages.map(img => img.url)} />
@@ -190,6 +199,13 @@ export function Landing() {
       <InfoSection />
       <Footer />
       <ChatAssistant />
+      
+      <Suspense fallback={null}>
+        <TerraceReservationModal
+          isOpen={isReservationModalOpen}
+          onClose={() => setIsReservationModalOpen(false)}
+        />
+      </Suspense>
     </div>
   );
 }
