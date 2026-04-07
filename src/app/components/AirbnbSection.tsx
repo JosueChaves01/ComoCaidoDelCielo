@@ -133,5 +133,3 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
     </section>
   );
 }
- );
-}
