@@ -132,4 +132,4 @@ export function AirbnbSection({ images }: AirbnbSectionProps) {
       </Suspense>
     </section>
   );
-}
+}

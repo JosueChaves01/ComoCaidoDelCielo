@@ -168,8 +168,8 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
                     </div>
                   </motion.div>
                 ))}
-                {/* Mobile Menu Button CTA */}
-                <div className="md:hidden pt-8">
+                {/* Menu Button CTA */}
+                <div className="pt-8">
                   <button
                     onClick={() => setIsModalOpen(true)}
                     className="w-full py-5 bg-[#C89F6A] text-black font-bold tracking-widest uppercase rounded-2xl shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform"
@@ -188,24 +188,18 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="order-1 md:order-2 relative h-[500px] md:h-[700px] md:sticky md:top-8"
             >
-              <div className="relative h-full rounded-3xl overflow-hidden shadow-2xl group border border-white/5 cursor-pointer" onClick={() => setIsModalOpen(true)}>
+              <div className="relative h-full rounded-3xl overflow-hidden shadow-2xl group border border-white/5">
                 <img
                   src={images[0]}
                   alt="Food truck con gastronomía artesanal"
                   className="w-full h-full object-cover group-hover:scale-110 md:group-hover:blur-[2px] transition-all duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-100 md:opacity-0 transition-opacity duration-300 flex flex-col justify-end p-8">
                   <p className="text-sm tracking-wider mb-2 text-[#C89F6A] font-bold uppercase">
                     Rincón del Atardecer
                   </p>
                   <h4 className="text-3xl font-serif text-white mb-2">Nuestro Menú</h4>
-                  <p className="text-white/70 text-sm mb-6 max-w-xs md:hidden">Toca para explorar todas nuestras opciones gastronómicas.</p>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }}
-                    className="px-8 py-4 bg-[#C89F6A] text-black font-bold rounded-full hover:bg-[#D4A574] transition-all self-start shadow-lg"
-                  >
-                    Ver menú completo
-                  </button>
+                  <p className="text-white/70 text-sm mb-6 max-w-xs md:hidden">Usa el botón de abajo para explorar todas nuestras opciones gastronómicas.</p>
                 </div>
               </div>
             </motion.div>
