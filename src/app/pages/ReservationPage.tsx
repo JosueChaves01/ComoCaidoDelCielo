@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Calendar as CalendarIcon, Users, CheckCircle, ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
+import { Calendar as CalendarIcon, Users, CheckCircle, ChevronRight, ChevronLeft, ArrowLeft, Info } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
 import {
@@ -183,65 +183,103 @@ export default function ReservationPage() {
 
         {/* ---- LEFT SIDEBAR: Progress ---- */}
         {step < 4 && (
-          <aside className="lg:w-72 flex-shrink-0">
+          <aside className="lg:w-80 flex-shrink-0">
             {/* Progress steps */}
-            <div className="hidden lg:block sticky top-10">
-              <h2 className="text-2xl font-light text-white mb-2">Tu <span className="text-[#C89F6A] font-medium">Reservación</span></h2>
-              <p className="text-white/40 text-sm mb-10">Completa los pasos para asegurar tu lugar.</p>
-              <div className="space-y-4">
+            <div className="hidden lg:block sticky top-10 space-y-8">
+              <div className="px-2">
+                <h2 className="text-3xl font-light text-white mb-2 leading-tight">
+                  Tu <span className="text-[#C89F6A] font-medium italic">Experiencia</span>
+                </h2>
+                <p className="text-white/40 text-sm leading-relaxed">Personaliza cada detalle de tu visita a la cima.</p>
+              </div>
+
+              <div className="space-y-3">
                 {STEPS.map((s) => (
                   <div
                     key={s.num}
-                    className={`flex items-center gap-4 p-4 rounded-2xl border transition-all duration-300 ${
+                    className={`group relative flex items-center gap-4 p-5 rounded-2xl border transition-all duration-500 overflow-hidden ${
                       step === s.num
-                        ? 'bg-[#C89F6A]/10 border-[#C89F6A]/40 shadow-[0_4px_20px_rgba(200,159,106,0.1)]'
+                        ? 'bg-[#11141D] border-[#C89F6A]/40 shadow-[0_10px_30px_rgba(0,0,0,0.3)]'
                         : step > s.num
-                        ? 'bg-white/3 border-white/10'
-                        : 'border-white/5 opacity-40'
+                        ? 'bg-transparent border-white/5 opacity-80'
+                        : 'bg-transparent border-white/5 opacity-40'
                     }`}
                   >
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold transition-all ${
+                    {/* Active Indicator Glow */}
+                    {step === s.num && (
+                      <div className="absolute inset-y-0 left-0 w-1 bg-[#C89F6A] shadow-[0_0_15px_rgba(200,159,106,0.5)]" />
+                    )}
+
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold transition-all duration-500 ${
                       step > s.num
                         ? 'bg-green-500/20 border border-green-500/40 text-green-400'
                         : step === s.num
-                        ? 'bg-[#C89F6A] text-black'
+                        ? 'bg-[#C89F6A] text-black scale-110 shadow-lg'
                         : 'bg-white/5 text-white/40 border border-white/10'
                     }`}>
-                      {step > s.num ? <CheckCircle size={16} /> : s.num}
+                      {step > s.num ? <CheckCircle size={18} /> : s.num}
                     </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-widest font-bold text-white/40 mb-0.5">Paso {s.num}</p>
-                      <p className={`font-medium ${step >= s.num ? 'text-white' : 'text-white/40'}`}>{s.label}</p>
+
+                    <div className="flex-1">
+                      <p className={`text-[10px] uppercase tracking-[0.2em] font-bold mb-0.5 transition-colors ${step >= s.num ? 'text-[#C89F6A]' : 'text-white/20'}`}>
+                        Paso {s.num}
+                      </p>
+                      <p className={`text-base font-medium transition-colors ${step >= s.num ? 'text-white' : 'text-white/40'}`}>
+                        {s.label}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Summary card (visible after step 1) */}
+              {/* Summary card (Premium style) */}
               {(adultsCount > 1 || childrenCount > 0) && step > 1 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-8 p-5 rounded-2xl bg-[#11141D] border border-white/10"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-6 rounded-3xl bg-gradient-to-br from-[#11141D] to-[#090B10] border border-white/10 shadow-2xl relative overflow-hidden"
                 >
-                  <p className="text-xs uppercase tracking-widest text-white/40 mb-3 font-medium">Tu visita</p>
-                  <div className="flex gap-4 text-sm">
-                    <span className="flex items-center gap-1.5 text-white/70"><Users size={14} className="text-[#C89F6A]" /> {adultsCount} adulto{adultsCount !== 1 ? 's' : ''}</span>
-                    {childrenCount > 0 && <span className="flex items-center gap-1.5 text-white/70"><Users size={14} /> {childrenCount} niño{childrenCount !== 1 ? 's' : ''}</span>}
+                  <div className="absolute top-0 right-0 p-3 opacity-10">
+                    <Users size={48} className="text-white" />
                   </div>
-                  {rules && (
-                    <p className="text-[#C89F6A] font-semibold mt-3 text-lg">₡{totalAmount.toLocaleString()}</p>
-                  )}
+                  
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#C89F6A] mb-4 font-bold">Resumen Actual</p>
+                  
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-white/50">Visitantes</span>
+                      <span className="text-white font-medium">
+                        {adultsCount + childrenCount} personas
+                      </span>
+                    </div>
+                    {selectedTerrace && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-white/50">Ubicación</span>
+                        <span className="text-white font-medium truncate ml-4 text-right">
+                          {selectedTerrace.title}
+                        </span>
+                      </div>
+                    )}
+                    <div className="pt-3 mt-3 border-t border-white/5 flex justify-between items-baseline">
+                      <span className="text-white/50 text-xs">Total</span>
+                      <span className="text-2xl font-semibold text-white tracking-tight">
+                        ₡{totalAmount.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
                 </motion.div>
               )}
             </div>
 
-            {/* Mobile: horizontal stepper */}
-            <div className="flex lg:hidden items-center justify-center gap-2 mb-6">
+            {/* Mobile: horizontal stepper - refined */}
+            <div className="flex lg:hidden items-center justify-center gap-3 mb-10 px-2">
               {STEPS.map((s, i) => (
                 <React.Fragment key={s.num}>
-                  <div className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step > s.num ? 'bg-green-500' : step === s.num ? 'bg-[#C89F6A]' : 'bg-white/10'}`} />
-                  {i < STEPS.length - 1 && <div className="w-1" />}
+                  <div className={`h-1.5 flex-1 rounded-full transition-all duration-700 ${
+                    step > s.num ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]' : 
+                    step === s.num ? 'bg-[#C89F6A] shadow-[0_0_15px_rgba(200,159,106,0.3)]' : 
+                    'bg-white/10'
+                  }`} />
                 </React.Fragment>
               ))}
             </div>
@@ -254,50 +292,98 @@ export default function ReservationPage() {
 
             {/* ===== STEP 1: PERSONAS ===== */}
             {step === 1 && (
-              <motion.div key="step1" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                <h2 className="text-3xl lg:text-4xl font-light text-white mb-3">¿Cuántas personas <span className="text-[#C89F6A]">asistirán?</span></h2>
-                <p className="text-white/40 mb-10">Selecciona el aforo para encontrar la terraza perfecta para tu grupo.</p>
+              <motion.div 
+                key="step1" 
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                exit={{ opacity: 0, y: -10 }}
+                className="max-w-4xl"
+              >
+                <h2 className="text-4xl lg:text-5xl font-light text-white mb-4">
+                  ¿Cuántas personas <span className="text-[#C89F6A] font-medium italic">asistirán?</span>
+                </h2>
+                <p className="text-white/40 text-lg mb-12 max-w-2xl">
+                  Selecciona el número de invitados para que podamos mostrarte las terrazas que mejor se adaptan a tu grupo.
+                </p>
 
-                <div className="max-w-lg space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                   {/* Adults */}
-                  <div className="bg-[#11141D] border border-white/10 rounded-2xl p-6">
-                    <div className="flex justify-between items-center mb-5">
+                  <div className="group bg-[#11141D] border border-white/10 rounded-3xl p-8 hover:border-[#C89F6A]/30 transition-all duration-500 shadow-xl">
+                    <div className="flex justify-between items-start mb-8">
                       <div>
-                        <p className="text-white font-medium text-lg">Adultos</p>
+                        <p className="text-white font-serif text-2xl mb-1">Adultos</p>
                         <p className="text-white/40 text-sm">Mayores de 12 años</p>
                       </div>
-                      {rules && <span className="text-[#C89F6A] font-medium text-sm bg-[#C89F6A]/10 px-3 py-1 rounded-full border border-[#C89F6A]/20">₡{rules.adult_price.toLocaleString()} c/u</span>}
+                      {rules && (
+                        <div className="bg-[#C89F6A]/10 px-4 py-2 rounded-2xl border border-[#C89F6A]/20">
+                          <p className="text-[#C89F6A] text-xs uppercase tracking-widest font-bold mb-0.5">Precio</p>
+                          <p className="text-white font-medium">₡{rules.adult_price.toLocaleString()}</p>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center bg-[#090B10] rounded-xl p-1.5 border border-white/10">
-                      <button onClick={() => setAdultsCount(Math.max(1, adultsCount - 1))} className="w-12 h-12 text-2xl text-white/50 hover:text-white transition-colors rounded-lg hover:bg-white/5">−</button>
-                      <div className="flex-1 text-center text-2xl text-white font-medium">{adultsCount}</div>
-                      <button onClick={() => setAdultsCount(adultsCount + 1)} className="w-12 h-12 text-2xl text-white/50 hover:text-white transition-colors rounded-lg hover:bg-white/5">+</button>
+                    
+                    <div className="flex items-center justify-between bg-[#090B10] rounded-2xl p-2 border border-white/5 shadow-inner">
+                      <button 
+                        onClick={() => setAdultsCount(Math.max(1, adultsCount - 1))} 
+                        className="w-14 h-14 text-2xl text-white/40 hover:text-[#C89F6A] hover:bg-white/5 rounded-xl transition-all"
+                      >
+                        −
+                      </button>
+                      <div className="text-3xl text-white font-light tracking-tighter w-16 text-center">
+                        {adultsCount}
+                      </div>
+                      <button 
+                        onClick={() => setAdultsCount(adultsCount + 1)} 
+                        className="w-14 h-14 text-2xl text-white/40 hover:text-[#C89F6A] hover:bg-white/5 rounded-xl transition-all"
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
 
                   {/* Children */}
-                  <div className="bg-[#11141D] border border-white/10 rounded-2xl p-6">
-                    <div className="flex justify-between items-center mb-5">
+                  <div className="group bg-[#11141D] border border-white/10 rounded-3xl p-8 hover:border-[#C89F6A]/30 transition-all duration-500 shadow-xl">
+                    <div className="flex justify-between items-start mb-8">
                       <div>
-                        <p className="text-white font-medium text-lg">Niños</p>
-                        <p className="text-white/40 text-sm">Menores de 12 años</p>
+                        <p className="text-white font-serif text-2xl mb-1">Niños</p>
+                        <p className="text-white/40 text-sm">De 3 a 12 años</p>
                       </div>
-                      {rules && <span className="text-[#C89F6A] font-medium text-sm bg-[#C89F6A]/10 px-3 py-1 rounded-full border border-[#C89F6A]/20">₡{rules.child_price.toLocaleString()} c/u</span>}
+                      {rules && (
+                        <div className="bg-[#C89F6A]/10 px-4 py-2 rounded-2xl border border-[#C89F6A]/20">
+                          <p className="text-[#C89F6A] text-xs uppercase tracking-widest font-bold mb-0.5">Precio</p>
+                          <p className="text-white font-medium">₡{rules.child_price.toLocaleString()}</p>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center bg-[#090B10] rounded-xl p-1.5 border border-white/10">
-                      <button onClick={() => setChildrenCount(Math.max(0, childrenCount - 1))} className="w-12 h-12 text-2xl text-white/50 hover:text-white transition-colors rounded-lg hover:bg-white/5">−</button>
-                      <div className="flex-1 text-center text-2xl text-white font-medium">{childrenCount}</div>
-                      <button onClick={() => setChildrenCount(childrenCount + 1)} className="w-12 h-12 text-2xl text-white/50 hover:text-white transition-colors rounded-lg hover:bg-white/5">+</button>
+                    
+                    <div className="flex items-center justify-between bg-[#090B10] rounded-2xl p-2 border border-white/5 shadow-inner">
+                      <button 
+                        onClick={() => setChildrenCount(Math.max(0, childrenCount - 1))} 
+                        className="w-14 h-14 text-2xl text-white/40 hover:text-[#C89F6A] hover:bg-white/5 rounded-xl transition-all"
+                      >
+                        −
+                      </button>
+                      <div className="text-3xl text-white font-light tracking-tighter w-16 text-center">
+                        {childrenCount}
+                      </div>
+                      <button 
+                        onClick={() => setChildrenCount(childrenCount + 1)} 
+                        className="w-14 h-14 text-2xl text-white/40 hover:text-[#C89F6A] hover:bg-white/5 rounded-xl transition-all"
+                      >
+                        +
+                      </button>
                     </div>
                   </div>
+                </div>
 
-                  {/* Total preview */}
-                  {rules && (
-                    <div className="flex justify-between items-center px-2 text-lg">
-                      <span className="text-white/60">Total estimado</span>
-                      <span className="text-[#C89F6A] font-bold">₡{totalAmount.toLocaleString()}</span>
-                    </div>
-                  )}
+                {/* Info Card */}
+                <div className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 border border-white/5 mb-12">
+                  <div className="w-10 h-10 rounded-full bg-[#C89F6A]/20 flex items-center justify-center flex-shrink-0">
+                    <Info size={20} className="text-[#C89F6A]" />
+                  </div>
+                  <p className="text-white/60 text-sm leading-relaxed">
+                    Reservando tu terraza aseguras un espacio privado con la mejor vista. Niños menores de 3 años no pagan entrada.
+                  </p>
                 </div>
               </motion.div>
             )}
@@ -508,48 +594,45 @@ export default function ReservationPage() {
           {/* ---- BOTTOM ACTION BAR ---- */}
           {step < 4 && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex gap-4 mt-10 pt-8 border-t border-white/5"
+              className="flex flex-col sm:flex-row gap-4 mt-6 pt-10 border-t border-white/5"
             >
               {step > 1 && (
                 <button
                   type="button"
                   onClick={handlePrevStep}
                   disabled={isLoading}
-                  className="px-6 py-4 flex items-center gap-2 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl transition-colors disabled:opacity-50"
+                  className="px-8 py-5 flex items-center justify-center gap-3 text-white font-medium bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all duration-300 disabled:opacity-50 group hover:shadow-xl"
                 >
-                  <ChevronLeft size={18} /> Atrás
+                  <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" /> 
+                  <span className="tracking-wide uppercase text-sm">Volver al paso {step - 1}</span>
                 </button>
               )}
 
-              {step < 3 ? (
-                <button
-                  type="button"
-                  onClick={handleNextStep}
-                  disabled={isLoading || (step === 2 && (!selectedTerrace || !selectedDate))}
-                  className="flex-1 px-8 py-4 bg-[#C89F6A] text-black font-semibold rounded-xl hover:bg-[#D5B285] transition-colors flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(200,159,106,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  ) : (
-                    <>Continuar <ChevronRight size={18} /></>
-                  )}
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  form="reservation-form"
-                  disabled={isLoading}
-                  className="flex-1 px-8 py-4 bg-[#C89F6A] text-black font-semibold rounded-xl hover:bg-[#D5B285] transition-colors flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(200,159,106,0.3)] disabled:opacity-50"
-                >
-                  {isLoading ? (
-                    <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  ) : (
-                    `Confirmar por ₡${totalAmount.toLocaleString()}`
-                  )}
-                </button>
-              )}
+              <button
+                type={step === 3 ? "submit" : "button"}
+                form={step === 3 ? "reservation-form" : undefined}
+                onClick={step === 3 ? undefined : handleNextStep}
+                disabled={isLoading || (step === 2 && (!selectedTerrace || !selectedDate))}
+                className={`flex-1 group relative px-10 py-5 rounded-2xl font-bold tracking-[0.15em] uppercase text-sm flex items-center justify-center gap-3 transition-all duration-500 overflow-hidden shadow-2xl ${
+                  isLoading || (step === 2 && (!selectedTerrace || !selectedDate))
+                    ? 'bg-white/5 text-white/20 cursor-not-allowed border border-white/5'
+                    : 'bg-[#C89F6A] text-black hover:bg-[#D5B285] hover:shadow-[#C89F6A]/30 transform hover:-translate-y-1'
+                }`}
+              >
+                {isLoading ? (
+                  <span className="w-6 h-6 border-3 border-black/30 border-t-black rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span className="relative z-10">{step === 3 ? `Confirmar Reservación (₡${totalAmount.toLocaleString()})` : "Siguiente Paso"}</span>
+                    {step < 3 && <ChevronRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />}
+                  </>
+                )}
+                
+                {/* Subtle highlight effect on hover */}
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </button>
             </motion.div>
           )}
         </main>
