@@ -9,10 +9,9 @@ import { InfoSection } from "../components/InfoSection";
 import { Footer } from "../components/Footer";
 import { ChatAssistant } from "../components/ChatAssistant";
 import { Navbar } from "../components/Navbar";
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
-
-const TerraceReservationModal = lazy(() => import("../components/TerraceReservationModal").then(m => ({ default: m.TerraceReservationModal })));
+import { useNavigate } from "react-router";
 
 const fallbackMainEvents: MainEvent[] = [
   {
@@ -57,9 +56,10 @@ const fallbackUpcomingPosters: UpcomingEvent[] = [
 ];
 
 export function Landing() {
+  const navigate = useNavigate();
   const [mainEvents, setMainEvents] = useState<MainEvent[]>(fallbackMainEvents);
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>(fallbackUpcomingPosters);
-  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const goToReservation = () => navigate("/reservar");
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -182,14 +182,14 @@ export function Landing() {
 
   return (
     <div className="overflow-x-hidden">
-      <Navbar onOpenReservation={() => setIsReservationModalOpen(true)} />
+      <Navbar onOpenReservation={goToReservation} />
       <Hero 
         imageUrl={heroImage} 
-        onOpenReservation={() => setIsReservationModalOpen(true)} 
+        onOpenReservation={goToReservation} 
       />
       <TerraceSection 
         images={terraceImages} 
-        onOpenReservation={() => setIsReservationModalOpen(true)} 
+        onOpenReservation={goToReservation} 
       />
       <EventsSection mainEvents={mainEvents} upcomingPosters={upcomingEvents} />
       <EventHallSection images={eventHallImages} />
@@ -199,13 +199,6 @@ export function Landing() {
       <InfoSection />
       <Footer />
       <ChatAssistant />
-      
-      <Suspense fallback={null}>
-        <TerraceReservationModal
-          isOpen={isReservationModalOpen}
-          onClose={() => setIsReservationModalOpen(false)}
-        />
-      </Suspense>
     </div>
   );
 }

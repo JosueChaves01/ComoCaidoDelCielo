@@ -15,6 +15,7 @@ import { Routes, Route } from "react-router";
 import { Landing } from "./pages/Landing";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ReservationPage from "./pages/ReservationPage";
 import { useAdminGuard } from "../lib/useAdminGuard";
 
 // Wrapper de ruta protegida: doble barrera junto al useAdminGuard interno del Dashboard.
@@ -39,6 +40,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/reservar" element={<ReservationPage />} />
       <Route path="/admin" element={<AdminLogin />} />
       <Route
         path="/admin/dashboard"
