@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Calendar as CalendarIcon, Users, CheckCircle, ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
