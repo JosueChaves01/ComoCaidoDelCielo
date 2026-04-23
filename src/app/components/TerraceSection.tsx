@@ -2,33 +2,22 @@ import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef, useState, useEffect } from "react";
 import BackgroundEffectLocal from "./BackgroundEffectLocal";
+import { Users } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import {
+  TERRACE_TYPES_NARRATIVE,
+  TERRACE_GALLERY,
+} from "../../data/terraceNarratives";
 
 interface TerraceSectionProps {
-  images: { description: string; url: string }[];
+  images?: { description: string; url: string }[];
   onOpenReservation?: () => void;
 }
 
-import {
-  NarrativeStep,
-  SUNSET_IMAGE,
-  FIRE_PIT_IMAGE,
-  PANORAMIC_IMAGE,
-  TERRACE_GALLERY,
-  SUNSET_NARRATIVE,
-  TERRACE_TYPES_NARRATIVE,
-  FIRE_PIT_NARRATIVE,
-  PANORAMIC_NARRATIVE
-} from "../../data/terraceNarratives";
-
-export function TerraceSection({
-  images,
-  onOpenReservation,
-}: TerraceSectionProps) {
+export function TerraceSection({ images, onOpenReservation }: TerraceSectionProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [dbTerraces, setDbTerraces] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTerraces = async () => {
@@ -45,29 +34,27 @@ export function TerraceSection({
         }
       } catch (err: any) {
         console.error("Error fetching terraces:", err.message);
-        setError("No se pudieron cargar todas las terrazas personalizadas.");
       }
     };
     fetchTerraces();
   }, []);
 
-  const sunsetImage = SUNSET_IMAGE;
-  const firePitImage = FIRE_PIT_IMAGE;
-  const panoramicImage = PANORAMIC_IMAGE;
-  const terraceGallery = TERRACE_GALLERY;
-
-  const sunsetNarrative = SUNSET_NARRATIVE;
-  const terraceTypesNarrative = TERRACE_TYPES_NARRATIVE;
-  const firePitNarrative = FIRE_PIT_NARRATIVE;
-  const panoramicNarrative = PANORAMIC_NARRATIVE;
-
-  const currentTerraceGallery = dbTerraces.length > 0
-    ? dbTerraces.map((t: any) => t.image_url)
-    : terraceGallery;
-
-  const currentTerraceTypesNarrative: NarrativeStep[] = dbTerraces.length > 0
-    ? dbTerraces.map((t: any) => ({ title: t.title, description: t.description, highlight: t.highlight }))
-    : terraceTypesNarrative;
+  // Sync narrative with DB data if available
+  const terracesToRender = dbTerraces.length > 0 
+    ? dbTerraces.map((t, i) => ({
+        title: t.title,
+        description: t.description || TERRACE_TYPES_NARRATIVE[i]?.description || "",
+        highlight: t.highlight || TERRACE_TYPES_NARRATIVE[i]?.highlight || "",
+        image: t.image_url || TERRACE_GALLERY[i] || "",
+        capacity: t.max_capacity ? `${t.max_capacity} PAX` : (i === 0 ? "2-4 PAX" : i === 1 ? "6-10 PAX" : i === 2 ? "12+ PAX" : "EXCLUSIVO")
+      }))
+    : TERRACE_TYPES_NARRATIVE.map((step, i) => ({
+        title: step.title,
+        description: step.description,
+        highlight: step.highlight,
+        image: TERRACE_GALLERY[i],
+        capacity: i === 0 ? "2-4 PAX" : i === 1 ? "6-10 PAX" : i === 2 ? "12+ PAX" : "EXCLUSIVO"
+      }));
 
   return (
     <section
@@ -76,6 +63,7 @@ export function TerraceSection({
       className="py-24 px-6 md:px-12 relative overflow-hidden bg-transparent"
     >
       <BackgroundEffectLocal sectionRef={ref as any} />
+      
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -83,16 +71,19 @@ export function TerraceSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-20"
+          className="text-center mb-16"
         >
+          <span className="text-sm tracking-widest text-[#966F40] mb-3 block uppercase font-bold">
+            Espacios con Alma
+          </span>
           <h2 className="text-4xl md:text-6xl text-[#2A2419] mb-6">
             Nuestras Terrazas
           </h2>
-          <p className="text-lg md:text-xl text-[#6B5D4F] max-w-3xl mx-auto mb-8">
-            Un viaje sensorial donde cada espacio cuenta su
-            propia historia. Descubre la magia de estar en el
-            lugar perfecto, en el momento perfecto.
+          <p className="text-lg md:text-xl text-[#6B5D4F] max-w-2xl mx-auto leading-relaxed mb-10">
+            Descubre el rincón perfecto para tu próxima experiencia. Cada terraza ha sido 
+            diseñada para ofrecerte vistas inigualables y un ambiente de máxima exclusividad.
           </p>
+
           <button
             onClick={onOpenReservation}
             className="px-8 py-4 bg-gradient-to-r from-[#B1630A] to-[#C89F6A] text-white font-bold rounded-xl hover:shadow-[0_4px_20px_rgba(200,159,106,0.4)] transition-all hover:-translate-y-1 transform uppercase tracking-widest text-sm"
@@ -101,396 +92,64 @@ export function TerraceSection({
           </button>
         </motion.div>
 
-        {/* EXPERIENCIA 1: Atardeceres Únicos */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.8 }}
-          className="mb-32"
-        >
-          <div className="grid md:grid-cols-2 gap-12 items-start mb-12">
-            <div className="order-2 md:order-1">
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="mb-6"
-              >
-                <span className="text-sm tracking-wider text-[#966F40] mb-2 block">
-                  Experiencia sensorial
-                </span>
-                <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
-                  Atardeceres Únicos
-                </h3>
-                <p className="text-lg text-[#6B5D4F] leading-relaxed">
-                  Vive el espectáculo natural más hermoso desde
-                  la primera fila. Cada atardecer es una obra de
-                  arte efímera que transforma el golfo de Nicoya
-                  en un lienzo de colores imposibles.
-                </p>
-              </motion.div>
-
-              {/* Guía narrativa paso a paso */}
-              <div className="space-y-6">
-                {sunsetNarrative.map((step, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.6,
-                      delay: 0.4 + index * 0.15,
-                    }}
-                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-300 hover:shadow-lg"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#966F40] to-[#8A7254] flex items-center justify-center text-white text-sm">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-lg text-[#2A2419] mb-2">
-                          {step.title}
-                        </h4>
-                        <p className="text-[#6B5D4F] mb-3">
-                          {step.description}
-                        </p>
-                        <p className="text-sm text-[#966F40] italic">
-                          {step.highlight}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
+        {/* 4 Cards Grid/Scroll */}
+        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-x-visible pb-8 md:pb-0 snap-x snap-mandatory hide-scrollbar">
+          {terracesToRender.map((terrace, index) => (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="order-1 md:order-2 relative h-[500px] md:h-[700px] rounded-3xl overflow-hidden group shadow-2xl sticky top-8"
+              transition={{
+                duration: 0.6,
+                delay: 0.2 + index * 0.1,
+              }}
+              className="min-w-[85%] md:min-w-0 snap-center bg-white/40 backdrop-blur-md rounded-[2.5rem] overflow-hidden border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-500 hover:shadow-2xl group flex flex-col h-full"
             >
-              <img
-                src={sunsetImage}
-                alt="Atardecer en terraza con vista al golfo"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8 right-8 text-white">
-                <p className="text-sm tracking-wider mb-2 opacity-90">
-                  Golden Hour
-                </p>
-                <p className="text-2xl">5:00 PM - 6:30 PM</p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* EXPERIENCIA 2: Distintos Tipos de Terrazas */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.8 }}
-          className="mb-32"
-        >
-          <div className="grid md:grid-cols-2 gap-12 items-start mb-12">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="relative sticky top-8"
-            >
-              <div className="grid grid-cols-2 gap-4">
-                {currentTerraceGallery.slice(0, 4).map((image, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.6,
-                      delay: 0.6 + index * 0.1,
-                    }}
-                    className="relative h-[220px] md:h-[280px] rounded-2xl overflow-hidden group shadow-lg"
-                  >
-                    <img
-                      src={image}
-                      alt={`Terraza tipo ${index + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-
-            <div>
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                className="mb-6"
-              >
-                <span className="text-sm tracking-wider text-[#966F40] mb-2 block">
-                  Espacios versátiles
-                </span>
-                <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
-                  Distintos Tipos y Tamaños
-                </h3>
-                <p className="text-lg text-[#6B5D4F] leading-relaxed">
-                  Cada grupo merece su espacio perfecto. Desde
-                  momentos íntimos hasta grandes celebraciones,
-                  tenemos la terraza ideal para tu experiencia.
-                </p>
-              </motion.div>
-
-              {/* Guía narrativa de tipos de terrazas */}
-              <div className="space-y-6">
-                {currentTerraceTypesNarrative.map((step, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.6,
-                      delay: 0.6 + index * 0.15,
-                    }}
-                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-300 hover:shadow-lg"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#8A7254] to-[#6B5D4F] flex items-center justify-center text-white text-sm">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-lg text-[#2A2419] mb-2">
-                          {step.title}
-                        </h4>
-                        <p className="text-[#6B5D4F] mb-3">
-                          {step.description}
-                        </p>
-                        <p className="text-sm text-[#966F40] italic">
-                          {step.highlight}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* EXPERIENCIA 3: Fogatas y Magia Nocturna */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.8 }}
-          className="mb-32"
-        >
-          <div className="grid md:grid-cols-2 gap-12 items-start mb-12">
-            <div className="order-2 md:order-1">
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.7 }}
-                className="mb-6"
-              >
-                <span className="text-sm tracking-wider text-[#966F40] mb-2 block">
-                  Experiencia nocturna
-                </span>
-                <h3 className="text-4xl md:text-5xl text-[#2A2419] mb-4">
-                  Fogatas y Magia Nocturna
-                </h3>
-                <p className="text-lg text-[#6B5D4F] leading-relaxed">
-                  Cuando cae la noche, la verdadera magia
-                  comienza. Las fogatas transforman nuestras
-                  terrazas en santuarios de calidez y conexión
-                  bajo las estrellas.
-                </p>
-              </motion.div>
-
-              {/* Guía narrativa de fogatas */}
-              <div className="space-y-6">
-                {firePitNarrative.map((step, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.6,
-                      delay: 0.8 + index * 0.15,
-                    }}
-                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-300 hover:shadow-lg"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#966F40] to-[#8A7254] flex items-center justify-center text-white text-sm">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-lg text-[#2A2419] mb-2">
-                          {step.title}
-                        </h4>
-                        <p className="text-[#6B5D4F] mb-3">
-                          {step.description}
-                        </p>
-                        <p className="text-sm text-[#966F40] italic">
-                          {step.highlight}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="order-1 md:order-2 relative h-[500px] md:h-[700px] rounded-3xl overflow-hidden group shadow-2xl sticky top-8"
-            >
-              <img
-                src={firePitImage}
-                alt="Fogata en terraza bajo las estrellas"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8 right-8 text-white">
-                <p className="text-sm tracking-wider mb-2 opacity-90">
-                  Experiencia nocturna
-                </p>
-                <p className="text-2xl">7:00 PM - 11:00 PM</p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* EXPERIENCIA 4: Vistas Panorámicas */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 0.8, delay: 1.0 }}
-              className="relative h-[500px] md:h-[700px] rounded-3xl overflow-hidden group shadow-2xl sticky top-8"
-            >
-              <img
-                src={panoramicImage}
-                alt="Vista panorámica desde las terrazas"
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8 right-8 text-white">
-                <p className="text-sm tracking-wider mb-2 opacity-90">
-                  Vista panorámica
-                </p>
-                <p className="text-2xl">Golfo de Nicoya</p>
-              </div>
-            </motion.div>
-
-            <div>
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, delay: 0.9 }}
-                className="mb-6"
-              >
-                <span className="text-sm tracking-wider text-[#966F40] mb-2 block">
-                  Naturaleza inmersiva
-                </span>
-                <h3 className="text-4xl md:text-5xl text-[#B1630A] mb-4">
-                  Vistas Que Quitan el Aliento
-                </h3>
-                <p className="text-lg text-[#6B5D4F] leading-relaxed">
-                  No es solo observar un paisaje, es convertirse
-                  en parte de él. Cada terraza ofrece una
-                  perspectiva única del esplendor natural de
-                  Costa Rica.
-                </p>
-              </motion.div>
-
-              {/* Guía narrativa de vistas */}
-              <div className="space-y-6">
-                {panoramicNarrative.map((step, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{
-                      duration: 0.6,
-                      delay: 1.0 + index * 0.15,
-                    }}
-                    className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-300 hover:shadow-lg"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#8A7254] to-[#6B5D4F] flex items-center justify-center text-white text-sm">
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-lg text-[#2A2419] mb-2">
-                          {step.title}
-                        </h4>
-                        <p className="text-[#6B5D4F] mb-3">
-                          {step.description}
-                        </p>
-                        <p className="text-sm text-[#966F40] italic">
-                          {step.highlight}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.8, delay: 1.5 }}
-                className="mt-8 bg-gradient-to-br from-[#966F40] to-[#8A7254] rounded-2xl p-6 text-white"
-              >
-                <p className="text-sm tracking-wider mb-3 opacity-90">
-                  Lo que verás
-                </p>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="opacity-80 mb-1">Horizonte</p>
-                    <p className="text-lg">∞ Infinito</p>
-                  </div>
-                  <div>
-                    <p className="opacity-80 mb-1">Altura</p>
-                    <p className="text-lg">150m</p>
-                  </div>
-                  <div>
-                    <p className="opacity-80 mb-1">
-                      Visibilidad
-                    </p>
-                    <p className="text-lg">360°</p>
-                  </div>
-                  <div>
-                    <p className="opacity-80 mb-1">Amanecer</p>
-                    <p className="text-lg">5:30 AM</p>
-                  </div>
+              {/* Header: Title + Capacity */}
+              <div className="p-8 pb-5 flex justify-between items-start gap-3">
+                <h4 className="text-2xl text-[#2A2419] font-serif leading-tight group-hover:text-[#966F40] transition-colors">
+                  {terrace.title}
+                </h4>
+                <div className="flex-shrink-0 bg-[#966F40]/10 px-3 py-1.5 rounded-full text-[#966F40] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 border border-[#966F40]/10">
+                  <Users size={12} />
+                  {terrace.capacity}
                 </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
+              </div>
+
+              {/* Image Container */}
+              <div className="px-6 relative h-48 overflow-hidden">
+                <div className="w-full h-full rounded-3xl overflow-hidden shadow-inner border border-white/20">
+                  <img
+                    src={terrace.image}
+                    alt={terrace.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                  />
+                  <div className="absolute inset-x-6 bottom-0 h-1/2 bg-gradient-to-t from-[#2A2419]/20 to-transparent" />
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-8 flex-1 flex flex-col">
+                <p className="text-[#6B5D4F] text-sm leading-relaxed mb-6">
+                  {terrace.title.toLowerCase().includes("atardecer") ? "Disfruta de los mejores crepúsculos de San Ramón en un ambiente íntimo y acogedor." : terrace.description}
+                </p>
+                
+                <div className="mt-auto pt-5 border-t border-[#E8DCC4]/50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#966F40]" />
+                    <p className="text-xs text-[#966F40] font-bold uppercase tracking-widest">
+                      Destacado
+                    </p>
+                  </div>
+                  <p className="text-[#2A2419]/80 text-sm italic mt-1 font-medium">
+                    {terrace.highlight}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );

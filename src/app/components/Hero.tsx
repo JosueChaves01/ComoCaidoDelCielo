@@ -57,7 +57,7 @@ export function Hero({ imageUrl, onOpenReservation }: HeroProps) {
             >
               Explorar la experiencia
             </button>
-            <button 
+            <button
               onClick={onOpenReservation}
               className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-full border-2 border-white/40 hover:bg-white/20 transition-all"
             >

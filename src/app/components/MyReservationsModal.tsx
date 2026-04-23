@@ -1,18 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Calendar, Users, MapPin, Loader2, Receipt } from "lucide-react";
+import { X, Calendar, Users, MapPin, Loader2, Receipt, Upload, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../lib/useAuth";
 
 interface Reservation {
   id: string;
   terrace_id: string;
-  reservation_date: string; // YYYY-MM-DD
+  reservation_date: string;
   adults_count: number;
   children_count: number;
   total_amount: number;
   status: string;
   created_at: string;
+  customer_email?: string;
+  customer_name?: string;
   terraces: {
     title: string;
   } | null;
@@ -27,6 +29,12 @@ export function MyReservationsModal({ isOpen, onClose }: MyReservationsModalProp
   const { user } = useAuth();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const [codeInput, setCodeInput] = useState<Record<string, string>>({});
+  const [verifyError, setVerifyError] = useState<Record<string, string>>({});
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [cancelingId, setCancelingId] = useState<string | null>(null);
+  const [actionSuccess, setActionSuccess] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (isOpen && user?.email) {
@@ -55,6 +63,101 @@ export function MyReservationsModal({ isOpen, onClose }: MyReservationsModalProp
     }
   };
 
+  const handleVerifyCode = async (reservation: Reservation) => {
+    const code = codeInput[reservation.id]?.trim() ?? "";
+    if (!code || code.length !== 6) {
+      setVerifyError((prev) => ({ ...prev, [reservation.id]: "Ingresa el código de 6 dígitos" }));
+      return;
+    }
+
+    setVerifyingId(reservation.id);
+    setVerifyError((prev) => ({ ...prev, [reservation.id]: "" }));
+    setActionSuccess((prev) => ({ ...prev, [reservation.id]: "" }));
+
+    try {
+      const { data, error } = await supabase.functions.invoke("verify-confirmation", {
+        body: { reservation_id: reservation.id, confirmation_code: code },
+      });
+
+      if (error || !data) {
+        const msg = data?.error ?? "Error al verificar código";
+        setVerifyError((prev) => ({ ...prev, [reservation.id]: msg }));
+      } else if (!data.success) {
+        setVerifyError((prev) => ({ ...prev, [reservation.id]: data.error }));
+      } else {
+        setActionSuccess((prev) => ({ ...prev, [reservation.id]: "Reserva confirmada. Ahora puedes proceder con el pago." }));
+        setCodeInput((prev) => {
+          const next = { ...prev };
+          delete next[reservation.id];
+          return next;
+        });
+        await fetchReservations();
+      }
+    } catch {
+      setVerifyError((prev) => ({ ...prev, [reservation.id]: "Error de conexión" }));
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
+  const handleUploadProof = async (reservation: Reservation, file: File) => {
+    setUploadingId(reservation.id);
+    try {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `comprobantes/${reservation.id}/${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("payment-proofs")
+        .upload(path, file, { upsert: true });
+
+      if (uploadError) {
+        setActionSuccess((prev) => ({ ...prev, [reservation.id]: `Error: ${uploadError.message}` }));
+        return;
+      }
+
+      const { data: urlData } = supabase.storage.from("payment-proofs").getPublicUrl(path);
+
+      // Update reservation status to pendiente_revision
+      const { error: updateError } = await supabase
+        .from("terrace_reservations")
+        .update({ status: "pendiente_revision", payment_proof_url: urlData.publicUrl })
+        .eq("id", reservation.id);
+
+      if (updateError) {
+        setActionSuccess((prev) => ({ ...prev, [reservation.id]: "Error al guardar comprobante" }));
+      } else {
+        setActionSuccess((prev) => ({ ...prev, [reservation.id]: "Comprobante subido. En revisión." }));
+        await fetchReservations();
+      }
+    } catch {
+      setActionSuccess((prev) => ({ ...prev, [reservation.id]: "Error de conexión" }));
+    } finally {
+      setUploadingId(null);
+    }
+  };
+
+  const handleCancel = async (reservation: Reservation) => {
+    if (!confirm("¿Cancelar esta reserva?")) return;
+    setCancelingId(reservation.id);
+    try {
+      const { error } = await supabase
+        .from("terrace_reservations")
+        .update({ status: "cancelled" })
+        .eq("id", reservation.id);
+
+      if (error) {
+        setActionSuccess((prev) => ({ ...prev, [reservation.id]: "Error al cancelar" }));
+      } else {
+        setActionSuccess((prev) => ({ ...prev, [reservation.id]: "Reserva cancelada" }));
+        await fetchReservations();
+      }
+    } catch {
+      setActionSuccess((prev) => ({ ...prev, [reservation.id]: "Error de conexión" }));
+    } finally {
+      setCancelingId(null);
+    }
+  };
+
   const STATUS_MAP: Record<string, { label: string; classes: string }> = {
     sin_confirmar:         { label: "Sin Confirmar",         classes: "bg-gray-500/20 text-gray-400 border-gray-500/30" },
     pendiente_revision:    { label: "Revisando Comprobante", classes: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
@@ -79,14 +182,19 @@ export function MyReservationsModal({ isOpen, onClose }: MyReservationsModalProp
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
-    // Asegurarse de que parseamos la fecha localmente
-    const date = new Date(dateStr + "T00:00:00"); 
+    const date = new Date(dateStr + "T00:00:00");
     return new Intl.DateTimeFormat("es-CR", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     }).format(date);
+  };
+
+  const PAYMENT_INFO = {
+    sinpe: "SINPE Móvil: 8888-8888",
+    cuenta: "Banco de Costa Rica: 1234-5678-9012",
+    tipo: "Tipo: Cuenta cliente"
   };
 
   return (
@@ -189,6 +297,172 @@ export function MyReservationsModal({ isOpen, onClose }: MyReservationsModalProp
                           </p>
                         </div>
                       </div>
+
+                      {/* ── ACCIONES POR ESTADO ── */}
+
+                      {/* Sin confirmar: pedir código */}
+                      {reservation.status === "sin_confirmar" && (
+                        <div className="mt-6 pt-4 border-t border-white/5">
+                          <div className="bg-gray-900/50 rounded-xl p-4">
+                            <div className="flex items-start gap-3 mb-3">
+                              <AlertCircle size={18} className="text-gray-400 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <p className="text-sm text-gray-300 font-medium">Código de confirmación</p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                  Revisa tu correo ({reservation.customer_email}) para obtener el código de 6 dígitos.
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                maxLength={6}
+                                placeholder="—— —— ——"
+                                value={codeInput[reservation.id] ?? ""}
+                                onChange={(e) =>
+                                  setCodeInput((prev) => ({
+                                    ...prev,
+                                    [reservation.id]: e.target.value.replace(/\D/g, "").slice(0, 6),
+                                  }))
+                                }
+                                className="flex-1 bg-black/40 border border-[#C89F6A]/30 rounded-lg px-4 py-2.5 text-white text-center text-lg tracking-[0.3em] placeholder:text-gray-600 focus:outline-none focus:border-[#C89F6A]"
+                              />
+                              <button
+                                onClick={() => handleVerifyCode(reservation)}
+                                disabled={verifyingId === reservation.id}
+                                className="px-5 py-2.5 bg-[#B1630A] hover:bg-[#C89F6A] disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors flex items-center gap-2"
+                              >
+                                {verifyingId === reservation.id ? (
+                                  <Loader2 size={16} className="animate-spin" />
+                                ) : (
+                                  <CheckCircle size={16} />
+                                )}
+                                Verificar
+                              </button>
+                            </div>
+                            {verifyError[reservation.id] && (
+                              <p className="text-xs text-red-400 mt-2">{verifyError[reservation.id]}</p>
+                            )}
+                            {actionSuccess[reservation.id] && (
+                              <p className="text-xs text-emerald-400 mt-2 flex items-center gap-1">
+                                <CheckCircle size={12} /> {actionSuccess[reservation.id]}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Pendiente pago: mostrar datos y subir comprobante */}
+                      {reservation.status === "pendiente_pago" && (
+                        <div className="mt-6 pt-4 border-t border-white/5">
+                          <div className="bg-orange-900/20 rounded-xl p-4">
+                            <div className="flex items-start gap-3 mb-4">
+                              <Clock size={18} className="text-orange-400 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <p className="text-sm text-orange-300 font-medium">Datos para tu pago</p>
+                                <p className="text-xs text-orange-400/70 mt-0.5">
+                                  Realiza tu pago y sube el comprobante para confirmar tu reserva.
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="bg-black/30 rounded-lg p-3 mb-4 space-y-1.5">
+                              <p className="text-xs text-gray-500 uppercase tracking-wider">Transferencia o SINPE</p>
+                              <p className="text-sm text-white font-mono">{PAYMENT_INFO.sinpe}</p>
+                              <p className="text-sm text-white font-mono">{PAYMENT_INFO.cuenta}</p>
+                              <p className="text-sm text-white font-mono">{PAYMENT_INFO.tipo}</p>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3">
+                              <label className="flex-1 cursor-pointer">
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) await handleUploadProof(reservation, file);
+                                    e.target.value = "";
+                                  }}
+                                />
+                                <div className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#B1630A] hover:bg-[#C89F6A] text-white text-sm font-semibold rounded-lg transition-colors">
+                                  {uploadingId === reservation.id ? (
+                                    <Loader2 size={16} className="animate-spin" />
+                                  ) : (
+                                    <Upload size={16} />
+                                  )}
+                                  Subir Comprobante
+                                </div>
+                              </label>
+                              <button
+                                onClick={() => handleCancel(reservation)}
+                                disabled={cancelingId === reservation.id}
+                                className="px-4 py-2.5 border border-red-500/30 text-red-400 hover:bg-red-500/10 disabled:opacity-50 text-sm rounded-lg transition-colors flex items-center gap-2"
+                              >
+                                {cancelingId === reservation.id ? <Loader2 size={14} className="animate-spin" /> : null}
+                                Cancelar
+                              </button>
+                            </div>
+                            {actionSuccess[reservation.id] && (
+                              <p className="text-xs text-emerald-400 mt-3 flex items-center gap-1">
+                                <CheckCircle size={12} /> {actionSuccess[reservation.id]}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Pendiente revisión: aviso */}
+                      {reservation.status === "pendiente_revision" && (
+                        <div className="mt-6 pt-4 border-t border-white/5">
+                          <div className="bg-blue-900/20 rounded-xl p-4 flex items-center gap-3">
+                            <Clock size={18} className="text-blue-400 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm text-blue-300 font-medium">Comprobante en revisión</p>
+                              <p className="text-xs text-blue-400/70 mt-0.5">
+                                Tu comprobante fue recibido. Te notificaremos cuando sea aprobado.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Aprobada/Confirmada: confirmada + cancelar */}
+                      {(reservation.status === "aprobada" || reservation.status === "confirmed") && (
+                        <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-emerald-400">
+                            <CheckCircle size={18} />
+                            <span className="text-sm font-medium">¡Reserva confirmada!</span>
+                          </div>
+                          <button
+                            onClick={() => handleCancel(reservation)}
+                            disabled={cancelingId === reservation.id}
+                            className="px-4 py-2 border border-red-500/30 text-red-400 hover:bg-red-500/10 disabled:opacity-50 text-sm rounded-lg transition-colors flex items-center gap-2"
+                          >
+                            {cancelingId === reservation.id ? <Loader2 size={14} className="animate-spin" /> : null}
+                            Cancelar
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Rechazada: mensaje */}
+                      {reservation.status === "rechazada" && (
+                        <div className="mt-6 pt-4 border-t border-white/5">
+                          <div className="bg-red-900/20 rounded-xl p-4 flex items-center gap-3">
+                            <AlertCircle size={18} className="text-red-400 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm text-red-300 font-medium">Reserva rechazada</p>
+                              <p className="text-xs text-red-400/70 mt-0.5">
+                                Contáctanos si crees que es un error.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Cancelada: no acciones */}
+                      {(reservation.status === "cancelled" || reservation.status === "rechazada" || reservation.status === "reembolsada") && null}
                     </div>
                   ))}
                 </div>

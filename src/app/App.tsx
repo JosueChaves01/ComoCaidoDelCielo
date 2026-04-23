@@ -1,16 +1,4 @@
 import React from "react";
-import { Hero } from "./components/Hero";
-import { TerraceSection } from "./components/TerraceSection";
-import { EventsSection } from "./components/EventsSection";
-import { EventHallSection } from "./components/EventHallSection";
-import { FoodTruckSection } from "./components/FoodTruckSection";
-import { AirbnbSection } from "./components/AirbnbSection";
-import { MomentsGallery } from "./components/MomentsGallery";
-import { InfoSection } from "./components/InfoSection";
-import { Footer } from "./components/Footer";
-import { ChatAssistant } from "./components/ChatAssistant";
-import { Navbar } from "./components/Navbar";
-
 import { Routes, Route } from "react-router";
 import { Landing } from "./pages/Landing";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -18,8 +6,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ReservationPage from "./pages/ReservationPage";
 import { useAdminGuard } from "../lib/useAdminGuard";
 
-// Wrapper de ruta protegida: doble barrera junto al useAdminGuard interno del Dashboard.
-// Si la sesión no existe o no es admin, el hook redirige antes de renderizar nada.
+// Wrapper de ruta protegida
 function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
   const { isAdmin, loading } = useAdminGuard();
 
@@ -31,7 +18,6 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // El hook ya redirigió si no es admin; si llegamos aquí con isAdmin=true, renderizar
   if (!isAdmin) return null;
   return <>{children}</>;
 }

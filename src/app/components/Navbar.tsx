@@ -14,6 +14,7 @@ export function Navbar({ onOpenReservation }: { onOpenReservation?: () => void }
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+  const [forceShowAuth, setForceShowAuth] = useState<"hidden" | "options" | "email" | "sent">("hidden");
 
   const SOCIAL_LINKS = {
     instagram: "https://www.instagram.com/comocaidodelcielo_sr/",
@@ -30,6 +31,13 @@ export function Navbar({ onOpenReservation }: { onOpenReservation?: () => void }
     document.body.style.overflow = isMobileMenuOpen ? "hidden" : "unset";
     return () => { document.body.style.overflow = "unset"; };
   }, [isMobileMenuOpen]);
+
+  // Reset auth panel trigger when user logs in
+  useEffect(() => {
+    if (user) {
+      setForceShowAuth("hidden");
+    }
+  }, [user]);
 
   const handleGoogleSignIn = async () => {
     setAuthLoading(true);
@@ -106,10 +114,15 @@ export function Navbar({ onOpenReservation }: { onOpenReservation?: () => void }
               </a>
 
               {/* Auth Panel */}
-              <NavbarAuthPanel onShowReservations={() => setShowMyReservations(true)} />
+              <NavbarAuthPanel
+                onShowReservations={() => setShowMyReservations(true)}
+                forceShowAuth={forceShowAuth}
+              />
 
               <button
-                onClick={onOpenReservation}
+                onClick={() => {
+                  onOpenReservation?.();
+                }}
                 className="px-8 py-2.5 rounded-full bg-[#C89F6A] text-black text-sm font-bold tracking-widest uppercase hover:scale-105 hover:bg-[#D4A574] transition-all shadow-[0_0_20px_rgba(200,159,106,0.2)]"
               >
                 Reservar
@@ -129,7 +142,7 @@ export function Navbar({ onOpenReservation }: { onOpenReservation?: () => void }
       </motion.nav>
 
       {/* Mobile Menu Overlay */}
-      <NavbarMobileMenu 
+      <NavbarMobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         menuItems={menuItems}
@@ -141,9 +154,9 @@ export function Navbar({ onOpenReservation }: { onOpenReservation?: () => void }
         onOpenReservation={onOpenReservation}
       />
 
-      <MyReservationsModal 
-        isOpen={showMyReservations} 
-        onClose={() => setShowMyReservations(false)} 
+      <MyReservationsModal
+        isOpen={showMyReservations}
+        onClose={() => setShowMyReservations(false)}
       />
     </>
   );

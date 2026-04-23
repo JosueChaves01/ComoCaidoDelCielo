@@ -1,10 +1,12 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Suspense, lazy } from "react";
 import { Coffee, Cake, Cookie, Utensils } from "lucide-react";
-import { FoodTruckModal } from "./FoodTruckModal";
 import { SpecialEventsSection, SpecialEvent } from "./SpecialEventsSection";
 import { supabase } from "../../lib/supabase";
+
+// Lazy loading the heavy modal
+const FoodTruckModal = lazy(() => import("./FoodTruckModal").then(m => ({ default: m.FoodTruckModal })));
 
 interface FoodTruckSectionProps {
   images: string[];

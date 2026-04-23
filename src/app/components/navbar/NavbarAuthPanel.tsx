@@ -8,25 +8,37 @@ import {
   Loader2, 
   User2, 
   ChevronDown, 
-  BookOpen 
+  BookOpen,
+  ShieldCheck,
+  ShieldAlert
 } from "lucide-react";
 import { supabase } from "../../../lib/supabase";
 import { useAuth } from "../../../lib/useAuth";
+import { WhatsAppVerificationModal } from "../WhatsAppVerificationModal";
 
 type AuthView = "hidden" | "options" | "email" | "sent";
 
 interface NavbarAuthPanelProps {
   onShowReservations: () => void;
+  forceShowAuth?: AuthView;
 }
 
-export function NavbarAuthPanel({ onShowReservations }: NavbarAuthPanelProps) {
-  const { user, loading } = useAuth();
+export function NavbarAuthPanel({ onShowReservations, forceShowAuth }: NavbarAuthPanelProps) {
+  const { user, profile, loading } = useAuth();
   const [authView, setAuthView] = useState<AuthView>("hidden");
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [authEmail, setAuthEmail] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
 
   const authPanelRef = useRef<HTMLDivElement>(null);
+
+  // Allow parent to trigger auth panel visibility
+  useEffect(() => {
+    if (forceShowAuth && forceShowAuth !== "hidden") {
+      setAuthView(forceShowAuth);
+    }
+  }, [forceShowAuth]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -86,7 +98,7 @@ export function NavbarAuthPanel({ onShowReservations }: NavbarAuthPanelProps) {
     setIsUserMenuOpen(false);
   };
 
-  const displayName = user?.user_metadata?.name ?? user?.email?.split("@")[0] ?? "";
+  const displayName = profile?.full_name ?? user?.user_metadata?.name ?? user?.email?.split("@")[0] ?? "";
 
   return (
     <div className="relative" ref={authPanelRef}>
@@ -97,7 +109,11 @@ export function NavbarAuthPanel({ onShowReservations }: NavbarAuthPanelProps) {
           onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
           className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-[11px] uppercase tracking-[0.15em] font-medium"
         >
-          <User2 size={15} />
+          {profile?.is_verified ? (
+            <ShieldCheck size={14} className="text-emerald-400" />
+          ) : (
+            <User2 size={15} />
+          )}
           <span className="max-w-[90px] truncate">{displayName}</span>
           <ChevronDown size={13} className={`opacity-60 transition-transform ${isUserMenuOpen ? "rotate-180" : ""}`} />
         </button>
@@ -121,7 +137,7 @@ export function NavbarAuthPanel({ onShowReservations }: NavbarAuthPanelProps) {
             transition={{ duration: 0.15 }}
             className="absolute right-0 top-full mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-[#E8DED0] overflow-hidden z-50 text-black"
           >
-            <div className="p-2">
+            <div className="p-2 space-y-1">
               <button
                 onClick={() => {
                   setIsUserMenuOpen(false);
@@ -132,7 +148,22 @@ export function NavbarAuthPanel({ onShowReservations }: NavbarAuthPanelProps) {
                 <BookOpen size={16} className="text-[#9B8677]" />
                 <span className="font-medium">Mis Reservas</span>
               </button>
+
+              {!profile?.is_verified && (
+                <button
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    setIsVerifyModalOpen(true);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-orange-50 hover:bg-orange-100 text-orange-700 text-sm transition-colors text-left"
+                >
+                  <ShieldAlert size={16} className="text-orange-500" />
+                  <span className="font-bold underline decoration-orange-300">Verificar Perfil</span>
+                </button>
+              )}
+
               <div className="h-[1px] bg-[#E8DED0] my-1 mx-2" />
+              
               <button
                 onClick={handleSignOut}
                 className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-red-50 text-red-600 text-sm transition-colors text-left"
@@ -218,6 +249,11 @@ export function NavbarAuthPanel({ onShowReservations }: NavbarAuthPanelProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <WhatsAppVerificationModal 
+        isOpen={isVerifyModalOpen}
+        onClose={() => setIsVerifyModalOpen(false)}
+      />
     </div>
   );
 }
