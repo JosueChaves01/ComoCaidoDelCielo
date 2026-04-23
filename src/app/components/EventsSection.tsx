@@ -25,6 +25,8 @@ export function EventsSection({ mainEvents, upcomingPosters }: EventsSectionProp
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [activeIndex, setActiveIndex] = useState(0);
+
+  if (!mainEvents || mainEvents.length === 0) return null;
   
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -194,7 +196,7 @@ export function EventsSection({ mainEvents, upcomingPosters }: EventsSectionProp
               {/* Right: Collage Masonry */}
               <div className="w-full lg:w-2/3 max-h-[450px] lg:max-h-[650px] overflow-y-auto pr-2 lg:pr-4 [&::-webkit-scrollbar]:w-1 lg:[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20 transition-all">
                 <div className="columns-2 lg:columns-3 gap-2 lg:gap-4">
-                  {mainEvents[activeIndex].gallery_urls.map((photo: string, j: number) => (
+                  {(mainEvents[activeIndex].gallery_urls || []).map((photo: string, j: number) => (
                     <motion.div 
                       key={j}
                       initial={{ opacity: 0, scale: 0.95 }}

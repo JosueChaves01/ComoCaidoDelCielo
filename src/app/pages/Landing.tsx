@@ -14,34 +14,22 @@ import { ChatAssistant } from "../components/ChatAssistant";
 import { useNavigate } from "react-router";
 import { supabase } from "../../lib/supabase";
 
-interface MainEvent {
-  id: string;
-  image_url: string;
-  title: string;
-  description: string;
-  date: string;
-}
-
-interface UpcomingEvent {
-  id: string;
-  poster_url: string;
-  title: string;
-}
+import { MainEvent, UpcomingEvent } from "../components/EventsSection";
 
 const fallbackMainEvents: MainEvent[] = [
   {
     id: "1",
-    image_url: "/assets/Eventos/ConciertoAtardecer.jpg",
+    poster_url: "/assets/Eventos/ConciertoAtardecer.jpg",
     title: "Atardeceres Acústicos",
     description: "Cada sábado, disfruta de música en vivo mientras el sol se oculta sobre las montañas de San Ramón.",
-    date: "Todos los Sábados, 4:30 PM"
+    gallery_urls: ["/assets/Eventos/Evento1.jpg", "/assets/Eventos/Evento2.jpg", "/assets/Eventos/Evento3.jpg"]
   },
   {
     id: "2",
-    image_url: "/assets/Eventos/CataVinos.jpg",
+    poster_url: "/assets/Eventos/CataVinos.jpg",
     title: "Catas de Altura",
     description: "Una selección exclusiva de vinos maridados con nuestra tabla de quesos artesanales.",
-    date: "Próximo: 15 de Mayo"
+    gallery_urls: ["/assets/Eventos/Evento2.jpg", "/assets/Eventos/Evento3.jpg", "/assets/Eventos/Evento1.jpg"]
   }
 ];
 
@@ -56,7 +44,7 @@ export function Landing() {
   const navigate = useNavigate();
   const [mainEvents, setMainEvents] = useState<MainEvent[]>(fallbackMainEvents);
   const [upcomingEvents, setUpcomingEvents] = useState<UpcomingEvent[]>(fallbackUpcomingPosters);
-  
+
   const scrollToReservation = () => {
     const el = document.getElementById('reservar');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -83,7 +71,7 @@ export function Landing() {
     fetchEvents();
   }, []);
 
-  const heroImage = "/assets/Home/HeroHome3.jpg";
+  const heroImage = "/assets/Hero/Atardecer.png";
   const terraceImages = [
     { url: "/assets/Terrazas/Terraza1.jpg", description: "Vista panorámica" },
     { url: "/assets/Terrazas/Terraza2.jpg", description: "Ambiente íntimo" },
@@ -138,7 +126,7 @@ export function Landing() {
       <EventHallSection images={eventHallImages} />
       <FoodTruckSection images={foodTruckImages.map(img => img.url)} />
       <AirbnbSection images={airbnbImages.map(img => img.url)} />
-      <MomentsGallery images={momentsImages} />
+      <MomentsGallery images={momentsImages.map(img => img.url)} />
       <InfoSection />
       <Footer />
       <ChatAssistant />

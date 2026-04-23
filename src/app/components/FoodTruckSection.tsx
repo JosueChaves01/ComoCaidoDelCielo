@@ -42,7 +42,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
     {
       id: "1",
       name: "Homenaje a la Música Italiana",
-      image: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.82787-15/649222232_18059093615690161_7500198547217970010_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=13d280&_nc_ohc=IC0RjAE9n2wQ7kNvwEkQoYz&_nc_oc=AdopRmWAl7K1d7Mje7xvgqNisLdeON_bj1GNTzjFGmL4CzgUUrQrvw7RITFMjY8tqDspXyRaB4Dk16oLc-c5SVBG&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=hbjPiypO-0ivZzxp9mNaJg&_nc_ss=7a389&oh=00_Afwn5cgK0XkMbAIXZIx6R01feTud3PEhn3MRrNvSlKubqg&oe=69CFD92B",
+      image: "/assets/Foodtruck/Comida4.jpg",
       date: "Sábado 15 de Marzo",
       description: "Una noche mágica donde la música italiana toma el protagonismo. Disfruta de una cena temática con nuestras pastas y pizzas artesanales mientras escuchas los mejores clásicos.",
       menu: [
@@ -57,7 +57,7 @@ export function FoodTruckSection({ images }: FoodTruckSectionProps) {
     {
       id: "2",
       name: "Cena de Gratitud",
-      image: "https://scontent.fsjo8-1.fna.fbcdn.net/v/t51.82787-15/573270359_18045450638690161_7929014585758110399_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=13d280&_nc_ohc=YdPvSKnihBQQ7kNvwEgfr0D&_nc_oc=AdqHZWEZdTI4abaWx0a9o_GPcEEFUB03-ldZRRkzG4BmDaDhyZM1bYnE-XxsA8HhncJKi9gUUqywyVfnhrZEXDNu&_nc_zt=23&_nc_ht=scontent.fsjo8-1.fna&_nc_gid=v2d6UkFf2HY4IaN9J1t_Wg&_nc_ss=7a389&oh=00_Afzc1oMg72Mf4mKD1Q0kOLXGucJ_0fEmadSrqdUYnC_oDw&oe=69CFDD42",
+      image: "/assets/Foodtruck/Comida2.jpg",
       date: "Sábado 29 de Noviembre",
       description: "Una experiencia al atardecer para agradecer y compartir. Disfruta de una cena especial diseñada para celebrar los momentos más importantes del año.",
       menu: [
