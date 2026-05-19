@@ -1,7 +1,6 @@
 import { motion } from "motion/react";
 import { useInView } from "motion/react";
 import { useRef, useState, useEffect } from "react";
-import BackgroundEffectLocal from "./BackgroundEffectLocal";
 import { Users } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import {
@@ -60,10 +59,8 @@ export function TerraceSection({ images, onOpenReservation }: TerraceSectionProp
     <section
       id="terrazas"
       ref={ref}
-      className="py-24 px-6 md:px-12 relative overflow-hidden bg-transparent"
+      className="py-24 px-6 md:px-12 relative overflow-hidden"
     >
-      <BackgroundEffectLocal sectionRef={ref as any} />
-      
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -73,13 +70,13 @@ export function TerraceSection({ images, onOpenReservation }: TerraceSectionProp
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <span className="text-sm tracking-widest text-[#966F40] mb-3 block uppercase font-bold">
+          <span className="text-sm tracking-widest text-[#C89F6A] mb-3 block uppercase font-bold">
             Espacios con Alma
           </span>
-          <h2 className="text-4xl md:text-6xl text-[#2A2419] mb-6">
+          <h2 className="text-4xl md:text-6xl text-white mb-6">
             Nuestras Terrazas
           </h2>
-          <p className="text-lg md:text-xl text-[#6B5D4F] max-w-2xl mx-auto leading-relaxed mb-10">
+          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed mb-10">
             Descubre el rincón perfecto para tu próxima experiencia. Cada terraza ha sido 
             diseñada para ofrecerte vistas inigualables y un ambiente de máxima exclusividad.
           </p>
@@ -104,14 +101,14 @@ export function TerraceSection({ images, onOpenReservation }: TerraceSectionProp
                 duration: 0.6,
                 delay: 0.2 + index * 0.1,
               }}
-              className="min-w-[85%] md:min-w-0 snap-center bg-white/40 backdrop-blur-md rounded-[2.5rem] overflow-hidden border border-[#E8DCC4]/30 hover:border-[#966F40]/40 transition-all duration-500 hover:shadow-2xl group flex flex-col h-full"
+              className="min-w-[85%] md:min-w-0 snap-center bg-black/30 backdrop-blur-md rounded-[2.5rem] overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-2xl group flex flex-col h-full"
             >
               {/* Header: Title + Capacity */}
               <div className="p-8 pb-5 flex justify-between items-start gap-3">
-                <h4 className="text-2xl text-[#2A2419] font-serif leading-tight group-hover:text-[#966F40] transition-colors">
+                <h4 className="text-2xl text-white font-serif leading-tight group-hover:text-[#C89F6A] transition-colors">
                   {terrace.title}
                 </h4>
-                <div className="flex-shrink-0 bg-[#966F40]/10 px-3 py-1.5 rounded-full text-[#966F40] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 border border-[#966F40]/10">
+                <div className="flex-shrink-0 bg-white/10 px-3 py-1.5 rounded-full text-white/80 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 border border-white/10">
                   <Users size={12} />
                   {terrace.capacity}
                 </div>
@@ -131,18 +128,18 @@ export function TerraceSection({ images, onOpenReservation }: TerraceSectionProp
 
               {/* Content */}
               <div className="p-8 flex-1 flex flex-col">
-                <p className="text-[#6B5D4F] text-sm leading-relaxed mb-6">
+                <p className="text-white/70 text-sm leading-relaxed mb-6">
                   {terrace.title.toLowerCase().includes("atardecer") ? "Disfruta de los mejores crepúsculos de San Ramón en un ambiente íntimo y acogedor." : terrace.description}
                 </p>
                 
-                <div className="mt-auto pt-5 border-t border-[#E8DCC4]/50">
+                <div className="mt-auto pt-5 border-t border-white/10">
                   <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#966F40]" />
-                    <p className="text-xs text-[#966F40] font-bold uppercase tracking-widest">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#C89F6A]" />
+                    <p className="text-xs text-[#C89F6A] font-bold uppercase tracking-widest">
                       Destacado
                     </p>
                   </div>
-                  <p className="text-[#2A2419]/80 text-sm italic mt-1 font-medium">
+                  <p className="text-white/60 text-sm italic mt-1 font-medium">
                     {terrace.highlight}
                   </p>
                 </div>

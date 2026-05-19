@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navbar } from "../components/Navbar";
-import { Hero } from "../components/Hero";
+import { VideoBackgroundSection } from "../components/VideoBackgroundSection";
+import { HeroContent } from "../components/HeroContent";
 import { TerraceSection } from "../components/TerraceSection";
 import { ReservationSection } from "../components/ReservationSection";
 import { EventsSection } from "../components/EventsSection";
@@ -71,7 +72,7 @@ export function Landing() {
     fetchEvents();
   }, []);
 
-  const heroImage = "/assets/Hero/Atardecer.png";
+  const heroVideo = "/assets/atardecer.mp4";
   const terraceImages = [
     { url: "/assets/Terrazas/Terraza1.jpg", description: "Vista panorámica" },
     { url: "/assets/Terrazas/Terraza2.jpg", description: "Ambiente íntimo" },
@@ -108,7 +109,6 @@ export function Landing() {
   ];
 
   const allImagesToPreload = [
-    heroImage,
     ...terraceImages.map(img => img.url),
     ...foodTruckImages.map(img => img.url),
     ...foodTruckImages.slice(0, 2).map(img => img.url),
@@ -119,8 +119,10 @@ export function Landing() {
   return (
     <div className="overflow-x-hidden">
       <Navbar onOpenReservation={scrollToReservation} />
-      <Hero imageUrl={heroImage} onOpenReservation={scrollToReservation} />
-      <TerraceSection images={terraceImages} onOpenReservation={scrollToReservation} />
+      <VideoBackgroundSection videoSrc={heroVideo}>
+        <HeroContent onOpenReservation={scrollToReservation} />
+        <TerraceSection images={terraceImages} onOpenReservation={scrollToReservation} />
+      </VideoBackgroundSection>
       <ReservationSection />
       <EventsSection mainEvents={mainEvents} upcomingPosters={upcomingEvents} />
       <EventHallSection images={eventHallImages} />
