@@ -15,8 +15,6 @@ import {
   type MotionValue,
 } from "motion/react";
 
-const SCRUB_THROTTLE_MS = 1000 / 30;
-
 interface VideoBackgroundContextValue {
   scrollYProgress: MotionValue<number>;
 }
@@ -41,7 +39,6 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const durationRef = useRef(0);
-  const lastScrubRef = useRef(0);
   const scrollYProgressRef = useRef(motionValue(0));
   const reduceMotion = useReducedMotion();
   const [hidden, setHidden] = useState(false);
@@ -57,9 +54,7 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
   const handleCanPlay = useCallback(() => {
     setVideoReady(true);
     if (videoRef.current && !reduceMotion) {
-      videoRef.current.play().then(() => {
-        videoRef.current?.pause();
-      }).catch(() => {});
+      videoRef.current.pause();
     }
   }, [reduceMotion]);
 
@@ -88,9 +83,7 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
 
       scrollYProgressRef.current.set(progress);
 
-      const now = performance.now();
-      if (video && durationRef.current > 0 && now - lastScrubRef.current >= SCRUB_THROTTLE_MS) {
-        lastScrubRef.current = now;
+      if (video && durationRef.current > 0) {
         video.currentTime = progress * durationRef.current;
       }
 
@@ -137,6 +130,7 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
           className="absolute inset-0 w-full h-full object-cover"
           muted
           playsInline
+          autoPlay
           preload="auto"
           poster={posterSrc}
           loop={reduceMotion ? true : undefined}
