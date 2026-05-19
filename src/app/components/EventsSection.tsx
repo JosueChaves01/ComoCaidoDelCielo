@@ -171,7 +171,7 @@ export function EventsSection({ mainEvents, upcomingPosters }: EventsSectionProp
                 <div className="flex justify-center lg:justify-start mt-2 mb-6 lg:mb-0 gap-6 items-center">
                   <button 
                     onClick={prevSlide} 
-                    className="p-4 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors backdrop-blur-md border border-white/10 hover:border-white/20 shadow-xl"
+                    className="p-4 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors backdrop-blur-lg backdrop-saturate-150 border border-white/10 hover:border-white/20 shadow-[0_4px_24px_rgba(255,255,255,0.06)]"
                   >
                     <ChevronLeft size={24} />
                   </button>
@@ -186,7 +186,7 @@ export function EventsSection({ mainEvents, upcomingPosters }: EventsSectionProp
                   </div>
                   <button 
                     onClick={nextSlide} 
-                    className="p-4 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors backdrop-blur-md border border-white/10 hover:border-white/20 shadow-xl"
+                    className="p-4 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors backdrop-blur-lg backdrop-saturate-150 border border-white/10 hover:border-white/20 shadow-[0_4px_24px_rgba(255,255,255,0.06)]"
                   >
                     <ChevronRight size={24} />
                   </button>

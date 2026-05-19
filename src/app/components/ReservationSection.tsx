@@ -134,7 +134,7 @@ export function ReservationSection() {
         </div>
 
         {/* Filters and Pricing */}
-        <div className="bg-[#12151C]/80 backdrop-blur-xl border border-white/5 rounded-[40px] p-8 md:p-12 mb-12 shadow-2xl">
+        <div className="bg-[#12151C]/60 backdrop-blur-xl backdrop-saturate-150 border border-white/10 rounded-[40px] p-8 md:p-12 mb-12 shadow-[0_8px_40px_rgba(0,0,0,0.6)]">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Guest Selector */}
@@ -146,7 +146,7 @@ export function ReservationSection() {
                 <div className="flex items-center bg-white/5 rounded-2xl p-2 border border-white/10">
                   <button 
                     onClick={() => setAdults(Math.max(1, adults - 1))}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors backdrop-blur-sm backdrop-saturate-150"
                   >-</button>
                   <span className="flex-1 text-center text-white font-bold">{adults}</span>
                   <button 
@@ -162,7 +162,7 @@ export function ReservationSection() {
                 <div className="flex items-center bg-white/5 rounded-2xl p-2 border border-white/10">
                   <button 
                     onClick={() => setChildren(Math.max(0, children - 1))}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 text-white transition-colors backdrop-blur-sm backdrop-saturate-150"
                   >-</button>
                   <span className="flex-1 text-center text-white font-bold">{children}</span>
                   <button 
@@ -189,7 +189,7 @@ export function ReservationSection() {
             <div className="lg:col-span-3 flex items-center justify-between lg:justify-end gap-4">
               <button 
                 onClick={() => setCurrentWeekStart(d => addDays(d, -7))}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all border border-white/10"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all border border-white/10 backdrop-blur-sm backdrop-saturate-150"
               >
                 <ChevronLeft size={20} />
               </button>
@@ -201,7 +201,7 @@ export function ReservationSection() {
               </div>
               <button 
                 onClick={() => setCurrentWeekStart(d => addDays(d, 7))}
-                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all border border-white/10"
+                className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all border border-white/10 backdrop-blur-sm backdrop-saturate-150"
               >
                 <ChevronRight size={20} />
               </button>

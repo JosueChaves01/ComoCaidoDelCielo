@@ -39,7 +39,7 @@ export function SpecialEventCard({ event, onClick }: SpecialEventCardProps) {
           </p>
         )}
         <div className="mt-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-200">
-          <span className="inline-block px-3 py-1 bg-[#C89F6A]/20 backdrop-blur-sm text-[#C89F6A] text-xs rounded-full border border-[#C89F6A]/30">
+          <span className="inline-block px-3 py-1 bg-[#C89F6A]/20 backdrop-blur-md backdrop-saturate-150 text-[#C89F6A] text-xs rounded-full border border-[#C89F6A]/30">
             Ver menú completo
           </span>
         </div>

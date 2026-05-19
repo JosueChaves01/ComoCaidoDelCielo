@@ -76,7 +76,7 @@ export function Navbar({ onOpenReservation }: { onOpenReservation?: () => void }
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 left-0 right-0 z-[60] transition-all duration-500 ${
           isScrolled || isMobileMenuOpen
-            ? "bg-black/60 backdrop-blur-xl border-b border-white/10 py-3"
+            ? "bg-black/40 backdrop-blur-xl backdrop-saturate-150 border-b border-white/10 py-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
             : "bg-transparent py-6"
         }`}
       >

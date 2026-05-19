@@ -92,7 +92,7 @@ export function WhatsAppVerificationModal({ isOpen, onClose, onSuccess }: WhatsA
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/90 backdrop-blur-md"
+            className="absolute inset-0 bg-black/85 backdrop-blur-xl backdrop-saturate-150"
           />
 
           <motion.div

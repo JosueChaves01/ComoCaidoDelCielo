@@ -115,8 +115,8 @@ export function VideoBackgroundSection({ videoSrc, children }: VideoBackgroundSe
           <source src={videoSrc.replace(/\.mp4$/, ".webm")} type="video/webm; codecs=vp9" />
           <source src={videoSrc} type="video/mp4; codecs=avc1" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70" />
-        <div className="absolute inset-0 bg-[#0F0F23]/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/25 to-black/65 backdrop-saturate-150" />
+        <div className="absolute inset-0 bg-[#0F0F23]/15" />
       </div>
 
       <div ref={wrapperRef} className="relative z-10">

@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useTransform } from "motion/react";
-import { ArrowDown } from "lucide-react";
 import { useVideoBackground } from "./VideoBackgroundSection";
 
 interface HeroContentProps {
@@ -58,37 +57,13 @@ export function HeroContent({ onOpenReservation }: HeroContentProps) {
           </button>
           <button
             onClick={onOpenReservation}
-            className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-full border-2 border-white/40 hover:bg-white/20 transition-all cursor-pointer"
+              className="px-8 py-4 bg-white/10 backdrop-blur-lg backdrop-saturate-150 text-white rounded-full border border-white/20 hover:bg-white/20 hover:border-white/30 transition-all cursor-pointer shadow-[0_4px_24px_rgba(255,255,255,0.08)]"
           >
             Consultar disponibilidad
           </button>
         </motion.div>
       </div>
 
-      {/* Progress bar */}
-      <div className="absolute bottom-12 left-0 right-0 px-8">
-        <div className="max-w-md mx-auto h-[2px] bg-white/10 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-[#E11D48] rounded-full"
-            style={{ scaleX: scrollYProgress, transformOrigin: "left" }}
-          />
-        </div>
-      </div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-4 left-1/2 -translate-x-1/2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.5 }}
-      >
-        <motion.div
-          animate={{ y: [0, 6, 0], opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <ArrowDown className="text-white/70" size={24} />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }

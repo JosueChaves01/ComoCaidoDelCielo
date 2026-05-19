@@ -52,7 +52,7 @@ export function NavbarMobileMenu({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
-          className="fixed inset-0 z-[50] flex flex-col items-center justify-center bg-black/95 backdrop-blur-2xl md:hidden"
+          className="fixed inset-0 z-[50] flex flex-col items-center justify-center bg-black/85 backdrop-blur-2xl backdrop-saturate-150 md:hidden"
         >
           {/* Background elements */}
           <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#C89F6A]/10 rounded-full blur-[120px]" />
@@ -73,7 +73,7 @@ export function NavbarMobileMenu({
                     onClick={onClose}
                     className="group flex items-center justify-center gap-4 text-2xl font-serif text-white hover:text-[#C89F6A] transition-colors"
                   >
-                    <div className="bg-white/5 p-2.5 rounded-xl group-hover:bg-[#C89F6A]/20 transition-all border border-white/5 group-hover:border-[#C89F6A]/30">
+                    <div                     className="bg-white/5 backdrop-blur-sm backdrop-saturate-150 p-2.5 rounded-xl group-hover:bg-[#C89F6A]/20 transition-all border border-white/5 group-hover:border-[#C89F6A]/30">
                       <Icon className="w-5 h-5 text-[#C89F6A]" strokeWidth={1.5} />
                     </div>
                     {item.label}
@@ -126,7 +126,7 @@ export function NavbarMobileMenu({
                     <button
                       onClick={onGoogleSignIn}
                       disabled={authLoading}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-all disabled:opacity-50"
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-md backdrop-saturate-150 text-white text-sm font-medium hover:bg-white/20 transition-all disabled:opacity-50 border border-white/10"
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -138,7 +138,7 @@ export function NavbarMobileMenu({
                     </button>
                     <button
                       onClick={onClose}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/10 text-white text-sm font-medium hover:bg-white/20 transition-all"
+                      className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-md backdrop-saturate-150 text-white text-sm font-medium hover:bg-white/20 transition-all border border-white/10"
                     >
                       <Mail size={15} />
                       Iniciar sesión con correo

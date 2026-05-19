@@ -26,7 +26,7 @@ export function SpecialEventsModal({ isOpen, onClose, event }: SpecialEventsModa
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/70 backdrop-blur-xl backdrop-saturate-150"
         onClick={onClose}
       />
 
@@ -50,7 +50,7 @@ export function SpecialEventsModal({ isOpen, onClose, event }: SpecialEventsModa
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm text-white rounded-full hover:bg-white/30 transition-colors"
+            className="absolute top-4 right-4 p-2 bg-white/15 backdrop-blur-md backdrop-saturate-150 text-white rounded-full hover:bg-white/25 transition-colors border border-white/10"
           >
             <X size={24} />
           </button>
@@ -95,7 +95,7 @@ export function SpecialEventsModal({ isOpen, onClose, event }: SpecialEventsModa
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3 p-3 bg-white/30 rounded-lg backdrop-blur-sm border border-[#C89F6A]/20"
+                  className="flex items-start gap-3 p-3 bg-white/15 backdrop-blur-md backdrop-saturate-150 rounded-lg border border-[#C89F6A]/20"
                 >
                   <div className="w-2 h-2 rounded-full bg-[#C89F6A] mt-2 flex-shrink-0" />
                   <span className="text-[#2A2419] font-medium">{item}</span>

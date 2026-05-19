@@ -101,14 +101,14 @@ export function TerraceSection({ images, onOpenReservation }: TerraceSectionProp
                 duration: 0.6,
                 delay: 0.2 + index * 0.1,
               }}
-              className="min-w-[85%] md:min-w-0 snap-center bg-black/30 backdrop-blur-md rounded-[2.5rem] overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-2xl group flex flex-col h-full"
+              className="min-w-[85%] md:min-w-0 snap-center bg-black/20 backdrop-blur-xl backdrop-saturate-150 rounded-[2.5rem] overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-500 hover:shadow-[0_8px_40px_rgba(0,0,0,0.6)] group flex flex-col h-full"
             >
               {/* Header: Title + Capacity */}
               <div className="p-8 pb-5 flex justify-between items-start gap-3">
                 <h4 className="text-2xl text-white font-serif leading-tight group-hover:text-[#C89F6A] transition-colors">
                   {terrace.title}
                 </h4>
-                <div className="flex-shrink-0 bg-white/10 px-3 py-1.5 rounded-full text-white/80 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 border border-white/10">
+                <div className="flex-shrink-0 bg-white/10 backdrop-blur-md backdrop-saturate-150 px-3 py-1.5 rounded-full text-white/80 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 border border-white/15">
                   <Users size={12} />
                   {terrace.capacity}
                 </div>
