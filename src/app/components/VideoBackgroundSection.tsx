@@ -63,13 +63,12 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
     }
   }, [reduceMotion]);
 
-  // Cache wrapper dimensions — avoids layout-forcing reads in the rAF loop
+  // Cache wrapper dimensions — ResizeObserver catches async image loads + vh changes
   useEffect(() => {
-    let frameId: number;
+    const w = wrapperRef.current;
+    if (!w) return;
 
     const cache = () => {
-      const w = wrapperRef.current;
-      if (!w) return;
       const rect = w.getBoundingClientRect();
       wrapperTopRef.current = rect.top + window.scrollY;
       wrapperHeightRef.current = rect.height;
@@ -77,18 +76,10 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
 
     cache();
 
-    const onResize = () => {
-      cancelAnimationFrame(frameId);
-      frameId = requestAnimationFrame(cache);
-    };
+    const ro = new ResizeObserver(() => cache());
+    ro.observe(w);
 
-    window.addEventListener("resize", onResize);
-    window.addEventListener("orientationchange", onResize);
-    return () => {
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("orientationchange", onResize);
-      cancelAnimationFrame(frameId);
-    };
+    return () => ro.disconnect();
   }, []);
 
   // rAF-based scroll tracking — zero layout-forcing reads
