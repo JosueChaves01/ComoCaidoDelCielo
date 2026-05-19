@@ -103,6 +103,11 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
     const tick = () => {
       if (!running) return;
 
+      if (wrapperHeightRef.current === 0) {
+        rafId = requestAnimationFrame(tick);
+        return;
+      }
+
       const scrollY = window.scrollY;
       const viewportH = window.innerHeight;
 
