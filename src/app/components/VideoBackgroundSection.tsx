@@ -10,8 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import {
-  useScroll,
   useReducedMotion,
+  motionValue,
   type MotionValue,
 } from "motion/react";
 
@@ -42,23 +42,17 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
   const videoRef = useRef<HTMLVideoElement>(null);
   const durationRef = useRef(0);
   const lastScrubRef = useRef(0);
+  const scrollYProgressRef = useRef(motionValue(0));
   const reduceMotion = useReducedMotion();
   const [hidden, setHidden] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
 
-  const { scrollYProgress } = useScroll({
-    target: wrapperRef,
-    offset: ["start start", "end end"],
-  });
-
-  const { scrollY } = useScroll();
-
   const handleLoadedMetadata = useCallback(() => {
     if (videoRef.current) {
       durationRef.current = videoRef.current.duration;
-      videoRef.current.currentTime = scrollYProgress.get() * durationRef.current;
+      videoRef.current.currentTime = scrollYProgressRef.current.get() * durationRef.current;
     }
-  }, [scrollYProgress]);
+  }, []);
 
   const handleCanPlay = useCallback(() => {
     setVideoReady(true);
@@ -69,31 +63,49 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
     }
   }, [reduceMotion]);
 
-  // Scrubbing with throttle
+  // rAF-based scroll tracking — works during iOS momentum scrolling
   useEffect(() => {
     if (reduceMotion) return;
 
-    const unsub = scrollYProgress.on("change", (v: number) => {
+    const wrapper = wrapperRef.current;
+    const video = videoRef.current;
+    if (!wrapper) return;
+
+    let rafId: number;
+    let running = true;
+
+    const tick = () => {
+      if (!running) return;
+
+      const rect = wrapper.getBoundingClientRect();
+      const wrapperHeight = wrapper.offsetHeight;
+      const viewportH = window.innerHeight;
+
+      const denom = wrapperHeight - viewportH;
+      const progress = denom > 0
+        ? Math.max(0, Math.min(1, -rect.top / denom))
+        : 0;
+
+      scrollYProgressRef.current.set(progress);
+
       const now = performance.now();
-      if (now - lastScrubRef.current < SCRUB_THROTTLE_MS) return;
-      lastScrubRef.current = now;
-
-      if (videoRef.current && durationRef.current > 0) {
-        videoRef.current.currentTime = v * durationRef.current;
+      if (video && durationRef.current > 0 && now - lastScrubRef.current >= SCRUB_THROTTLE_MS) {
+        lastScrubRef.current = now;
+        video.currentTime = progress * durationRef.current;
       }
-    });
-    return unsub;
-  }, [scrollYProgress, reduceMotion]);
 
-  // Hide video only when wrapper is fully past viewport and next section fills the screen
-  useEffect(() => {
-    const unsub = scrollY.on("change", () => {
-      if (!wrapperRef.current) return;
-      const rect = wrapperRef.current.getBoundingClientRect();
-      setHidden(rect.bottom <= -window.innerHeight);
-    });
-    return unsub;
-  }, [scrollY]);
+      setHidden(rect.bottom <= -viewportH);
+
+      rafId = requestAnimationFrame(tick);
+    };
+
+    rafId = requestAnimationFrame(tick);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(rafId);
+    };
+  }, [reduceMotion]);
 
   // Cleanup video resources on unmount
   useEffect(() => {
@@ -108,7 +120,7 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
   }, []);
 
   return (
-    <VideoBackgroundContext.Provider value={{ scrollYProgress }}>
+    <VideoBackgroundContext.Provider value={{ scrollYProgress: scrollYProgressRef.current }}>
       <div
         className="fixed inset-0 z-0 pointer-events-none"
         style={{ visibility: hidden ? "hidden" : "visible" }}
