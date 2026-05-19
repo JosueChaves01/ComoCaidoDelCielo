@@ -119,7 +119,7 @@ export function Landing() {
   return (
     <div className="overflow-x-hidden">
       <Navbar onOpenReservation={scrollToReservation} />
-      <VideoBackgroundSection videoSrc={heroVideo}>
+      <VideoBackgroundSection videoSrc={heroVideo} posterSrc="/assets/atardecer-poster.jpg">
         <HeroContent onOpenReservation={scrollToReservation} />
         <TerraceSection images={terraceImages} onOpenReservation={scrollToReservation} />
       </VideoBackgroundSection>

@@ -33,16 +33,18 @@ export function useVideoBackground(): VideoBackgroundContextValue {
 
 interface VideoBackgroundSectionProps {
   videoSrc: string;
+  posterSrc?: string;
   children: ReactNode;
 }
 
-export function VideoBackgroundSection({ videoSrc, children }: VideoBackgroundSectionProps) {
+export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoBackgroundSectionProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const durationRef = useRef(0);
   const lastScrubRef = useRef(0);
   const reduceMotion = useReducedMotion();
   const [hidden, setHidden] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
@@ -57,6 +59,15 @@ export function VideoBackgroundSection({ videoSrc, children }: VideoBackgroundSe
       videoRef.current.currentTime = scrollYProgress.get() * durationRef.current;
     }
   }, [scrollYProgress]);
+
+  const handleCanPlay = useCallback(() => {
+    setVideoReady(true);
+    if (videoRef.current && !reduceMotion) {
+      videoRef.current.play().then(() => {
+        videoRef.current?.pause();
+      }).catch(() => {});
+    }
+  }, [reduceMotion]);
 
   // Scrubbing with throttle
   useEffect(() => {
@@ -102,15 +113,24 @@ export function VideoBackgroundSection({ videoSrc, children }: VideoBackgroundSe
         className="fixed inset-0 z-0 pointer-events-none"
         style={{ visibility: hidden ? "hidden" : "visible" }}
       >
+        {posterSrc && !videoReady && (
+          <img
+            src={posterSrc}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
         <video
           ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover"
           muted
           playsInline
-          preload="metadata"
-          autoPlay={reduceMotion ? true : undefined}
+          preload="auto"
+          poster={posterSrc}
           loop={reduceMotion ? true : undefined}
           onLoadedMetadata={handleLoadedMetadata}
+          onCanPlay={handleCanPlay}
+          style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.5s ease" }}
         >
           <source src={videoSrc.replace(/\.mp4$/, ".webm")} type="video/webm; codecs=vp9" />
           <source src={videoSrc} type="video/mp4; codecs=avc1" />

@@ -39,6 +39,7 @@ guidelines/
 
 #AI
 .claude/
+.opencode/
 
 #Workflows
 .n8n/   
