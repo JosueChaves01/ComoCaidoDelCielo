@@ -124,7 +124,7 @@ export function VideoBackgroundSection({ videoSrc, posterSrc, children }: VideoB
         }
       }
 
-      const shouldHide = scrollY > wrapperTopRef.current + wrapperHeightRef.current;
+      const shouldHide = scrollY > wrapperTopRef.current + wrapperHeightRef.current + viewportH;
       if (shouldHide !== prevHiddenRef.current) {
         prevHiddenRef.current = shouldHide;
         setHidden(shouldHide);
